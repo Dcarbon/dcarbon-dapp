@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --example: 0 0% 100%;
+  }
+
+  .dark {
+    --example: 222.2 84% 4.9%;
+  }
+}
+
+.min-h-100 {
+  @include min-height(100vh);
+}
+
+.p-0 {
+  @include padding(0);
+}
+
+.p-1 {
+  @include padding(1rem);
+}
+
+#__next {
+  height: 100%;
+}

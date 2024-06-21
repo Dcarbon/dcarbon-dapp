@@ -7,7 +7,8 @@ TELEGRAM_GROUP_ID=
 EV=
 WORKSPACE=
 URL=
-while getopts "a:b:c:d:e:g:i:k:" opt; do
+TELEGRAM_TOPIC_ID=
+while getopts "a:b:c:d:e:g:i:k:h:" opt; do
   # shellcheck disable=SC2220
   case "$opt" in
   a) BUILD_MODE="$OPTARG" ;;
@@ -18,6 +19,7 @@ while getopts "a:b:c:d:e:g:i:k:" opt; do
   g) EV="$OPTARG" ;;
   i) WORKSPACE="$OPTARG" ;;
   k) URL="$OPTARG" ;;
+  h ) TELEGRAM_TOPIC_ID="$OPTARG" ;;
   esac
 done
 BUILD_ARG=$(for arg in $(cat .env); do echo "--build-arg $arg "; done | tr -d '\n')
@@ -47,7 +49,7 @@ $3"
   MSG=${MSG//</(}
   MSG=${MSG//>/)}
   MSG=$(urlencode "$MSG")
-  curl --location --request GET "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendmessage?chat_id=$TELEGRAM_GROUP_ID&parse_mode=HTML&text=<code>$MSG</code>"
+  curl --location --request GET "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendmessage?chat_id=$TELEGRAM_GROUP_ID&message_thread_id=$TELEGRAM_TOPIC_ID&parse_mode=HTML&text=<code>$MSG</code>"
   if [ "$1" == "ERROR" ]; then
     exit 1
   fi

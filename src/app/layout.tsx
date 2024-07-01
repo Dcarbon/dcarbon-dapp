@@ -6,6 +6,7 @@ import '@styles/globals.css';
 
 import dynamic from 'next/dynamic';
 import { Lexend as FontSans } from 'next/font/google';
+import Footer from '@/components/common/footer';
 import Header from '@/components/common/header';
 import NextTopLoader from 'nextjs-toploader';
 
@@ -23,10 +24,10 @@ const metadata = META_DATA_DEFAULT;
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <html lang="en">
+    <html lang="en" className="scroll-smooth snap-y scrollbar">
       <body
         className={cn(
-          'min-h-screen font-sans antialiased text-text-primary',
+          'min-h-screen font-sans antialiased text-text-primary overflow-x-hidden',
           fontSans.variable,
         )}
       >
@@ -36,6 +37,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
           <SolanaWalletProvider>
             <Header />
             {children}
+            <Footer />
           </SolanaWalletProvider>
         </NextuiProviders>
         <SonnerToaster />

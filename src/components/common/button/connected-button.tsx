@@ -48,7 +48,7 @@ function ConnectedButton() {
           }
           type="button"
           className={cn(
-            'bg-[#7BDA08] text-[#1B1B1B] hover:bg-[#5DAF01] font-medium rounded-[4px] py-[16px] px-[32px]',
+            'bg-[#7BDA08] text-[#1B1B1B] hover:bg-[#5DAF01] font-medium rounded-[4px] px-4 py-2 sm:py-[16px] sm:px-[32px]',
           )}
         >
           {(publicKey?.toBase58()?.slice(0, 5) || '') +

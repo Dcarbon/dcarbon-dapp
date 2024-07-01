@@ -27,3 +27,29 @@
 #__next {
   height: 100%;
 }
+
+@layer utilities {
+  .scrollbar::-webkit-scrollbar {
+    width: 15px;
+    height: 15px;
+  }
+
+  .scrollbar::-webkit-scrollbar-track {
+    border-radius: 100vh;
+    background: transparent;
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb {
+    background: #7bda08;
+    border-radius: 100vh;
+    border: 2px solid #5daf01;
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #5daf01;
+  }
+
+  .scrollbar::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+}

@@ -133,7 +133,12 @@ function NotConnectButton() {
 
   if (connecting) {
     return (
-      <DCarbonButton color="primary" variant="flat" isLoading={true}>
+      <DCarbonButton
+        color="primary"
+        variant="flat"
+        isLoading={true}
+        className="px-4 py-2 sm:py-[16px] sm:px-[32px]"
+      >
         Connecting
       </DCarbonButton>
     );
@@ -141,7 +146,12 @@ function NotConnectButton() {
 
   return (
     <>
-      <DCarbonButton color="primary" variant="flat" onClick={onOpen}>
+      <DCarbonButton
+        color="primary"
+        variant="flat"
+        onClick={onOpen}
+        className="px-4 py-2 sm:py-[16px] sm:px-[32px]"
+      >
         Connect Wallet
       </DCarbonButton>
       <Modal

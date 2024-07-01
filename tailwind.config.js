@@ -17,6 +17,7 @@ const theme = {
 
     colors: {
       'text-primary': '#1B1B1B',
+      'primary-color': '#7BDA08',
     },
   },
 };

@@ -1,6 +1,8 @@
 import React from 'react';
+import NextImage from 'next/image';
 import {
   Button,
+  cn,
   Dropdown,
   DropdownItem,
   DropdownMenu,
@@ -30,16 +32,24 @@ function ConnectedButton() {
         <Button
           isLoading={disconnecting}
           disableRipple
-          color="default"
-          variant="bordered"
+          color="primary"
+          variant="flat"
           startContent={
             <Image
               src={wallet.adapter.icon}
               alt="icon"
               width={20}
               height={20}
+              as={NextImage}
+              radius="sm"
+              className="border-1 min-w-5"
+              draggable={false}
             />
           }
+          type="button"
+          className={cn(
+            'bg-[#7BDA08] text-[#1B1B1B] hover:bg-[#5DAF01] font-medium rounded-[4px] py-[16px] px-[32px]',
+          )}
         >
           {(publicKey?.toBase58()?.slice(0, 5) || '') +
             '...' +

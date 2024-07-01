@@ -5,7 +5,7 @@ import { cn } from '@/utils/helpers/common';
 import '@styles/globals.css';
 
 import dynamic from 'next/dynamic';
-import { Inter as FontSans } from 'next/font/google';
+import { Lexend as FontSans } from 'next/font/google';
 import Header from '@/components/common/header';
 import NextTopLoader from 'nextjs-toploader';
 
@@ -26,7 +26,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
     <html lang="en">
       <body
         className={cn(
-          'min-h-screen font-sans antialiased bg-gray-100',
+          'min-h-screen font-sans antialiased text-text-primary',
           fontSans.variable,
         )}
       >

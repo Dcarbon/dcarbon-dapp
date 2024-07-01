@@ -1,6 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 import { nextui } from '@nextui-org/react';
 
+const defaultTheme = require('tailwindcss/defaultTheme');
+
 const darkMode = ['class'];
 const content = [
   './src/**/*.{ts,tsx}',
@@ -8,7 +10,28 @@ const content = [
 ];
 const prefix = '';
 const theme = {
-  extend: {},
+  extend: {
+    fontFamily: {
+      sans: ['var(--font-sans)', ...defaultTheme.fontFamily.sans],
+    },
+
+    colors: {
+      'text-primary': '#1B1B1B',
+    },
+  },
 };
-const plugins = [require('tailwindcss-animate'), nextui()];
+const plugins = [
+  require('tailwindcss-animate'),
+  nextui({
+    themes: {
+      light: {
+        colors: {
+          warning: '#FCC400',
+          danger: '#FF2614',
+          success: '#2FC32F',
+        },
+      },
+    },
+  }),
+];
 export { plugins, content, darkMode, prefix, theme };

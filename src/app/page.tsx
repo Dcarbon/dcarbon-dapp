@@ -3,16 +3,16 @@ import NextImage from 'next/image';
 import DCarbonButton from '@/components/common/button';
 import { Divider, Image } from '@nextui-org/react';
 import arrowRightButtonImage from 'public/images/home/arrow-right-button.svg';
-import heroImage from 'public/images/home/hero.png';
-import section2Image from 'public/images/home/section-2.png';
-import section3Image from 'public/images/home/section-3.png';
-import section4Image from 'public/images/home/section-4.png';
+import heroImage from 'public/images/home/hero.avif';
+import section2Image from 'public/images/home/section-2.avif';
+import section3Image from 'public/images/home/section-3.avif';
+import section4Image from 'public/images/home/section-4.avif';
 
 const Home = async () => {
   return (
     <>
       <main>
-        <section className="relative h-screen w-full snap-start">
+        <section className="relative h-screen w-full">
           <Image
             removeWrapper
             src={heroImage.src}
@@ -20,7 +20,7 @@ const Home = async () => {
             as={NextImage}
             draggable={false}
             radius="none"
-            layout="fill"
+            fill
             style={{
               objectFit: 'cover',
             }}
@@ -86,7 +86,7 @@ const Home = async () => {
           </div>
         </section>
 
-        <section className="relative h-screen w-full snap-start">
+        <section className="relative h-screen w-full">
           <Image
             removeWrapper
             src={section2Image.src}
@@ -94,7 +94,7 @@ const Home = async () => {
             as={NextImage}
             draggable={false}
             radius="none"
-            layout="fill"
+            fill
             style={{
               objectFit: 'cover',
             }}
@@ -118,7 +118,7 @@ const Home = async () => {
           </div>
         </section>
 
-        <section className="relative h-screen w-full snap-start">
+        <section className="relative h-screen w-full">
           <Image
             removeWrapper
             src={section3Image.src}
@@ -126,7 +126,7 @@ const Home = async () => {
             as={NextImage}
             draggable={false}
             radius="none"
-            layout="fill"
+            fill
             style={{
               objectFit: 'cover',
             }}
@@ -150,7 +150,7 @@ const Home = async () => {
           </div>
         </section>
 
-        <section className="relative h-screen w-full snap-start">
+        <section className="relative h-screen w-full">
           <Image
             removeWrapper
             src={section4Image.src}
@@ -158,7 +158,7 @@ const Home = async () => {
             as={NextImage}
             draggable={false}
             radius="none"
-            layout="fill"
+            fill
             style={{
               objectFit: 'cover',
             }}

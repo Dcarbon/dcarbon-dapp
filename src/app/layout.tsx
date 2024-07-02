@@ -24,7 +24,7 @@ const metadata = META_DATA_DEFAULT;
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <html lang="en" className="scroll-smooth snap-y scrollbar">
+    <html lang="en" className="scroll-smooth scrollbar relative">
       <body
         className={cn(
           'min-h-screen font-sans antialiased text-text-primary overflow-x-hidden',

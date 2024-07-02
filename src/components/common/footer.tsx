@@ -2,9 +2,9 @@ import React from 'react';
 import NextImage from 'next/image';
 import { Image, Link } from '@nextui-org/react';
 import facebook from 'public/images/common/facebook.svg';
+import fullLogoImage from 'public/images/common/full-logo.svg';
 import instagram from 'public/images/common/instagram.svg';
 import linkedin from 'public/images/common/linkedin.svg';
-import logo from 'public/images/common/logo.png';
 import x from 'public/images/common/x.svg';
 import youtube from 'public/images/common/youtube.svg';
 
@@ -14,14 +14,14 @@ function Footer() {
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center">
           <Image
-            src={logo.src}
+            className="min-w-[164px]"
+            src={fullLogoImage.src}
             alt="logo"
             as={NextImage}
-            width={32}
+            width={164}
             height={32}
             draggable={false}
           />
-          <p className="font-bold text-white ml-[10px]">DCARBON</p>
         </div>
 
         <nav>

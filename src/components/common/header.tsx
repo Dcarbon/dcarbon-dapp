@@ -12,7 +12,7 @@ import {
   NavbarContent,
   NavbarItem,
 } from '@nextui-org/react';
-import logo from 'public/images/common/logo.png';
+import fullLogoImage from 'public/images/common/full-logo.svg';
 
 import ConnectButton from './button/connect-button';
 
@@ -67,7 +67,7 @@ function Header() {
           'data-[active=true]:after:bg-primary',
         ],
         base: cn(
-          'lg:px-[64px] py-[10px] overflow-hidden fixed bg-transparent transition-all',
+          'lg:px-[64px] py-[10px] overflow-hidden bg-transparent transition-all mb-[-92px] lg:mb-[-60px]',
           isHideNavbar ? 'translate-y-[-95px]' : 'translate-y-0',
         ),
         wrapper: 'p-4 lg:p-0',
@@ -76,15 +76,14 @@ function Header() {
       <NavbarBrand>
         <Link href={WEB_ROUTES.HOME}>
           <Image
-            className="min-w-8"
-            src={logo.src}
+            className="min-w-[164px]"
+            src={fullLogoImage.src}
             alt="logo"
             as={NextImage}
-            width={32}
+            width={164}
             height={32}
             draggable={false}
           />
-          <p className="font-bold ml-[10px] text-white">DCARBON</p>
         </Link>
       </NavbarBrand>
       <NavbarContent justify="end">

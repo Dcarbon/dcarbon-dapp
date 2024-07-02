@@ -84,7 +84,7 @@ const nextConfig = runWithBundleAnalyzer({
 
   images: {
     minimumCacheTTL: process.env.NODE_ENV === 'production' ? 60 : 0,
-    formats: ['image/webp'],
+    formats: ['image/avif', 'image/webp'],
     remotePatterns:
       process.env.ALLOWED_RESOURCES?.split(',').map((remote) => {
         return { hostname: remote };

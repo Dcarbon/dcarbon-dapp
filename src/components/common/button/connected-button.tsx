@@ -38,6 +38,7 @@ function ConnectedButton() {
       classNames={{
         content: 'p-0',
       }}
+      offset={-30}
     >
       <DropdownTrigger>
         <Button

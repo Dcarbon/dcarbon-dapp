@@ -70,7 +70,7 @@ function Header() {
           'lg:px-[64px] py-[10px] overflow-hidden bg-transparent transition-all mb-[-92px] lg:mb-[-60px]',
           isHideNavbar ? 'translate-y-[-95px]' : 'translate-y-0',
         ),
-        wrapper: 'p-4 lg:p-0',
+        wrapper: 'px-4 lg:p-0',
       }}
     >
       <NavbarBrand>

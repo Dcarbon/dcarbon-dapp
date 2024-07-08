@@ -3,9 +3,13 @@
 import React from 'react';
 import NextImage from 'next/image';
 import {
+  Accordion,
+  AccordionItem,
   Chip,
   cn,
   Image,
+  Input,
+  Link,
   Modal,
   ModalBody,
   ModalContent,
@@ -172,9 +176,11 @@ function NotConnectButton() {
         }
         classNames={{
           closeButton: 'p-[10px] right-4 top-4 rounded-[8px]',
+          base: 'max-w-[480px]',
         }}
         radius="md"
         size="lg"
+        scrollBehavior="inside"
       >
         <ModalContent>
           {(onClose) => (
@@ -184,8 +190,8 @@ function NotConnectButton() {
                   as={NextImage}
                   alt="wallets"
                   src={walletsImage.src}
-                  width={48}
-                  height={48}
+                  width={54}
+                  height={54}
                   draggable={false}
                 />
                 Connect Wallet
@@ -193,11 +199,7 @@ function NotConnectButton() {
               <ModalBody>
                 <div className="flex flex-col gap-5">
                   {wallets
-                    .filter((wl) =>
-                      ['Phantom', 'Backpack', 'Solflare'].includes(
-                        wl.adapter.name,
-                      ),
-                    )
+                    .filter((wl) => ['Phantom'].includes(wl.adapter.name))
                     .map((wl) => {
                       return (
                         <WalletButton
@@ -208,6 +210,125 @@ function NotConnectButton() {
                         />
                       );
                     })}
+                </div>
+
+                <Accordion className="px-0">
+                  <AccordionItem
+                    key="1"
+                    aria-label="More options"
+                    title="More options"
+                    indicator={({ isOpen }) =>
+                      isOpen ? (
+                        <Image
+                          src={arrowRightWalletButton.src}
+                          alt="arrow right"
+                          as={NextImage}
+                          draggable={false}
+                          width={14}
+                          height={14}
+                          className="rotate-270"
+                        />
+                      ) : (
+                        <Image
+                          src={arrowRightWalletButton.src}
+                          alt="arrow right"
+                          as={NextImage}
+                          draggable={false}
+                          width={14}
+                          height={14}
+                          className="rotate-90"
+                        />
+                      )
+                    }
+                    classNames={{
+                      title: 'text-right text-sm',
+                      base: 'flex flex-col',
+                      heading: 'order-2',
+                      trigger: 'py-0',
+                    }}
+                  >
+                    <div className="flex flex-col gap-5">
+                      {wallets
+                        .filter((wl) =>
+                          ['Backpack', 'Solflare'].includes(wl.adapter.name),
+                        )
+                        .map((wl) => {
+                          return (
+                            <WalletButton
+                              state={wl}
+                              key={wl.adapter.name}
+                              select={select}
+                              onClose={onClose}
+                            />
+                          );
+                        })}
+                    </div>
+                  </AccordionItem>
+                </Accordion>
+
+                <div className="pt-8">
+                  <div className="h-[1px] w-full bg-[#D1D1D1] relative mb-8">
+                    <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-sm bg-white px-2 text-[#4F4F4F] text-center">
+                      Or, Login to PO page
+                    </span>
+                  </div>
+
+                  <span className="font-light text-[#4F4F4F] block pb-4">
+                    Enter your email and password to sign in
+                  </span>
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                    }}
+                  >
+                    <Input
+                      key="email"
+                      type="email"
+                      labelPlacement="outside"
+                      label="Email"
+                      placeholder="Your email address"
+                      radius="none"
+                      classNames={{
+                        inputWrapper: 'rounded-[4px] max-w-[408px]',
+                        label: '!text-[#21272A]',
+                      }}
+                      autoComplete="off"
+                      // isInvalid
+                      // errorMessage="Please enter a valid email"
+                      // variant="bordered"
+                    />
+
+                    <div className="mt-12">
+                      <Input
+                        key="password"
+                        type="password"
+                        labelPlacement="outside"
+                        label="Password"
+                        placeholder="Your password"
+                        radius="none"
+                        classNames={{
+                          inputWrapper: 'rounded-[4px] max-w-[408px]',
+                          label: '!text-[#21272A]',
+                        }}
+                        autoComplete="off"
+                      />
+                    </div>
+
+                    <div className="flex justify-end mt-2">
+                      <Link className="text-sm text-[#5DAF01]">
+                        Reset password
+                      </Link>
+                    </div>
+
+                    <DCarbonButton
+                      color="primary"
+                      fullWidth
+                      className="mt-6"
+                      type="submit"
+                    >
+                      Sign In
+                    </DCarbonButton>
+                  </form>
                 </div>
               </ModalBody>
               <ModalFooter></ModalFooter>

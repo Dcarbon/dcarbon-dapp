@@ -1,11 +1,17 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import NextImage from 'next/image';
+import { doSignIn } from '@/adapters/auth';
+import { THROW_EXCEPTION } from '@/utils/constants';
 import {
+  Accordion,
+  AccordionItem,
   Chip,
   cn,
   Image,
+  Input,
+  Link,
   Modal,
   ModalBody,
   ModalContent,
@@ -15,11 +21,13 @@ import {
 } from '@nextui-org/react';
 import { WalletName, WalletReadyState } from '@solana/wallet-adapter-base';
 import { useWallet, Wallet } from '@solana/wallet-adapter-react';
+import { env } from 'env.mjs';
 import arrowRightWalletButton from 'public/images/common/arrow-right-wallet-button.svg';
 import closeModal from 'public/images/common/close-modal.svg';
 import walletsImage from 'public/images/common/wallets.svg';
 
 import DCarbonButton from '.';
+import { ShowAlert } from '../toast';
 
 function WalletButton({
   select,
@@ -130,6 +138,18 @@ function WalletButton({
 function NotConnectButton() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { wallets, select, connecting } = useWallet();
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const validateEmail = (value: string) =>
+    value.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,4}$/i);
+
+  const isInvalidEmail = React.useMemo(() => {
+    if (email === '') return false;
+
+    return validateEmail(email) ? false : true;
+  }, [email]);
 
   if (connecting) {
     return (
@@ -172,9 +192,11 @@ function NotConnectButton() {
         }
         classNames={{
           closeButton: 'p-[10px] right-4 top-4 rounded-[8px]',
+          base: 'max-w-[480px]',
         }}
         radius="md"
         size="lg"
+        scrollBehavior="inside"
       >
         <ModalContent>
           {(onClose) => (
@@ -184,8 +206,8 @@ function NotConnectButton() {
                   as={NextImage}
                   alt="wallets"
                   src={walletsImage.src}
-                  width={48}
-                  height={48}
+                  width={54}
+                  height={54}
                   draggable={false}
                 />
                 Connect Wallet
@@ -193,11 +215,7 @@ function NotConnectButton() {
               <ModalBody>
                 <div className="flex flex-col gap-5">
                   {wallets
-                    .filter((wl) =>
-                      ['Phantom', 'Backpack', 'Solflare'].includes(
-                        wl.adapter.name,
-                      ),
-                    )
+                    .filter((wl) => ['Phantom'].includes(wl.adapter.name))
                     .map((wl) => {
                       return (
                         <WalletButton
@@ -208,6 +226,197 @@ function NotConnectButton() {
                         />
                       );
                     })}
+                </div>
+
+                <Accordion className="px-0">
+                  <AccordionItem
+                    key="1"
+                    aria-label="More options"
+                    title="More options"
+                    indicator={({ isOpen }) =>
+                      isOpen ? (
+                        <Image
+                          src={arrowRightWalletButton.src}
+                          alt="arrow right"
+                          as={NextImage}
+                          draggable={false}
+                          width={14}
+                          height={14}
+                          className="rotate-270"
+                        />
+                      ) : (
+                        <Image
+                          src={arrowRightWalletButton.src}
+                          alt="arrow right"
+                          as={NextImage}
+                          draggable={false}
+                          width={14}
+                          height={14}
+                          className="rotate-90"
+                        />
+                      )
+                    }
+                    classNames={{
+                      title: 'text-right text-sm',
+                      base: 'flex flex-col',
+                      heading: 'order-2',
+                      trigger: 'py-0',
+                    }}
+                  >
+                    <div className="flex flex-col gap-5">
+                      {wallets
+                        .filter((wl) =>
+                          ['Backpack', 'Solflare'].includes(wl.adapter.name),
+                        )
+                        .map((wl) => {
+                          return (
+                            <WalletButton
+                              state={wl}
+                              key={wl.adapter.name}
+                              select={select}
+                              onClose={onClose}
+                            />
+                          );
+                        })}
+                    </div>
+                  </AccordionItem>
+                </Accordion>
+
+                <div className="pt-8">
+                  <div className="h-[1px] w-full bg-[#D1D1D1] relative mb-8">
+                    <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-sm bg-white px-2 text-[#4F4F4F] text-center">
+                      Or, Login to PO page
+                    </span>
+                  </div>
+
+                  <span className="font-light text-[#4F4F4F] block pb-4">
+                    Enter your email and password to sign in
+                  </span>
+                  <form
+                    onSubmit={async (e) => {
+                      e.preventDefault();
+
+                      if (!email) {
+                        ShowAlert.error({
+                          message: 'Please enter your email!',
+                        });
+
+                        return;
+                      }
+
+                      if (!password) {
+                        ShowAlert.error({
+                          message: 'Please enter your password!',
+                        });
+
+                        return;
+                      }
+
+                      setLoading(true);
+
+                      try {
+                        const result = (await doSignIn(email, password)) as any;
+
+                        if (result?.statusCode === 401) {
+                          ShowAlert.error({
+                            message: result?.message || THROW_EXCEPTION.UNKNOWN,
+                          });
+
+                          return;
+                        }
+
+                        if (result?.statusCode === 400) {
+                          ShowAlert.error({
+                            message:
+                              (Array.isArray(result?.message)
+                                ? result?.message?.join('<br />')
+                                : result?.message) || THROW_EXCEPTION.UNKNOWN,
+                          });
+
+                          return;
+                        }
+
+                        if (result?.data?.redirect_url) {
+                          ShowAlert.success({
+                            message:
+                              'Logged in successfully! Please wait redirecting...',
+                          });
+                          window.location.replace(result.data.redirect_url);
+                        }
+                      } catch (e) {
+                        const error = e as Error;
+                        console.error(error.message || '');
+                        ShowAlert.error({
+                          message: THROW_EXCEPTION.UNKNOWN,
+                        });
+                      } finally {
+                        setLoading(false);
+                      }
+                    }}
+                  >
+                    <Input
+                      key="email"
+                      type="email"
+                      labelPlacement="outside"
+                      label="Email"
+                      placeholder="Your email address"
+                      radius="none"
+                      classNames={{
+                        inputWrapper: 'rounded-[4px] max-w-[408px]',
+                        label: '!text-[#21272A]',
+                        helperWrapper: 'px-0',
+                      }}
+                      autoComplete="off"
+                      isInvalid={isInvalidEmail}
+                      errorMessage="Please enter a valid email!"
+                      variant={isInvalidEmail ? 'bordered' : 'flat'}
+                      value={email}
+                      onValueChange={setEmail}
+                      isDisabled={loading}
+                    />
+
+                    <div className="mt-12">
+                      <Input
+                        key="password"
+                        type="password"
+                        labelPlacement="outside"
+                        label="Password"
+                        placeholder="Your password"
+                        radius="none"
+                        classNames={{
+                          inputWrapper: 'rounded-[4px] max-w-[408px]',
+                          label: '!text-[#21272A]',
+                        }}
+                        autoComplete="off"
+                        value={password}
+                        onValueChange={setPassword}
+                        isDisabled={loading}
+                        isInvalid={!!email && !password}
+                        errorMessage="Please enter your password!"
+                        variant={!!email && !password ? 'bordered' : 'flat'}
+                      />
+                    </div>
+
+                    <div className="flex justify-end mt-2">
+                      <Link
+                        href={env.NEXT_PUBLIC_PO_RESET_PASSWORD}
+                        className="text-sm text-[#5DAF01]"
+                        isExternal
+                      >
+                        Reset password
+                      </Link>
+                    </div>
+
+                    <DCarbonButton
+                      color="primary"
+                      fullWidth
+                      className="mt-6"
+                      type="submit"
+                      isLoading={loading}
+                    >
+                      Sign In
+                    </DCarbonButton>
+                  </form>
                 </div>
               </ModalBody>
               <ModalFooter></ModalFooter>

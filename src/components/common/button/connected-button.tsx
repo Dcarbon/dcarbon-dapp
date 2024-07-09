@@ -38,6 +38,7 @@ function ConnectedButton() {
       classNames={{
         content: 'p-0',
       }}
+      offset={-33}
     >
       <DropdownTrigger>
         <Button
@@ -67,11 +68,12 @@ function ConnectedButton() {
       </DropdownTrigger>
       <DropdownMenu
         aria-label="Connect menu"
-        className="p-4 sm:p-[24px] min-w-[250px] sm:min-w-[348px]"
+        className="p-4 sm:p-[24px] min-w-[250px] sm:min-w-[348px] h-[calc(100vh-32px)] overflow-y-auto"
         disabledKeys={['address', 'wallet_balance', 'divider']}
         classNames={{
           list: 'gap-4',
         }}
+        defaultSelectedKeys={[]}
       >
         <DropdownItem
           key="close"

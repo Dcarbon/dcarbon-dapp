@@ -26,36 +26,40 @@ const Home = async () => {
             }}
             priority
           />
-          <div className="text-white absolute top-0 left-0 w-full h-full z-10 flex justify-center items-center flex-col gap-4 p-4 overflow-x-hidden">
-            <h2 className="text-2xl sm:text-5xl font-semibold text-center">
-              <span className="text-primary-color">DCarbon</span> a Trustless
-              and <br /> autonomous Carbon system
-            </h2>
+          <div className="text-white absolute bottom-[8%] left-0 w-full h-full z-10 flex justify-between max-h-[62vh] items-center flex-col gap-4 p-4 overflow-hidden">
+            <div className="flex flex-col gap-4">
+              <h2 className="text-2xl sm:text-5xl font-semibold text-center">
+                <span className="text-primary-color">DCarbon</span> a Trustless
+                and <br /> autonomous Carbon system
+              </h2>
 
-            <p className="text-[#d9d9d9] text-center">
-              Accurately measure, report and verify carbon footprints reduced,
-              then bring them to the blockchains.
-            </p>
+              <p className="text-[#d9d9d9] text-center">
+                Accurately measure, report and verify carbon footprints reduced,
+                then <br /> bring them to the blockchains.
+              </p>
 
-            <DCarbonButton
-              color="primary"
-              className="mt-[11px] h-[53px]"
-              endContent={
-                <Image
-                  src={arrowRightButtonImage.src}
-                  width={20}
-                  height={20}
-                  as={NextImage}
-                  alt="Arrow Right"
-                  radius="none"
-                  draggable={false}
-                />
-              }
-            >
-              Get in touch
-            </DCarbonButton>
+              <div className="flex">
+                <DCarbonButton
+                  color="primary"
+                  className="mt-[11px] h-[53px] mx-auto"
+                  endContent={
+                    <Image
+                      src={arrowRightButtonImage.src}
+                      width={20}
+                      height={20}
+                      as={NextImage}
+                      alt="Arrow Right"
+                      radius="none"
+                      draggable={false}
+                    />
+                  }
+                >
+                  Get in touch
+                </DCarbonButton>
+              </div>
+            </div>
 
-            <div className="p-6 backdrop-blur-sm rounded-[16px] flex items-center space-x-[25.75px] mt-[139px]">
+            <div className="p-6 backdrop-blur-sm rounded-[16px] flex items-center space-x-[25.75px]">
               <div className="flex flex-col gap-2 items-center">
                 <span className="text-primary-color text-xl sm:text-5xl font-bold">
                   30K

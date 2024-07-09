@@ -19,6 +19,7 @@ const env = createEnv({
     NEXT_PUBLIC_ALLOWED_COOKIE_DOMAIN: z.string().min(1),
     NEXT_PUBLIC_SENTRY_DSN: z.string().min(1).includes('http').nullish(),
     NEXT_PUBLIC_DEBUG: z.string().nullish(),
+    NEXT_PUBLIC_PO_RESET_PASSWORD: z.string().includes('http').nullish(),
   },
   runtimeEnv: {
     NEXT_PUBLIC_API_ENDPOINT: process.env.NEXT_PUBLIC_API_ENDPOINT,
@@ -32,6 +33,7 @@ const env = createEnv({
     SENTRY_PROJECT: process.env.SENTRY_PROJECT,
     SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
     NEXT_PUBLIC_DEBUG: process.env.NEXT_PUBLIC_DEBUG,
+    NEXT_PUBLIC_PO_RESET_PASSWORD: process.env.NEXT_PUBLIC_PO_RESET_PASSWORD,
   },
 });
 

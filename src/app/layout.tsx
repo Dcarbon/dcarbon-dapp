@@ -40,7 +40,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
             <Footer />
           </SolanaWalletProvider>
         </NextuiProviders>
-        <SonnerToaster />
+        <SonnerToaster position="top-right" />
       </body>
     </html>
   );

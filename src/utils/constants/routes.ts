@@ -8,6 +8,7 @@ const API_ROUTES = {
 const WEB_ROUTES = {
   HOME: '/',
   NOTFOUND: '/404',
+  PROJECTS: '/projects',
 };
 
 export { API_ROUTES, WEB_ROUTES };

@@ -1,7 +1,8 @@
 import React from 'react';
 import NextImage from 'next/image';
 import DCarbonButton from '@/components/common/button';
-import { Divider, Image } from '@nextui-org/react';
+import { WEB_ROUTES } from '@/utils/constants';
+import { Divider, Image, Link } from '@nextui-org/react';
 import arrowRightButtonImage from 'public/images/home/arrow-right-button.svg';
 import heroImage from 'public/images/home/hero.avif';
 import section2Image from 'public/images/home/section-2.avif';
@@ -114,7 +115,14 @@ const Home = async () => {
             </div>
 
             <div className="flex flex-wrap gap-8 justify-center items-center">
-              <DCarbonButton className="min-w-[200px]">Order now</DCarbonButton>
+              <DCarbonButton className="min-w-[200px]">
+                <Link
+                  className="absolute top-0 left-0 w-full h-full flex justify-center text-sm text-text-primary"
+                  href={WEB_ROUTES.PROJECTS + '?mode=quick-buy'}
+                >
+                  Order now
+                </Link>
+              </DCarbonButton>
               <DCarbonButton color="primary" className="min-w-[200px]">
                 Learn more
               </DCarbonButton>
@@ -146,7 +154,14 @@ const Home = async () => {
             </div>
 
             <div className="flex flex-wrap gap-8 justify-center items-center">
-              <DCarbonButton className="min-w-[200px]">Order now</DCarbonButton>
+              <DCarbonButton className="min-w-[200px]">
+                <Link
+                  className="absolute top-0 left-0 w-full h-full flex justify-center text-sm text-text-primary"
+                  href={WEB_ROUTES.PROJECTS + '?mode=quick-buy'}
+                >
+                  Order now
+                </Link>
+              </DCarbonButton>
               <DCarbonButton color="primary" className="min-w-[200px]">
                 Learn more
               </DCarbonButton>
@@ -178,7 +193,14 @@ const Home = async () => {
             </div>
 
             <div className="flex flex-wrap gap-8 justify-center items-center">
-              <DCarbonButton className="min-w-[200px]">Order now</DCarbonButton>
+              <DCarbonButton className="min-w-[200px]">
+                <Link
+                  className="absolute top-0 left-0 w-full h-full flex justify-center text-sm text-text-primary"
+                  href={WEB_ROUTES.PROJECTS}
+                >
+                  Order now
+                </Link>
+              </DCarbonButton>
               <DCarbonButton color="primary" className="min-w-[200px]">
                 Learn more
               </DCarbonButton>

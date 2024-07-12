@@ -10,7 +10,7 @@ import youtube from 'public/images/common/youtube.svg';
 
 function Footer() {
   return (
-    <footer className="bg-text-primary pt-[24px] px-[64px] pb-[48px]">
+    <footer className="bg-text-primary pt-[24px] px-[64px] pb-[48px] z-10 relative">
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center">
           <Image

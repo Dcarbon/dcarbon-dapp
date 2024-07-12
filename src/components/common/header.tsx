@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import NextImage from 'next/image';
+import { usePathname } from 'next/navigation';
 import { WEB_ROUTES } from '@/utils/constants';
 import {
   cn,
@@ -12,6 +13,7 @@ import {
   NavbarContent,
   NavbarItem,
 } from '@nextui-org/react';
+import fullLogoDarkIcon from 'public/images/common/full-logo-dark.svg';
 import fullLogoImage from 'public/images/common/full-logo.svg';
 
 import ConnectButton from './button/connect-button';
@@ -19,7 +21,16 @@ import ConnectButton from './button/connect-button';
 function Header() {
   const [currentScrollPosition, setCurrentScrollPosition] = useState(0);
   const [isHideNavbar, setHideNavbar] = useState(false);
+  const pathName = usePathname();
+
   useEffect(() => {
+    if (
+      typeof window !== 'undefined' &&
+      window.location.pathname !== WEB_ROUTES.HOME
+    ) {
+      return;
+    }
+
     const debounceHandleScroll = () => {
       let timer: NodeJS.Timeout;
       return () => {
@@ -67,23 +78,36 @@ function Header() {
           'data-[active=true]:after:bg-primary',
         ],
         base: cn(
-          'lg:px-[64px] py-[10px] overflow-hidden bg-transparent transition-all mb-[-92px] lg:mb-[-60px]',
+          'lg:px-[64px] py-[10px] overflow-hidden transition-all mb-[-92px] lg:mb-[-60px]',
           isHideNavbar ? 'translate-y-[-95px]' : 'translate-y-0',
+          pathName === WEB_ROUTES.HOME ? 'bg-transparent' : 'bg-white',
         ),
         wrapper: 'px-4 lg:p-0',
       }}
     >
       <NavbarBrand>
         <Link href={WEB_ROUTES.HOME}>
-          <Image
-            className="min-w-[164px]"
-            src={fullLogoImage.src}
-            alt="logo"
-            as={NextImage}
-            width={164}
-            height={32}
-            draggable={false}
-          />
+          {pathName === WEB_ROUTES.HOME ? (
+            <Image
+              className="min-w-[164px]"
+              src={fullLogoImage.src}
+              alt="logo"
+              as={NextImage}
+              width={164}
+              height={32}
+              draggable={false}
+            />
+          ) : (
+            <Image
+              className="min-w-[164px]"
+              src={fullLogoDarkIcon.src}
+              alt="logo"
+              as={NextImage}
+              width={164}
+              height={32}
+              draggable={false}
+            />
+          )}
         </Link>
       </NavbarBrand>
       <NavbarContent justify="end">

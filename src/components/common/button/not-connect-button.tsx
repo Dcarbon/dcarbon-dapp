@@ -172,7 +172,7 @@ function NotConnectButton() {
         onClick={onOpen}
         className="px-4 py-2 sm:py-[16px] sm:px-[32px]"
       >
-        Connect Wallet
+        Sign In
       </DCarbonButton>
       <Modal
         backdrop="blur"

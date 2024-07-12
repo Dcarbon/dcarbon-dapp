@@ -4,6 +4,7 @@ import { cn } from '@/utils/helpers/common';
 
 import '@styles/globals.css';
 
+import { Viewport } from 'next';
 import dynamic from 'next/dynamic';
 import { Lexend as FontSans } from 'next/font/google';
 import Footer from '@/components/common/footer';
@@ -22,7 +23,14 @@ const fontSans = FontSans({
 
 const metadata = META_DATA_DEFAULT;
 
-const RootLayout = ({ children }: { children: React.ReactNode }) => {
+const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
+
+const RootLayout = (props: { children: React.ReactNode }) => {
   return (
     <html lang="en" className="scroll-smooth scrollbar relative">
       <body
@@ -32,11 +40,11 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         )}
       >
         <WebVitals />
-        <NextTopLoader />
+        <NextTopLoader color="#7BDA08" />
         <NextuiProviders>
           <SolanaWalletProvider>
             <Header />
-            {children}
+            {props?.children}
             <Footer />
           </SolanaWalletProvider>
         </NextuiProviders>
@@ -49,4 +57,5 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
 // eslint-disable-next-line import/no-unused-modules
 export default RootLayout;
 
-export { metadata };
+// eslint-disable-next-line import/no-unused-modules
+export { metadata, viewport };

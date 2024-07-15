@@ -13,6 +13,7 @@ import NextTopLoader from 'nextjs-toploader';
 
 import NextuiProviders from './nextui-provider';
 import SolanaWalletProvider from './solana-wallets-provider';
+import SWRProvider from './swr-provider';
 
 const SonnerToaster = dynamic(() => import('@/components/common/toast/sonner'));
 
@@ -42,11 +43,13 @@ const RootLayout = (props: { children: React.ReactNode }) => {
         <WebVitals />
         <NextTopLoader color="#7BDA08" />
         <NextuiProviders>
-          <SolanaWalletProvider>
-            <Header />
-            {props?.children}
-            <Footer />
-          </SolanaWalletProvider>
+          <SWRProvider>
+            <SolanaWalletProvider>
+              <Header />
+              {props?.children}
+              <Footer />
+            </SolanaWalletProvider>
+          </SWRProvider>
         </NextuiProviders>
         <SonnerToaster position="top-right" />
       </body>

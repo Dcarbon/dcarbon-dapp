@@ -1,3 +1,9 @@
 const NO_IMAGE = '/common/no-avatar.png';
 
-export { NO_IMAGE };
+const QUERY_KEYS = {
+  PROJECTS: {
+    GET_PROJECTS: 'GET_PROJECTS',
+  },
+};
+
+export { NO_IMAGE, QUERY_KEYS };

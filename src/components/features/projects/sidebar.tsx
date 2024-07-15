@@ -66,7 +66,7 @@ function Sidebar() {
     <>
       <motion.aside
         className={cn(
-          'fixed top-0 right-0 bottom-0 w-[300px] z-50 bg-white px-4 xl:px-6 py-12 xl:sticky xl:top-[60px] xl:self-start xl:max-w-[408px] xl:!opacity-100 xl:!translate-x-0 xl:w-full xl:p-0 overflow-x-hidden overflow-y-auto xl:overflow-visible',
+          'fixed top-0 right-0 bottom-0 w-[300px] z-50 xl:z-20 bg-white px-4 xl:px-6 py-12 xl:sticky xl:top-[60px] xl:self-start xl:max-w-[408px] xl:!opacity-100 xl:!translate-x-0 xl:w-full xl:p-0 overflow-x-hidden overflow-y-auto xl:overflow-visible',
         )}
         ref={asideRef}
         variants={sidebar}

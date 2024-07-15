@@ -7,6 +7,7 @@ import {
   CheckboxGroup,
   Image,
   Input,
+  Spinner,
 } from '@nextui-org/react';
 import countryList from 'country-list';
 import arrowDownIcon from 'public/images/common/arrow-down-icon.svg';
@@ -16,6 +17,7 @@ import locationIcon from 'public/images/common/location-icon.svg';
 import searchIcon from 'public/images/common/search-icon.svg';
 import ReactCountryFlag from 'react-country-flag';
 import Select from 'react-select';
+import { useProjectStore } from '@/app/project-store-provider';
 
 const DropdownIndicator = () => (
   <div className="h-6 w-8 translate-y-[2px] flex justify-end">
@@ -70,14 +72,20 @@ const Dropdown = ({
 );
 
 function ProjectListSidebar() {
-  const [search, setSearch] = useState<string>('');
+  const keyword = useProjectStore((state) => state.keyword);
+  const setKeyword = useProjectStore((state) => state.setKeyword);
+  const setFilters = useProjectStore((state) => state.setFilters);
+  const setAction = useProjectStore((state) => state.setAction);
+  const action = useProjectStore((state) => state.action);
+  const isLoading = useProjectStore((state) => state.isLoading);
+
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [countryValue, setCountryValue] = useState<{
     label: string;
     value: string;
   }>();
   const [location, setLocation] = useState<string>('');
-  const [interm, setInterm] = React.useState(['small']);
+  const [interm, setInterm] = React.useState(['']);
 
   const countryData = countryList.getData();
 
@@ -152,18 +160,25 @@ function ProjectListSidebar() {
         }}
         autoComplete="off"
         endContent={
-          <Image
-            src={searchIcon.src}
-            as={NextImage}
-            alt="search"
-            width={20}
-            height={20}
-            radius="none"
-            draggable={false}
-          />
+          action === 'search' && isLoading ? (
+            <Spinner size="sm" color="success" labelColor="success" />
+          ) : (
+            <Image
+              src={searchIcon.src}
+              as={NextImage}
+              alt="search"
+              width={20}
+              height={20}
+              radius="none"
+              draggable={false}
+            />
+          )
         }
-        value={search}
-        onValueChange={setSearch}
+        value={keyword}
+        onValueChange={(kw) => {
+          setKeyword(kw);
+          setAction('search');
+        }}
       />
       <div className="flex gap-2 items-center my-8">
         <Image
@@ -402,10 +417,38 @@ function ProjectListSidebar() {
       </div>
 
       <div className="flex gap-6">
-        <DCarbonButton fullWidth className="bg-[#F6F6F6]">
+        <DCarbonButton
+          fullWidth
+          className="bg-[#F6F6F6]"
+          onClick={() => {
+            setCountryValue(undefined);
+            setLocation('');
+            setInterm(['']);
+          }}
+          disabled={isLoading}
+        >
           Clear
         </DCarbonButton>
-        <DCarbonButton color="primary" fullWidth>
+        <DCarbonButton
+          color="primary"
+          fullWidth
+          onClick={() => {
+            setAction('filter');
+            setFilters({
+              country: countryValue,
+              location,
+              quantity:
+                interm?.[0] === 'small'
+                  ? '40_90'
+                  : interm?.[0] === 'medium'
+                    ? '90_200'
+                    : interm?.[0] === 'large'
+                      ? '200'
+                      : undefined,
+            });
+          }}
+          isLoading={isLoading && action === 'filter'}
+        >
           Confirm
         </DCarbonButton>
       </div>

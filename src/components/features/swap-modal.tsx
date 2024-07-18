@@ -39,7 +39,7 @@ function SwapModal() {
         </div>
       }
     >
-      <div className="flex flex-col gap-2 items-center">
+      <div className="flex flex-col gap-2 items-center mb-2">
         <div className="flex flex-col gap-2 w-full">
           <label className="text-sm" htmlFor="total">
             You send
@@ -49,7 +49,7 @@ function SwapModal() {
               thousandSeparator
               allowNegative={false}
               id="you_send"
-              className="text-sm w-full bg-[#F6F6F6] p-3 pr-[52.63px] rounded h-[40px] outline-none hover:bg-gray-50 transition-all focus:ring-1 focus:ring-primary-color placeholder:text-[#888] placeholder:text-sm placeholder:font-normal"
+              className="text-sm w-full bg-[#F6F6F6] p-3 pr-[88.63px] rounded h-[40px] outline-none hover:bg-gray-50 transition-all focus:ring-1 focus:ring-primary-color placeholder:text-[#888] placeholder:text-sm placeholder:font-normal"
               placeholder="0.1"
             />
 
@@ -77,7 +77,7 @@ function SwapModal() {
               thousandSeparator
               allowNegative={false}
               id="you_send"
-              className="text-sm w-full bg-[#F6F6F6] p-3 pr-[52.63px] rounded h-[40px] outline-none hover:bg-gray-50 transition-all focus:ring-1 focus:ring-primary-color placeholder:text-[#888] placeholder:text-sm placeholder:font-normal"
+              className="text-sm w-full bg-[#F6F6F6] p-3 pr-[92.63px] rounded h-[40px] outline-none hover:bg-gray-50 transition-all focus:ring-1 focus:ring-primary-color placeholder:text-[#888] placeholder:text-sm placeholder:font-normal"
               placeholder="0.1"
             />
 

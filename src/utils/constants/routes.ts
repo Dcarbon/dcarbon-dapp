@@ -5,6 +5,7 @@ const API_ROUTES = {
   },
   PROJECT: {
     LIST: '/v1/projects',
+    DETAIL: '/v1/projects/[slug]',
   },
 };
 

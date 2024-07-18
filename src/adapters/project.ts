@@ -22,4 +22,15 @@ const doGetProjetList = async (
   });
 };
 
-export { doGetProjetList };
+const doGetProjectDetail = async (slug: string) => {
+  return request(
+    'GET',
+    API_ROUTES.PROJECT.DETAIL.replace('[slug]', slug),
+    undefined,
+    {
+      cache: 'no-store',
+    },
+  );
+};
+
+export { doGetProjetList, doGetProjectDetail };

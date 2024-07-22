@@ -65,9 +65,10 @@ function DCarbonModal({
                   as={NextImage}
                   alt="Icon"
                   src={icon}
-                  width={54}
-                  height={54}
+                  width={66}
+                  height={66}
                   draggable={false}
+                  className="-translate-y-[5px]"
                 />
               )}
               <div className="flex justify-between gap-4 flex-wrap">

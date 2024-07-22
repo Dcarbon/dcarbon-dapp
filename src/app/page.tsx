@@ -1,6 +1,8 @@
 import React from 'react';
 import NextImage from 'next/image';
 import DCarbonButton from '@/components/common/button';
+import CerfiticateModal from '@/components/features/cerfiticate-modal';
+import SwapModal from '@/components/features/swap-modal';
 import { WEB_ROUTES } from '@/utils/constants';
 import { Divider, Image, Link } from '@nextui-org/react';
 import arrowRightButtonImage from 'public/images/home/arrow-right-button.svg';
@@ -12,6 +14,7 @@ import section4Image from 'public/images/home/section-4.avif';
 const Home = async () => {
   return (
     <>
+      {/* <CerfiticateModal /> */}
       <main>
         <section className="relative h-screen w-full">
           <Image

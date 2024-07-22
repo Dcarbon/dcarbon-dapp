@@ -3,7 +3,7 @@
 import React from 'react';
 import NextImage from 'next/image';
 import { Image, useDisclosure } from '@nextui-org/react';
-import swapIcon from 'public/images/projects/swap-icon.svg';
+import swapIcon from 'public/images/projects/swap-icon.png';
 import transferIcon from 'public/images/projects/transfer-icon.svg';
 import { NumericFormat } from 'react-number-format';
 

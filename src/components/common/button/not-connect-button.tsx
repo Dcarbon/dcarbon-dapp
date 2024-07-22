@@ -24,7 +24,7 @@ import { useWallet, Wallet } from '@solana/wallet-adapter-react';
 import { env } from 'env.mjs';
 import arrowRightWalletButton from 'public/images/common/arrow-right-wallet-button.svg';
 import closeModal from 'public/images/common/close-modal.svg';
-import walletsImage from 'public/images/common/wallets.svg';
+import walletsImage from 'public/images/common/wallets.png';
 
 import DCarbonButton from '.';
 import { ShowAlert } from '../toast';
@@ -206,9 +206,10 @@ function NotConnectButton() {
                   as={NextImage}
                   alt="wallets"
                   src={walletsImage.src}
-                  width={54}
-                  height={54}
+                  width={66}
+                  height={66}
                   draggable={false}
+                  className="-translate-y-[5px]"
                 />
                 Connect Wallet
               </ModalHeader>

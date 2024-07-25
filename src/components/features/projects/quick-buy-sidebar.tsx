@@ -1,15 +1,11 @@
 import React, { useState } from 'react';
 import DCarbonButton from '@/components/common/button';
-import { Input, useDisclosure } from '@nextui-org/react';
-
-import BuyModal from './buy-modal';
+import { Input } from '@nextui-org/react';
 
 function QuickBuySidebar() {
   const [credits, setCredits] = useState('0');
-  const { isOpen, onOpen, onClose } = useDisclosure();
   return (
     <>
-      <BuyModal isOpen={isOpen} onClose={onClose} />
       <div>
         <p className="text-sm font-light text-[#454545] mb-16">
           Lorem ipsum dolor sit amet consectetur. Pellentesque quis.
@@ -36,12 +32,7 @@ function QuickBuySidebar() {
           min={0}
         />
 
-        <DCarbonButton
-          color="primary"
-          fullWidth
-          className="mt-6"
-          onClick={onOpen}
-        >
+        <DCarbonButton color="primary" fullWidth className="mt-6">
           Buy Now
         </DCarbonButton>
       </div>

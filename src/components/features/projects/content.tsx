@@ -13,6 +13,7 @@ import {
   Image,
   Link,
   Spinner,
+  useDisclosure,
 } from '@nextui-org/react';
 import { useInView } from 'framer-motion';
 import quickBuyImage from 'public/images/projects/quick-buy-cover.avif';
@@ -20,6 +21,8 @@ import ReactCountryFlag from 'react-country-flag';
 import useSWRInfinite from 'swr/infinite';
 import { useDebounceValue } from 'usehooks-ts';
 import { useProjectStore } from '@/app/project-store-provider';
+
+import BuyModal from './buy-modal';
 
 type ProjectResponse = {
   id: string;
@@ -117,7 +120,7 @@ function ProjectContent({
     },
     {
       fallbackData: [initialData] as any,
-      keepPreviousData: true,
+      keepPreviousData: false,
       parallel: true,
       revalidateFirstPage: false,
       persistSize: true,
@@ -145,106 +148,118 @@ function ProjectContent({
     setLoading(isLoading);
   }, [isLoading]);
 
+  const { isOpen, onClose, onOpen } = useDisclosure();
+
   return (
-    <div className="w-full relative">
-      {mode === 'quick-buy' ? (
-        <Image
-          src={quickBuyImage.src}
-          alt="quick buy"
-          draggable={false}
-          as={NextImage}
-          width={1336}
-          height={807}
-          radius="none"
-          className="rounded-[16px]"
-        />
-      ) : (
-        <>
-          <div className="gap-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 mt-[2px]">
-            {(data as any)
-              ?.reduce((prevData: any, current: any) => {
-                return prevData.concat(current?.data || []);
-              }, [])
-              .map((item: ProjectResponse) => {
-                return (
-                  <div key={item.id}>
-                    <Card
-                      shadow="none"
-                      radius="none"
-                      classNames={{ base: 'rounded-[4px] border-1 h-full' }}
-                      isHoverable
-                      as="div"
-                    >
-                      <CardBody className="overflow-visible p-0 relative">
-                        <Link
-                          className="block"
-                          href={WEB_ROUTES.PROJECT_DETAIL?.replace(
-                            '[slug]',
-                            item?.slug || '',
-                          )}
-                        >
-                          <Image
-                            shadow="none"
-                            radius="none"
-                            width="100%"
-                            alt={item?.project_name || ''}
-                            className="w-full object-cover h-[158px] rounded-bl-[4px] rounded-br-[4px]"
-                            src={item.thumbnail}
-                            draggable={false}
-                            isZoomed
-                          />
-                        </Link>
+    <>
+      <BuyModal isOpen={isOpen} onClose={onClose} />
 
-                        <div className="absolute left-2 right-2 bottom-2 z-10 flex gap-1 items-center justify-end">
-                          <ReactCountryFlag
-                            countryCode={item?.country || ''}
-                            svg
-                            className="!w-[24px] !h-[16px]"
-                          />
-                          <span className="text-white text-xs">
-                            {item.location || ''}
-                            {item?.country_name ? `, ${item.country_name}` : ''}
-                          </span>
-                        </div>
-                      </CardBody>
-                      <CardFooter className="flex flex-col items-start justify-between h-full">
-                        <Link
-                          className="block w-full"
-                          href={WEB_ROUTES.PROJECT_DETAIL?.replace(
-                            '[slug]',
-                            item?.slug || '',
-                          )}
-                        >
-                          <h2 className="text-lg font-medium text-[#21272A] mb-1">
-                            {item.project_name || ''}
-                          </h2>
+      <div className="w-full relative">
+        {mode === 'quick-buy' ? (
+          <Image
+            src={quickBuyImage.src}
+            alt="quick buy"
+            draggable={false}
+            as={NextImage}
+            width={1336}
+            height={807}
+            radius="none"
+            className="rounded-[16px]"
+          />
+        ) : (
+          <>
+            <div className="gap-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 mt-[2px]">
+              {(data as any)
+                ?.reduce((prevData: any, current: any) => {
+                  return prevData.concat(current?.data || []);
+                }, [])
+                .map((item: ProjectResponse) => {
+                  return (
+                    <div key={item.id}>
+                      <Card
+                        shadow="none"
+                        radius="none"
+                        classNames={{ base: 'rounded-[4px] border-1 h-full' }}
+                        isHoverable
+                        as="div"
+                      >
+                        <CardBody className="overflow-visible p-0 relative">
+                          <Link
+                            className="block"
+                            href={WEB_ROUTES.PROJECT_DETAIL?.replace(
+                              '[slug]',
+                              item?.slug || '',
+                            )}
+                          >
+                            <Image
+                              shadow="none"
+                              radius="none"
+                              width="100%"
+                              alt={item?.project_name || ''}
+                              className="w-full object-cover h-[158px] rounded-bl-[4px] rounded-br-[4px]"
+                              src={item.thumbnail}
+                              draggable={false}
+                              isZoomed
+                            />
+                          </Link>
 
-                          <div className="text-sm text-[#4F4F4F]">
-                            Sản lượng: {item?.power || ''}
+                          <div className="absolute left-2 right-2 bottom-2 z-10 flex gap-1 items-center justify-end">
+                            <ReactCountryFlag
+                              countryCode={item?.country || ''}
+                              svg
+                              className="!w-[24px] !h-[16px]"
+                            />
+                            <span className="text-white text-xs">
+                              {item.location || ''}
+                              {item?.country_name
+                                ? `, ${item.country_name}`
+                                : ''}
+                            </span>
                           </div>
+                        </CardBody>
+                        <CardFooter className="flex flex-col items-start justify-between h-full">
+                          <Link
+                            className="block w-full"
+                            href={WEB_ROUTES.PROJECT_DETAIL?.replace(
+                              '[slug]',
+                              item?.slug || '',
+                            )}
+                          >
+                            <h2 className="text-lg font-medium text-[#21272A] mb-1">
+                              {item.project_name || ''}
+                            </h2>
 
-                          <p className="text-sm text-[#21272A] my-4">
-                            Dự án Miền Nam
-                          </p>
-                        </Link>
+                            <div className="text-sm text-[#4F4F4F]">
+                              Sản lượng: {item?.power || ''}
+                            </div>
 
-                        <DCarbonButton color="primary" fullWidth>
-                          Buy Now
-                        </DCarbonButton>
-                      </CardFooter>
-                    </Card>
-                  </div>
-                );
-              })}
-          </div>
-          {totalPage > 1 && size < totalPage && (
-            <div className="flex w-full justify-center mt-6">
-              <Spinner id="spinner" color="success" />
+                            <p className="text-sm text-[#21272A] my-4">
+                              Dự án Miền Nam
+                            </p>
+                          </Link>
+
+                          <DCarbonButton
+                            color="primary"
+                            fullWidth
+                            onClick={onOpen}
+                          >
+                            Buy Now
+                          </DCarbonButton>
+                        </CardFooter>
+                      </Card>
+                    </div>
+                  );
+                })}
             </div>
-          )}
-        </>
-      )}
-    </div>
+            {totalPage > 1 && size < totalPage && (
+              <div className="flex w-full justify-center mt-6">
+                <Spinner id="spinner" color="success" />
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </>
   );
 }
 

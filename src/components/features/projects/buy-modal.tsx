@@ -1,23 +1,26 @@
 'use client';
 
 import React from 'react';
-import { useDisclosure } from '@nextui-org/react';
-import swapIcon from 'public/images/projects/swap-icon.svg';
+import DCarbonButton from '@/components/common/button';
+import DCarbonModal from '@/components/common/modal';
+import swapIcon from 'public/images/projects/swap-icon.png';
 import { NumericFormat } from 'react-number-format';
 
-import DCarbonButton from '../common/button';
-import DCarbonModal from '../common/modal';
-
-function BuyModal() {
-  const { onClose } = useDisclosure();
+function BuyModal({
+  isOpen,
+  onClose,
+}: {
+  isOpen: boolean;
+  onClose?: () => void;
+}) {
   return (
     <DCarbonModal
       onClose={onClose}
-      isOpen
+      isOpen={isOpen}
       title="Market"
       icon={swapIcon.src}
       cancelBtn={
-        <DCarbonButton fullWidth className="bg-[#F6F6F6]">
+        <DCarbonButton fullWidth className="bg-[#F6F6F6]" onClick={onClose}>
           Cancel
         </DCarbonButton>
       }
@@ -37,7 +40,7 @@ function BuyModal() {
               thousandSeparator
               allowNegative={false}
               id="you_send"
-              className="text-sm w-full bg-[#F6F6F6] p-3 rounded h-[40px] outline-none hover:bg-gray-50 transition-all focus:ring-1 focus:ring-primary-color placeholder:text-[#888] placeholder:text-sm placeholder:font-normal"
+              className="text-sm w-full bg-[#F6F6F6] p-3 rounded h-[40px] outline-none hover:bg-gray-50 transition-all focus:ring-1 focus:ring-primary-color placeholder:text-[#888] placeholder:text-sm placeholder:font-normal focus:bg-white"
               placeholder="0.1 ~ 10.000"
             />
           </div>

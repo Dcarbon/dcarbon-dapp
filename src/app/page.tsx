@@ -108,9 +108,10 @@ const Home = async () => {
             <div className="max-w-[704px] flex flex-col gap-4 items-center">
               <h2 className="text-[44px] font-medium">Model G</h2>
               <p className="text-center font-light">
-                Lorem ipsum dolor sit amet consectetur. Vestibulum vitae morbi
-                magna urna mollis sit malesuada. Praesent nunc consequat
-                convallis.
+                Biomass gasification technology converts organic waste into
+                syngas for clean energy, featuring continuous feeding, high
+                efficiency, and low emissions, reducing fuel costs and
+                environmental impact.
               </p>
             </div>
 
@@ -118,7 +119,7 @@ const Home = async () => {
               <DCarbonButton className="min-w-[200px]">
                 <Link
                   className="absolute top-0 left-0 w-full h-full flex justify-center text-sm text-text-primary"
-                  href={WEB_ROUTES.PROJECTS + '?mode=quick-buy'}
+                  href={WEB_ROUTES.PROJECTS + '?mode=quick-buy&model=G'}
                 >
                   Order now
                 </Link>
@@ -147,9 +148,9 @@ const Home = async () => {
             <div className="max-w-[704px] flex flex-col gap-4 items-center">
               <h2 className="text-[44px] font-medium">Model E</h2>
               <p className="text-center font-light">
-                Lorem ipsum dolor sit amet consectetur. Vestibulum vitae morbi
-                magna urna mollis sit malesuada. Praesent nunc consequat
-                convallis.
+                Biogas to electricity converts organic waste into clean,
+                renewable energy, reducing greenhouse gas emissions and
+                promoting sustainability.
               </p>
             </div>
 
@@ -157,7 +158,7 @@ const Home = async () => {
               <DCarbonButton className="min-w-[200px]">
                 <Link
                   className="absolute top-0 left-0 w-full h-full flex justify-center text-sm text-text-primary"
-                  href={WEB_ROUTES.PROJECTS + '?mode=quick-buy'}
+                  href={WEB_ROUTES.PROJECTS + '?mode=quick-buy&model=E'}
                 >
                   Order now
                 </Link>
@@ -192,18 +193,28 @@ const Home = async () => {
               </p>
             </div>
 
-            <div className="flex flex-wrap gap-8 justify-center items-center">
-              <DCarbonButton className="min-w-[200px]">
-                <Link
-                  className="absolute top-0 left-0 w-full h-full flex justify-center text-sm text-text-primary"
-                  href={WEB_ROUTES.PROJECTS}
-                >
+            <div>
+              <div className="text-white text-[28px] font-light mb-6 text-center">
+                Coming soon
+              </div>
+
+              <div className="flex flex-wrap gap-8 justify-center items-center">
+                <DCarbonButton className="min-w-[200px]" isDisabled>
+                  {/* <Link
+                    className="absolute top-0 left-0 w-full h-full flex justify-center text-sm text-text-primary"
+                    href={WEB_ROUTES.PROJECTS}
+                  > */}
                   Order now
-                </Link>
-              </DCarbonButton>
-              <DCarbonButton color="primary" className="min-w-[200px]">
-                Learn more
-              </DCarbonButton>
+                  {/* </Link> */}
+                </DCarbonButton>
+                <DCarbonButton
+                  color="primary"
+                  className="min-w-[200px]"
+                  isDisabled
+                >
+                  Learn more
+                </DCarbonButton>
+              </div>
             </div>
           </div>
         </section>

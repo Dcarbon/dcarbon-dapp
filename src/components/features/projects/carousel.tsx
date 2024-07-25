@@ -8,18 +8,16 @@ import arrowActive from 'public/images/projects/arrow-active.svg';
 import arrowInactive from 'public/images/projects/arrow-inactive.svg';
 
 function ProjectDetailCarousel({ data }: { data: string[] }) {
-  const [emblaRef, emblaApi] = useEmblaCarousel(
-    {
-      align: 'start',
-      dragFree: true,
-      breakpoints: {
-        '(min-width: 1024px)': {
-          watchDrag: false,
-        },
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    align: 'start',
+    dragFree: true,
+    breakpoints: {
+      '(min-width: 1024px)': {
+        watchDrag: false,
       },
     },
-    [],
-  );
+    loop: true,
+  });
   const [currentSlideIndex, setCurrentSlideIndex] = useState<number>(0);
   const [canNext, setCanNext] = useState<boolean>(true);
   const [canPrev, setCanPrev] = useState<boolean>(false);
@@ -62,11 +60,12 @@ function ProjectDetailCarousel({ data }: { data: string[] }) {
               key={index}
               className={cn(
                 'embla__slide relative w-full transition-[flex]',
-                index === data.length - 1 ? 'mr-0' : 'mr-8',
+                index === data.length - 1 ? 'mr-8' : 'mr-8',
                 currentSlideIndex === index
                   ? 'flex-[0_0_100%] lg:flex-[0_0_803px] h-[460px]'
                   : 'flex-[0_0_100%] h-[460px] lg:flex-[0_0_390px] lg:h-[390px]',
                 data.length < 3 && '!flex-[0_0_100%] !h-[460px]',
+                data.length === 3 && index === data.length - 1 && 'lg:mr-0',
               )}
             >
               <Image
@@ -85,8 +84,9 @@ function ProjectDetailCarousel({ data }: { data: string[] }) {
           <>
             <button
               className={cn(
-                'embla__prev absolute right-[94px] bottom-6 lg:left-6 xl:left-[unset] xl:right-[70px] xl:bottom-0',
+                'embla__prev absolute right-[94px] bottom-6 lg:left-6 xl:left-[836px] xl:bottom-0',
                 data.length < 3 && '!right-[94px] !bottom-6',
+                data.length === 3 && 'xl:left-[unset] xl:right-[70px]',
               )}
               onClick={scrollPrev}
             >
@@ -114,8 +114,9 @@ function ProjectDetailCarousel({ data }: { data: string[] }) {
             </button>
             <button
               className={cn(
-                'embla__next absolute bottom-6 right-6 lg:left-[94px] xl:left-[unset] xl:right-0 xl:bottom-0',
+                'embla__next absolute bottom-6 right-6 lg:left-[94px] xl:left-[910px] xl:bottom-0',
                 data.length < 3 && '!right-6 !bottom-6',
+                data.length === 3 && 'xl:left-[unset] xl:right-[0px]',
               )}
               onClick={scrollNext}
             >

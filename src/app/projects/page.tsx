@@ -5,8 +5,23 @@ import Sidebar from '@/components/features/projects/sidebar';
 
 import { ProjectStoreProvider } from '../project-store-provider';
 
-async function Projects() {
-  const projectsData = (await doGetProjetList()) as any;
+async function Projects({ searchParams }: any) {
+  const model = searchParams?.model;
+  let iot_model;
+
+  switch (model) {
+    case 'G':
+      iot_model = 'PrjT_G' as const;
+      break;
+    case 'E':
+      iot_model = 'PrjT_E' as const;
+      break;
+    default:
+      iot_model = undefined;
+      break;
+  }
+
+  const projectsData = (await doGetProjetList({ iot_model })) as any;
 
   return (
     <ProjectStoreProvider>

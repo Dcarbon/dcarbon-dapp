@@ -43,7 +43,7 @@ function InformationDetailSidebar({ data }: { data: any }) {
                   setQuantity(q.value);
                 }}
                 id="quantity"
-                className="text-sm w-full bg-white p-3 pr-[82.63px] rounded h-[40px] outline-none hover:bg-gray-50 transition-all focus:ring-1 focus:ring-primary-color placeholder:text-[#888] placeholder:text-sm placeholder:font-normal"
+                className="text-sm w-full bg-white p-3 pr-[82.63px] rounded h-[40px] outline-none hover:bg-gray-50 transition-all focus:ring-1 focus:ring-primary-color placeholder:text-[#888] placeholder:text-sm placeholder:font-normal focus:bg-white"
                 placeholder="0.1"
               />
 
@@ -62,7 +62,7 @@ function InformationDetailSidebar({ data }: { data: any }) {
                 thousandSeparator
                 allowNegative={false}
                 id="asset"
-                className="text-sm w-full bg-white p-3 pr-[52.63px] rounded h-[40px] outline-none hover:bg-gray-50 transition-all focus:ring-1 focus:ring-primary-color placeholder:text-[#888] placeholder:text-sm placeholder:font-normal"
+                className="text-sm w-full bg-white p-3 pr-[52.63px] rounded h-[40px] outline-none hover:bg-gray-50 transition-all focus:ring-1 focus:ring-primary-color placeholder:text-[#888] placeholder:text-sm placeholder:font-normal focus:bg-white"
                 placeholder="0"
               />
 
@@ -81,7 +81,7 @@ function InformationDetailSidebar({ data }: { data: any }) {
                 thousandSeparator
                 allowNegative={false}
                 id="total"
-                className="text-sm w-full bg-white p-3 pr-[52.63px] rounded h-[40px] outline-none hover:bg-gray-50 transition-all focus:ring-1 focus:ring-primary-color placeholder:text-[#888] placeholder:text-sm placeholder:font-normal"
+                className="text-sm w-full bg-white p-3 pr-[52.63px] rounded h-[40px] outline-none hover:bg-gray-50 transition-all focus:ring-1 focus:ring-primary-color placeholder:text-[#888] placeholder:text-sm placeholder:font-normal focus:bg-white"
                 placeholder="0"
               />
 

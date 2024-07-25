@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Input } from '@nextui-org/react';
 import { NumericFormat } from 'react-number-format';
 
-function CerfiticateCorporate() {
+function CertificateCorporate() {
   const [name, setName] = useState<string>('');
   const [isNameInvalid] = useState<boolean>(false);
   const [projectType, setProjectType] = useState<string>('');
@@ -181,4 +181,4 @@ function CerfiticateCorporate() {
   );
 }
 
-export default CerfiticateCorporate;
+export default CertificateCorporate;

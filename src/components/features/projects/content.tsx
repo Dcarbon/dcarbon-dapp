@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import NextImage from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { doGetProjetList } from '@/adapters/project';
@@ -42,16 +42,56 @@ function ProjectContent({
   const searchParams = useSearchParams();
   const keyword = useProjectStore((state) => state.keyword);
   const [debouncedKeyword] = useDebounceValue(keyword, 500);
-  const spinRef = useRef(null);
+  const [spinRef, setSpinRef] = useState<any>({
+    current: null,
+  });
   const isInView = useInView(spinRef);
   const filters = useProjectStore((state) => state.filters);
 
   const mode = searchParams.get('mode');
+  const model = searchParams.get('model');
+  let iot_model;
+
+  switch (model) {
+    case 'G':
+      iot_model = 'PrjT_G' as const;
+      break;
+    case 'E':
+      iot_model = 'PrjT_E' as const;
+      break;
+    default:
+      iot_model = undefined;
+      break;
+  }
+
   const totalPage = Math.ceil(
     ((initialData as any)?.paging?.total || 1) /
       ((initialData as any)?.paging?.limit || 1),
   );
   const setLoading = useProjectStore((state) => state.setLoading);
+
+  useEffect(() => {
+    let count = 0;
+    const checkSpinner = () => {
+      const spinnerEl = document.querySelector('#spinner');
+      if (spinnerEl) {
+        setSpinRef({ current: spinnerEl });
+      }
+      count++;
+    };
+
+    const id = mode === 'quick-buy' ? 0 : setInterval(checkSpinner, 1000);
+
+    if (spinRef?.current) {
+      clearInterval(id);
+    }
+
+    if (count >= 10) {
+      clearInterval(id);
+    }
+
+    return () => clearInterval(id);
+  }, [mode, spinRef]);
 
   const { data, size, setSize, isLoading } = useSWRInfinite(
     (index) => {
@@ -66,13 +106,14 @@ function ProjectContent({
       if (index + 1 > totalPage) {
         return null;
       }
-      return doGetProjetList(
-        debouncedKeyword,
-        index + 1,
-        filters?.country?.value,
-        filters?.location,
-        filters?.quantity,
-      );
+      return doGetProjetList({
+        keyword: debouncedKeyword,
+        page: index + 1,
+        country: filters?.country?.value,
+        location: filters?.location,
+        quantity: filters?.quantity,
+        iot_model,
+      });
     },
     {
       fallbackData: [initialData] as any,
@@ -198,7 +239,7 @@ function ProjectContent({
           </div>
           {totalPage > 1 && size < totalPage && (
             <div className="flex w-full justify-center mt-6">
-              <Spinner color="success" ref={spinRef} />
+              <Spinner id="spinner" color="success" />
             </div>
           )}
         </>

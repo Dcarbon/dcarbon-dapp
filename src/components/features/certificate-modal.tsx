@@ -6,10 +6,10 @@ import cerfiticateIcon from 'public/images/projects/cerfiticate-icon.png';
 
 import DCarbonButton from '../common/button';
 import DCarbonModal from '../common/modal';
-import CerfiticateCorporate from './cerfiticate-corporate';
-import CerfiticateIndividual from './cerfiticate-individual';
+import CertificateCorporate from './certificate-corporate';
+import CertificateIndividual from './certificate-individual';
 
-function CerfiticateModal() {
+function CertificateModal() {
   const { onClose } = useDisclosure();
   return (
     <DCarbonModal
@@ -50,10 +50,10 @@ function CerfiticateModal() {
           defaultSelectedKey={'individual'}
         >
           <Tab key="individual" title="Individual">
-            <CerfiticateIndividual />
+            <CertificateIndividual />
           </Tab>
           <Tab key="corporate" title="Corporate">
-            <CerfiticateCorporate />
+            <CertificateCorporate />
           </Tab>
         </Tabs>
       </div>
@@ -61,4 +61,4 @@ function CerfiticateModal() {
   );
 }
 
-export default CerfiticateModal;
+export default CertificateModal;

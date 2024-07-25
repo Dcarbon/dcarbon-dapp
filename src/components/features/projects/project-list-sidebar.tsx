@@ -1,5 +1,6 @@
 import React, { ReactNode, useMemo, useState } from 'react';
 import NextImage from 'next/image';
+import { useSearchParams } from 'next/navigation';
 import DCarbonButton from '@/components/common/button';
 import {
   Button,
@@ -78,6 +79,8 @@ function ProjectListSidebar() {
   const setAction = useProjectStore((state) => state.setAction);
   const action = useProjectStore((state) => state.action);
   const isLoading = useProjectStore((state) => state.isLoading);
+  const searchParams = useSearchParams();
+  const model = searchParams.get('model');
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [countryValue, setCountryValue] = useState<{
@@ -298,122 +301,124 @@ function ProjectListSidebar() {
       </div>
 
       <div className="mb-6">
-        <CheckboxGroup
-          label="Sản lượng"
-          color="default"
-          value={interm}
-          onValueChange={(value) => {
-            const newValue = value?.[value.length - 1];
-            setInterm(newValue ? [newValue] : []);
-          }}
-          classNames={{
-            label: 'text-sm text-[#21272A]',
-          }}
-          radius="full"
-        >
-          <Checkbox
-            value="small"
+        {['G', 'E'].includes(model || '') && (
+          <CheckboxGroup
+            label={model === 'G' ? 'Scale' : 'Power'}
+            color="default"
+            value={interm}
+            onValueChange={(value) => {
+              const newValue = value?.[value.length - 1];
+              setInterm(newValue ? [newValue] : []);
+            }}
             classNames={{
-              label: 'text-[#4F4F4F] text-sm',
-              wrapper: 'before:border-[1px]',
+              label: 'text-sm text-[#21272A]',
             }}
-            icon={({ size, height, width, ...props }: any) => {
-              const {
-                // eslint-disable-next-line no-unused-vars
-                isSelected,
-                // eslint-disable-next-line no-unused-vars
-                isIndeterminate,
-                // eslint-disable-next-line no-unused-vars
-                disableAnimation,
-                ...otherProps
-              } = props;
-
-              return (
-                <div {...otherProps} style={{ width: 20, height: 20 }}>
-                  <Image
-                    src={checkboxCheckedIcon.src}
-                    alt="checkbox"
-                    as={NextImage}
-                    width={20}
-                    height={20}
-                    radius="none"
-                    draggable={false}
-                  />
-                </div>
-              );
-            }}
+            radius="full"
           >
-            Small: (40 - 90 KvA)
-          </Checkbox>
-          <Checkbox
-            value="medium"
-            classNames={{
-              label: 'text-[#4F4F4F] text-sm',
-              wrapper: 'before:border-[1px]',
-            }}
-            icon={({ size, height, width, ...props }: any) => {
-              const {
-                // eslint-disable-next-line no-unused-vars
-                isSelected,
-                // eslint-disable-next-line no-unused-vars
-                isIndeterminate,
-                // eslint-disable-next-line no-unused-vars
-                disableAnimation,
-                ...otherProps
-              } = props;
+            <Checkbox
+              value="small"
+              classNames={{
+                label: 'text-[#4F4F4F] text-sm',
+                wrapper: 'before:border-[1px]',
+              }}
+              icon={({ size, height, width, ...props }: any) => {
+                const {
+                  // eslint-disable-next-line no-unused-vars
+                  isSelected,
+                  // eslint-disable-next-line no-unused-vars
+                  isIndeterminate,
+                  // eslint-disable-next-line no-unused-vars
+                  disableAnimation,
+                  ...otherProps
+                } = props;
 
-              return (
-                <div {...otherProps} style={{ width: 20, height: 20 }}>
-                  <Image
-                    src={checkboxCheckedIcon.src}
-                    alt="checkbox"
-                    as={NextImage}
-                    width={20}
-                    height={20}
-                    radius="none"
-                    draggable={false}
-                  />
-                </div>
-              );
-            }}
-          >
-            Medium (90 - 200 KvA)
-          </Checkbox>
-          <Checkbox
-            value="large"
-            classNames={{
-              label: 'text-[#4F4F4F] text-sm',
-              wrapper: 'before:border-[1px]',
-            }}
-            icon={({ size, height, width, ...props }: any) => {
-              const {
-                // eslint-disable-next-line no-unused-vars
-                isSelected,
-                // eslint-disable-next-line no-unused-vars
-                isIndeterminate,
-                // eslint-disable-next-line no-unused-vars
-                disableAnimation,
-                ...otherProps
-              } = props;
+                return (
+                  <div {...otherProps} style={{ width: 20, height: 20 }}>
+                    <Image
+                      src={checkboxCheckedIcon.src}
+                      alt="checkbox"
+                      as={NextImage}
+                      width={20}
+                      height={20}
+                      radius="none"
+                      draggable={false}
+                    />
+                  </div>
+                );
+              }}
+            >
+              Small: ({model === 'G' ? '40 - 90 KvA' : '1 - 20 Ton'})
+            </Checkbox>
+            <Checkbox
+              value="medium"
+              classNames={{
+                label: 'text-[#4F4F4F] text-sm',
+                wrapper: 'before:border-[1px]',
+              }}
+              icon={({ size, height, width, ...props }: any) => {
+                const {
+                  // eslint-disable-next-line no-unused-vars
+                  isSelected,
+                  // eslint-disable-next-line no-unused-vars
+                  isIndeterminate,
+                  // eslint-disable-next-line no-unused-vars
+                  disableAnimation,
+                  ...otherProps
+                } = props;
 
-              return (
-                <div {...otherProps} style={{ width: 20, height: 20 }}>
-                  <Image
-                    src={checkboxCheckedIcon.src}
-                    alt="checkbox"
-                    as={NextImage}
-                    width={20}
-                    height={20}
-                    radius="none"
-                    draggable={false}
-                  />
-                </div>
-              );
-            }}
-          >
-            Large (&gt;200 KvA)
-          </Checkbox>
-        </CheckboxGroup>
+                return (
+                  <div {...otherProps} style={{ width: 20, height: 20 }}>
+                    <Image
+                      src={checkboxCheckedIcon.src}
+                      alt="checkbox"
+                      as={NextImage}
+                      width={20}
+                      height={20}
+                      radius="none"
+                      draggable={false}
+                    />
+                  </div>
+                );
+              }}
+            >
+              Medium ({model === 'G' ? '90 - 200 KvA' : '20 - 100 Ton'})
+            </Checkbox>
+            <Checkbox
+              value="large"
+              classNames={{
+                label: 'text-[#4F4F4F] text-sm',
+                wrapper: 'before:border-[1px]',
+              }}
+              icon={({ size, height, width, ...props }: any) => {
+                const {
+                  // eslint-disable-next-line no-unused-vars
+                  isSelected,
+                  // eslint-disable-next-line no-unused-vars
+                  isIndeterminate,
+                  // eslint-disable-next-line no-unused-vars
+                  disableAnimation,
+                  ...otherProps
+                } = props;
+
+                return (
+                  <div {...otherProps} style={{ width: 20, height: 20 }}>
+                    <Image
+                      src={checkboxCheckedIcon.src}
+                      alt="checkbox"
+                      as={NextImage}
+                      width={20}
+                      height={20}
+                      radius="none"
+                      draggable={false}
+                    />
+                  </div>
+                );
+              }}
+            >
+              Large ({model === 'G' ? '>200 KvA' : '>100 Ton'})
+            </Checkbox>
+          </CheckboxGroup>
+        )}
       </div>
 
       <div className="flex gap-6">
@@ -439,11 +444,17 @@ function ProjectListSidebar() {
               location,
               quantity:
                 interm?.[0] === 'small'
-                  ? '40_90'
+                  ? model === 'G'
+                    ? '40_90'
+                    : '1_20'
                   : interm?.[0] === 'medium'
-                    ? '90_200'
+                    ? model === 'G'
+                      ? '90_200'
+                      : '20_100'
                     : interm?.[0] === 'large'
-                      ? '200'
+                      ? model === 'G'
+                        ? '200'
+                        : '100'
                       : undefined,
             });
           }}

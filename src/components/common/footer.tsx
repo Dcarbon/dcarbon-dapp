@@ -8,6 +8,8 @@ import linkedin from 'public/images/common/linkedin.svg';
 import x from 'public/images/common/x.svg';
 import youtube from 'public/images/common/youtube.svg';
 
+import FeedbackModal from '../features/feedback';
+
 function Footer() {
   return (
     <footer className="bg-text-primary pt-[24px] px-[64px] pb-[48px] z-10 relative">
@@ -37,9 +39,7 @@ function Footer() {
           <Link href="#" className="py-3 px-2 text-sm text-[#C8C8C8]">
             Policy
           </Link>
-          <Link href="#" className="py-3 px-2 text-sm text-[#C8C8C8]">
-            Feedback
-          </Link>
+          <FeedbackModal />
         </nav>
 
         <div className="flex gap-2">

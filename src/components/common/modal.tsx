@@ -25,6 +25,7 @@ function DCarbonModal({
   hideCloseButton,
   centeredTitle,
   classNames,
+  description,
 }: {
   children: ReactNode;
   icon?: string;
@@ -39,6 +40,7 @@ function DCarbonModal({
   classNames?: {
     title: string;
   };
+  description?: string;
 }) {
   return (
     <Modal
@@ -92,7 +94,14 @@ function DCarbonModal({
                   classNames?.title || '',
                 )}
               >
-                {title || ''}
+                <div>
+                  {title || ''}
+                  {description && (
+                    <h3 className="text-sm text-[#454545] font-light mt-[4px]">
+                      {description}
+                    </h3>
+                  )}
+                </div>
                 {extra && extra}
               </div>
             </ModalHeader>

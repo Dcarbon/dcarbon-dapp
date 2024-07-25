@@ -5,7 +5,7 @@ type ProjectState = {
   filters?: {
     country?: { label: string; value: string };
     location?: string;
-    quantity?: '40_90' | '90_200' | '200' | '1_20' | '20_100' | '100';
+    quantity?: 'PrjU_Smal' | 'PrjU_None' | 'PrjU_Medium' | 'PrjU_Large';
   };
   isLoading?: boolean;
   action?: 'search' | 'filter';
@@ -16,7 +16,7 @@ type ProjectAction = {
   setFilters: (filters?: {
     country?: { label: string; value: string };
     location?: string;
-    quantity?: '40_90' | '90_200' | '200' | '1_20' | '20_100' | '100';
+    quantity?: 'PrjU_Smal' | 'PrjU_None' | 'PrjU_Medium' | 'PrjU_Large';
   }) => void;
   setLoading: (loading: boolean) => void;
   setAction: (action: 'search' | 'filter') => void;
@@ -36,7 +36,7 @@ const createProjectStore = (initState: ProjectState = defaultInitState) => {
     setFilters: (filters?: {
       country?: { label: string; value: string };
       location?: string;
-      quantity?: '40_90' | '90_200' | '200' | '1_20' | '20_100' | '100';
+      quantity?: 'PrjU_Smal' | 'PrjU_None' | 'PrjU_Medium' | 'PrjU_Large';
     }) => set(() => ({ filters })),
     setLoading: (loading: boolean) => set(() => ({ isLoading: loading })),
     setAction: (action: 'search' | 'filter') => set(() => ({ action })),

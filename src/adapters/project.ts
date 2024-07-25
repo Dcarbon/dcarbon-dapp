@@ -14,7 +14,7 @@ const doGetProjetList = async ({
   page?: number;
   country?: string;
   location?: string;
-  quantity?: '40_90' | '90_200' | '200' | '1_20' | '20_100' | '100';
+  quantity?: 'PrjU_Smal' | 'PrjU_None' | 'PrjU_Medium' | 'PrjU_Large';
   iot_model?: 'PrjT_G' | 'PrjT_E' | 'PrjT_S';
 }) => {
   const params = {
@@ -22,7 +22,7 @@ const doGetProjetList = async ({
     ...(page ? { page } : {}),
     ...(country ? { country } : {}),
     ...(location ? { location } : {}),
-    ...(quantity ? { quantity } : {}),
+    ...(quantity ? { quantity } : { quantity: 'PrjU_None' }),
     ...(iot_model ? { iot_model } : {}),
   };
 

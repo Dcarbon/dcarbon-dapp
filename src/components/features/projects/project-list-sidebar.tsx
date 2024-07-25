@@ -444,18 +444,12 @@ function ProjectListSidebar() {
               location,
               quantity:
                 interm?.[0] === 'small'
-                  ? model === 'G'
-                    ? '40_90'
-                    : '1_20'
+                  ? 'PrjU_Smal'
                   : interm?.[0] === 'medium'
-                    ? model === 'G'
-                      ? '90_200'
-                      : '20_100'
+                    ? 'PrjU_Medium'
                     : interm?.[0] === 'large'
-                      ? model === 'G'
-                        ? '200'
-                        : '100'
-                      : undefined,
+                      ? 'PrjU_Large'
+                      : 'PrjU_None',
             });
           }}
           isLoading={isLoading && action === 'filter'}

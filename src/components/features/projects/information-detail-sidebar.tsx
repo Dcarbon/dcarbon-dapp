@@ -95,16 +95,18 @@ function InformationDetailSidebar({ data }: { data: any }) {
         </div>
       </div>
 
-      <div className="bg-[#F6F6F6] p-4 rounded-lg text-[#21272A] mt-6">
-        <h3 className="text-[23px] font-medium mb-6">Address</h3>
-        <div className="text-sm mb-2">Location</div>
-        <div
-          id="project-detail"
-          dangerouslySetInnerHTML={{
-            __html: data?.data?.location?.iframe,
-          }}
-        />
-      </div>
+      {data?.data?.location?.iframe && (
+        <div className="bg-[#F6F6F6] p-4 rounded-lg text-[#21272A] mt-6">
+          <h3 className="text-[23px] font-medium mb-6">Address</h3>
+          <div className="text-sm mb-2">Location</div>
+          <div
+            id="project-detail"
+            dangerouslySetInnerHTML={{
+              __html: data.data.location.iframe,
+            }}
+          />
+        </div>
+      )}
     </>
   );
 }

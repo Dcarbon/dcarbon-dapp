@@ -103,6 +103,7 @@ function ProjectContent({
         debouncedKeyword,
         index,
         filters,
+        model,
       ];
     },
     ([, debouncedKeyword, index, filters]) => {
@@ -120,7 +121,7 @@ function ProjectContent({
     },
     {
       fallbackData: [initialData] as any,
-      keepPreviousData: false,
+      keepPreviousData: true,
       parallel: true,
       revalidateFirstPage: false,
       persistSize: true,

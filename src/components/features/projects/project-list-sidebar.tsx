@@ -102,15 +102,16 @@ function ProjectListSidebar() {
   );
 
   const selectStyles = {
-    control: (provided: any) => {
+    control: (provided: any, { isFocused }: any) => {
       return {
         ...provided,
         minWidth: 240,
         marginBottom: 16,
-        border: 0,
-        background: '#F6F6F6',
+        background: isFocused ? '#fff' : '#F6F6F6',
         boxShadow: 'none',
         flexDirection: 'row-reverse',
+        border: isFocused ? '1px solid #7BDA08 !important' : 0,
+        cursor: 'text',
       };
     },
     menu: () => ({ boxShadow: 'inset 0 0px 0 rgba(0, 0, 0, 0.1)' }),
@@ -148,7 +149,7 @@ function ProjectListSidebar() {
 
   return (
     <div>
-      <div className="mb-6">Tìm kiếm dự án</div>
+      <div className="mb-6">Search Project</div>
       <Input
         key="search"
         type="text"
@@ -157,7 +158,8 @@ function ProjectListSidebar() {
         placeholder="Search..."
         radius="none"
         classNames={{
-          inputWrapper: 'rounded-[4px] max-w-[408px]',
+          inputWrapper:
+            'rounded-[4px] bg-[#F6F6F6] group-data-[focus=true]:ring-1 group-data-[focus=true]:bg-white group-data-[focus=true]:ring-primary-color',
           label: '!text-[#21272A]',
           innerWrapper: ['custom-input'],
         }}
@@ -279,7 +281,8 @@ function ProjectListSidebar() {
           placeholder="Type location"
           radius="none"
           classNames={{
-            inputWrapper: 'rounded-[4px] max-w-[408px]',
+            inputWrapper:
+              'rounded-[4px] bg-[#F6F6F6] group-data-[focus=true]:ring-1 group-data-[focus=true]:bg-white group-data-[focus=true]:ring-primary-color',
             label: '!text-[#21272A]',
             innerWrapper: ['custom-input'],
           }}

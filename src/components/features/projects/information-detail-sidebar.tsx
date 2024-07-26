@@ -98,15 +98,12 @@ function InformationDetailSidebar({ data }: { data: any }) {
       <div className="bg-[#F6F6F6] p-4 rounded-lg text-[#21272A] mt-6">
         <h3 className="text-[23px] font-medium mb-6">Address</h3>
         <div className="text-sm mb-2">Location</div>
-        <iframe
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d5083.089990768232!2d105.78816679098541!3d10.044482718530391!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31a063a1771a0823%3A0xa7fe937e43c2970c!2zS2jDoWNoIHPhuqFuIE3GsOG7nW5nIFRoYW5oIEx1eHVyeSBD4bqnbiBUaMah!5e0!3m2!1svi!2s!4v1721130792950!5m2!1svi!2s"
-          width="100%"
-          height="200"
-          className="border-none rounded"
-          allowFullScreen
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-        ></iframe>
+        <div
+          id="project-detail"
+          dangerouslySetInnerHTML={{
+            __html: data?.data?.location?.iframe,
+          }}
+        />
       </div>
     </>
   );

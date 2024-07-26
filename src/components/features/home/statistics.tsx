@@ -8,9 +8,15 @@ function Statistics() {
   const projectCount = useMotionValue(0);
   const organizationCount = useMotionValue(0);
   const userCount = useMotionValue(0);
-  const projectRound = useTransform(projectCount, Math.round);
-  const organizationRound = useTransform(organizationCount, Math.round);
-  const userRound = useTransform(userCount, Math.round);
+  const projectRound = useTransform(projectCount, (value) =>
+    Math.round(value).toLocaleString('en-US'),
+  );
+  const organizationRound = useTransform(organizationCount, (value) =>
+    Math.round(value).toLocaleString('en-US'),
+  );
+  const userRound = useTransform(userCount, (value) =>
+    Math.round(value).toLocaleString('en-US'),
+  );
 
   useEffect(() => {
     const animation = animate(projectCount, 30, { duration: 3 });

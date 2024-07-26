@@ -9,7 +9,7 @@ import locationActiveIcon from 'public/images/common/location-active-icon.svg';
 async function ProjectDetail({ params }: { params: { slug: string } }) {
   const data = (await doGetProjectDetail(params.slug)) as any;
 
-  const location = `${data?.data?.location_name || ''}${data?.data?.country_name ? `, ${data?.data?.country_name}` : ''}`;
+  const location = `${data?.data?.location?.name || ''}${data?.data?.country_name ? `, ${data?.data?.country_name}` : ''}`;
 
   return (
     <main className="px-4 lg:px-[64px] pb-[32px] mt-[90px] lg:mt-[60px] min-h-screen max-w-[1528px] mx-auto">
@@ -32,6 +32,7 @@ async function ProjectDetail({ params }: { params: { slug: string } }) {
             <span className="text-sm">{location}</span>
           </div>
           <div
+            id="project-detail-description"
             dangerouslySetInnerHTML={{
               __html: data?.data?.description || '',
             }}

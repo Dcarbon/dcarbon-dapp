@@ -19,7 +19,8 @@ function QuickBuySidebar() {
           placeholder="0"
           radius="none"
           classNames={{
-            inputWrapper: 'rounded-[4px] max-w-[408px]',
+            inputWrapper:
+              'rounded-[4px] bg-[#F6F6F6] group-data-[focus=true]:ring-1 group-data-[focus=true]:bg-white group-data-[focus=true]:ring-primary-color',
             label: '!text-[#21272A]',
           }}
           autoComplete="off"

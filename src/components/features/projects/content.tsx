@@ -30,7 +30,7 @@ type ProjectResponse = {
   project_name: string;
   country: string;
   country_name: string;
-  location: string;
+  location: { name: string };
   power: number;
   thumbnail: string;
 };
@@ -210,7 +210,7 @@ function ProjectContent({
                               className="!w-[24px] !h-[16px]"
                             />
                             <span className="text-white text-xs">
-                              {item.location || ''}
+                              {item.location?.name || ''}
                               {item?.country_name
                                 ? `, ${item.country_name}`
                                 : ''}

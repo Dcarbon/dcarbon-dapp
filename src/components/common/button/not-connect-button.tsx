@@ -24,6 +24,8 @@ import { useWallet, Wallet } from '@solana/wallet-adapter-react';
 import { env } from 'env.mjs';
 import arrowRightWalletButton from 'public/images/common/arrow-right-wallet-button.svg';
 import closeModal from 'public/images/common/close-modal.svg';
+import eyeClose from 'public/images/common/eye-close.svg';
+import eyeOpen from 'public/images/common/eye-open.svg';
 import walletsImage from 'public/images/common/wallets.png';
 
 import DCarbonButton from '.';
@@ -141,6 +143,9 @@ function NotConnectButton() {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
+  const [isVisible, setIsVisible] = React.useState(false);
+
+  const toggleVisibility = () => setIsVisible(!isVisible);
 
   const validateEmail = (value: string) =>
     value.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,4}$/i);
@@ -363,7 +368,8 @@ function NotConnectButton() {
                       placeholder="Your email address"
                       radius="none"
                       classNames={{
-                        inputWrapper: 'rounded-[4px] max-w-[408px]',
+                        inputWrapper:
+                          'rounded-[4px] bg-[#F6F6F6] group-data-[focus=true]:ring-1 group-data-[focus=true]:bg-white group-data-[focus=true]:ring-primary-color max-w-[408px]',
                         label: '!text-[#21272A]',
                         helperWrapper: 'px-0',
                       }}
@@ -379,13 +385,42 @@ function NotConnectButton() {
                     <div className="mt-12">
                       <Input
                         key="password"
-                        type="password"
+                        endContent={
+                          <button
+                            className="focus:outline-none"
+                            type="button"
+                            onClick={toggleVisibility}
+                            aria-label="toggle password visibility"
+                          >
+                            {isVisible ? (
+                              <Image
+                                src={eyeClose.src}
+                                alt="hide password"
+                                className="text-2xl text-default-400 pointer-events-none"
+                                width={20}
+                                height={20}
+                                as={NextImage}
+                              />
+                            ) : (
+                              <Image
+                                src={eyeOpen.src}
+                                alt="show password"
+                                className="text-2xl text-default-400 pointer-events-none"
+                                as={NextImage}
+                                width={20}
+                                height={20}
+                              />
+                            )}
+                          </button>
+                        }
+                        type={isVisible ? 'text' : 'password'}
                         labelPlacement="outside"
                         label="Password"
                         placeholder="Your password"
                         radius="none"
                         classNames={{
-                          inputWrapper: 'rounded-[4px] max-w-[408px]',
+                          inputWrapper:
+                            'rounded-[4px] bg-[#F6F6F6] group-data-[focus=true]:ring-1 group-data-[focus=true]:bg-white group-data-[focus=true]:ring-primary-color max-w-[408px]',
                           label: '!text-[#21272A]',
                         }}
                         autoComplete="off"

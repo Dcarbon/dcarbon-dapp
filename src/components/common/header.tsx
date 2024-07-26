@@ -28,6 +28,7 @@ function Header() {
       typeof window !== 'undefined' &&
       window.location.pathname !== WEB_ROUTES.HOME
     ) {
+      setHideNavbar(false);
       return;
     }
 
@@ -56,7 +57,7 @@ function Header() {
     return () => {
       window.removeEventListener('scroll', debouncedScroll);
     };
-  }, [currentScrollPosition]);
+  }, [currentScrollPosition, pathName]);
   return (
     <Navbar
       isBlurred={currentScrollPosition !== 0}

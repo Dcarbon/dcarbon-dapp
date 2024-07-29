@@ -11,6 +11,7 @@ import Footer from '@/components/common/footer';
 import Header from '@/components/common/header';
 import NextTopLoader from 'nextjs-toploader';
 
+import GlobalStoreProvider from './global-store-provider';
 import NextuiProviders from './nextui-provider';
 import SolanaWalletProvider from './solana-wallets-provider';
 import SWRProvider from './swr-provider';
@@ -45,9 +46,11 @@ const RootLayout = (props: { children: React.ReactNode }) => {
         <NextuiProviders>
           <SWRProvider>
             <SolanaWalletProvider>
-              <Header />
-              {props?.children}
-              <Footer />
+              <GlobalStoreProvider>
+                <Header />
+                {props?.children}
+                <Footer />
+              </GlobalStoreProvider>
             </SolanaWalletProvider>
           </SWRProvider>
         </NextuiProviders>

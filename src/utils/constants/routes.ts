@@ -14,6 +14,7 @@ const WEB_ROUTES = {
   NOTFOUND: '/404',
   PROJECTS: '/projects',
   PROJECT_DETAIL: '/projects/[slug]',
+  PROFILE: '/profile',
 };
 
 export { API_ROUTES, WEB_ROUTES };

@@ -1,5 +1,6 @@
 import React from 'react';
 import NextImage from 'next/image';
+import { WEB_ROUTES } from '@/utils/constants';
 import {
   Button,
   Chip,
@@ -155,6 +156,7 @@ function ConnectedButton() {
               radius="none"
             />
           }
+          href={WEB_ROUTES.PROFILE}
         >
           Profile
         </DropdownItem>

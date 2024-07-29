@@ -1,8 +1,8 @@
 import React from 'react';
 import NextImage from 'next/image';
 import DCarbonButton from '@/components/common/button';
-import CertificateListContent from '@/components/features/certificates/list-content';
-import CertificateProfile from '@/components/features/certificates/profile';
+import CertificateListContent from '@/components/features/profile/list-content';
+import CertificateProfile from '@/components/features/profile/profile';
 import { Avatar, Image } from '@nextui-org/react';
 import avatar from 'public/images/certificates/avatar.png';
 import cameraIcon from 'public/images/certificates/camera.svg';

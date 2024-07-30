@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import NextImage from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { doGetProjetList } from '@/adapters/project';
 import DCarbonButton from '@/components/common/button';
+import NoData from '@/components/common/no-data';
 import { QUERY_KEYS, WEB_ROUTES } from '@/utils/constants';
 import {
   Card,
@@ -89,7 +90,7 @@ function ProjectContent({
       clearInterval(id);
     }
 
-    if (count >= 10) {
+    if (count >= 100) {
       clearInterval(id);
     }
 
@@ -151,6 +152,14 @@ function ProjectContent({
 
   const { isOpen, onClose, onOpen } = useDisclosure();
 
+  const dataMerged = useMemo(
+    () =>
+      (data as any)?.reduce((prevData: any, current: any) => {
+        return prevData.concat(current?.data || []);
+      }, []),
+    [data],
+  );
+
   return (
     <>
       <BuyModal isOpen={isOpen} onClose={onClose} />
@@ -167,90 +176,84 @@ function ProjectContent({
             radius="none"
             className="rounded-[16px]"
           />
-        ) : (
+        ) : dataMerged?.length !== 0 ? (
           <>
             <div className="gap-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 mt-[2px]">
-              {(data as any)
-                ?.reduce((prevData: any, current: any) => {
-                  return prevData.concat(current?.data || []);
-                }, [])
-                .map((item: ProjectResponse) => {
-                  return (
-                    <div key={item.id}>
-                      <Card
-                        shadow="none"
-                        radius="none"
-                        classNames={{ base: 'rounded-[4px] border-1 h-full' }}
-                        isHoverable
-                        as="div"
-                      >
-                        <CardBody className="overflow-visible p-0 relative">
-                          <Link
-                            className="block"
-                            href={WEB_ROUTES.PROJECT_DETAIL?.replace(
-                              '[slug]',
-                              item?.slug || '',
-                            )}
-                          >
-                            <Image
-                              shadow="none"
-                              radius="none"
-                              width="100%"
-                              alt={item?.project_name || ''}
-                              className="w-full object-cover h-[158px] rounded-bl-[4px] rounded-br-[4px]"
-                              src={item.thumbnail}
-                              draggable={false}
-                              isZoomed
-                            />
-                          </Link>
+              {dataMerged?.map((item: ProjectResponse) => {
+                return (
+                  <div key={item.id}>
+                    <Card
+                      shadow="none"
+                      radius="none"
+                      classNames={{ base: 'rounded-[4px] border-1 h-full' }}
+                      isHoverable
+                      as="div"
+                    >
+                      <CardBody className="overflow-visible p-0 relative">
+                        <Link
+                          className="block"
+                          href={WEB_ROUTES.PROJECT_DETAIL?.replace(
+                            '[slug]',
+                            item?.slug || '',
+                          )}
+                        >
+                          <Image
+                            shadow="none"
+                            radius="none"
+                            width="100%"
+                            alt={item?.project_name || ''}
+                            className="w-full object-cover h-[158px] rounded-bl-[4px] rounded-br-[4px]"
+                            src={item.thumbnail}
+                            draggable={false}
+                            isZoomed
+                          />
+                        </Link>
 
-                          <div className="absolute left-2 right-2 bottom-2 z-10 flex gap-1 items-center justify-end">
-                            <ReactCountryFlag
-                              countryCode={item?.country || ''}
-                              svg
-                              className="!w-[24px] !h-[16px]"
-                            />
-                            <span className="text-white text-xs">
-                              {item.location?.name || ''}
-                              {item?.country_name
-                                ? `, ${item.country_name}`
-                                : ''}
-                            </span>
+                        <div className="absolute left-2 right-2 bottom-2 z-10 flex gap-1 items-center justify-end">
+                          <ReactCountryFlag
+                            countryCode={item?.country || ''}
+                            svg
+                            className="!w-[24px] !h-[16px]"
+                          />
+                          <span className="text-white text-xs">
+                            {item.location?.name || ''}
+                            {item?.country_name ? `, ${item.country_name}` : ''}
+                          </span>
+                        </div>
+                      </CardBody>
+                      <CardFooter className="flex flex-col items-start justify-between h-full">
+                        <Link
+                          className="block w-full"
+                          href={WEB_ROUTES.PROJECT_DETAIL?.replace(
+                            '[slug]',
+                            item?.slug || '',
+                          )}
+                        >
+                          <h2 className="text-lg font-medium text-[#21272A] mb-1">
+                            {item.project_name || ''}
+                          </h2>
+
+                          <div className="text-sm text-[#4F4F4F]">
+                            Sản lượng: {item?.power || ''}
                           </div>
-                        </CardBody>
-                        <CardFooter className="flex flex-col items-start justify-between h-full">
-                          <Link
-                            className="block w-full"
-                            href={WEB_ROUTES.PROJECT_DETAIL?.replace(
-                              '[slug]',
-                              item?.slug || '',
-                            )}
-                          >
-                            <h2 className="text-lg font-medium text-[#21272A] mb-1">
-                              {item.project_name || ''}
-                            </h2>
 
-                            <div className="text-sm text-[#4F4F4F]">
-                              Sản lượng: {item?.power || ''}
-                            </div>
+                          <p className="text-sm text-[#21272A] my-4">
+                            Dự án Miền Nam
+                          </p>
+                        </Link>
 
-                            <p className="text-sm text-[#21272A] my-4">
-                              Dự án Miền Nam
-                            </p>
-                          </Link>
-
-                          <DCarbonButton
-                            color="primary"
-                            fullWidth
-                            onClick={onOpen}
-                          >
-                            Buy Now
-                          </DCarbonButton>
-                        </CardFooter>
-                      </Card>
-                    </div>
-                  );
-                })}
+                        <DCarbonButton
+                          color="primary"
+                          fullWidth
+                          onClick={onOpen}
+                        >
+                          Buy Now
+                        </DCarbonButton>
+                      </CardFooter>
+                    </Card>
+                  </div>
+                );
+              })}
             </div>
             {totalPage > 1 && size < totalPage && (
               <div className="flex w-full justify-center mt-6">
@@ -258,6 +261,8 @@ function ProjectContent({
               </div>
             )}
           </>
+        ) : (
+          <NoData />
         )}
       </div>
     </>

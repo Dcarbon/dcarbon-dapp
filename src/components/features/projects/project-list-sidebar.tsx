@@ -432,6 +432,7 @@ function ProjectListSidebar() {
             setCountryValue(undefined);
             setLocation('');
             setInterm(['']);
+            setKeyword('');
           }}
           disabled={isLoading}
         >

@@ -85,7 +85,7 @@ function ProjectDetailCarousel({ data }: { data: string[] }) {
             <button
               className={cn(
                 'embla__prev absolute right-[94px] bottom-6 lg:left-6 xl:left-[836px] xl:bottom-0',
-                data.length < 3 && '!right-[94px] !bottom-6',
+                data.length < 3 && '!right-[94px] !bottom-6 !left-[unset]',
                 data.length === 3 && 'xl:left-[unset] xl:right-[70px]',
               )}
               onClick={scrollPrev}
@@ -115,7 +115,7 @@ function ProjectDetailCarousel({ data }: { data: string[] }) {
             <button
               className={cn(
                 'embla__next absolute bottom-6 right-6 lg:left-[94px] xl:left-[910px] xl:bottom-0',
-                data.length < 3 && '!right-6 !bottom-6',
+                data.length < 3 && '!right-6 !bottom-6 !left-[unset]',
                 data.length === 3 && 'xl:left-[unset] xl:right-[0px]',
               )}
               onClick={scrollNext}

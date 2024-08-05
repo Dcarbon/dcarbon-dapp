@@ -78,6 +78,12 @@ const cn = (...inputs: ClassValue[]) => {
   return twMerge(clsx(inputs));
 };
 
+const currencyFormatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  minimumFractionDigits: 0,
+});
+
 export {
   removeUndefinedAndNull,
   isEmpty,
@@ -85,4 +91,5 @@ export {
   logger,
   getInfoDevice,
   cn,
+  currencyFormatter,
 };

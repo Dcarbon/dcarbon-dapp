@@ -1,7 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import NextImage from 'next/image';
+import DCarbonButton from '@/components/common/button';
+import { currencyFormatter } from '@/utils/helpers/common';
 import {
   Image,
   Tab,
@@ -13,62 +15,67 @@ import {
   TableRow,
   Tabs,
 } from '@nextui-org/react';
-import menuIcon from 'public/images/certificates/menu.svg';
+import logo from 'public/images/common/logo.svg';
+import solScanIcon from 'public/images/common/sol-scan.avif';
+import solanaExplorerIcon from 'public/images/common/solana-explorer.avif';
+import viewIcon from 'public/images/common/view-icon.svg';
 
 function CertificateListContent() {
-  const rows = [
+  const [selectedKeys, setSelectedKeys] = useState<any>(new Set([]));
+
+  const certificateRows = [
     {
       key: '1',
       date: 'June 26, 2024',
       name: 'Name',
-      amount: '$60.000',
+      amount: '60',
     },
     {
       key: '2',
       date: 'June 26, 2024',
       name: 'Name',
-      amount: '$60.000',
+      amount: '60',
     },
     {
       key: '3',
       date: 'June 26, 2024',
       name: 'Name',
-      amount: '$60.000',
+      amount: '60',
     },
     {
       key: '4',
       date: 'June 26, 2024',
       name: 'Name',
-      amount: '$60.000',
+      amount: '60',
     },
 
     {
       key: '5',
       date: 'June 26, 2024',
       name: 'Name',
-      amount: '$60.000',
+      amount: '60',
     },
     {
       key: '6',
       date: 'June 26, 2024',
       name: 'Name',
-      amount: '$60.000',
+      amount: '60',
     },
     {
       key: '7',
       date: 'June 26, 2024',
       name: 'Name',
-      amount: '$60.000',
+      amount: '60',
     },
     {
       key: '8',
       date: 'June 26, 2024',
       name: 'Name',
-      amount: '$60.000',
+      amount: '60',
     },
   ];
 
-  const columns = [
+  const certificateColumns = [
     {
       key: 'date',
       label: 'Date',
@@ -83,31 +90,152 @@ function CertificateListContent() {
     },
     {
       key: 'action',
-      label: '',
+      label: 'Action',
     },
   ];
 
-  const renderCell = React.useCallback((user: any, columnKey: React.Key) => {
-    const cellValue = user[columnKey as keyof any];
+  const transactionRows = [
+    {
+      key: '1',
+      date: 'June 26, 2024',
+      name: 'Name',
+      amount: '60',
+    },
+    {
+      key: '2',
+      date: 'June 26, 2024',
+      name: 'Name',
+      amount: '60',
+    },
+    {
+      key: '3',
+      date: 'June 26, 2024',
+      name: 'Name',
+      amount: '60',
+    },
+    {
+      key: '4',
+      date: 'June 26, 2024',
+      name: 'Name',
+      amount: '60000',
+    },
 
-    switch (columnKey) {
-      case 'action':
-        return (
-          <div className="relative flex justify-end">
-            <Image
-              src={menuIcon.src}
-              alt="action"
-              as={NextImage}
-              width={24}
-              height={24}
-              draggable={false}
-            />
-          </div>
-        );
-      default:
-        return cellValue;
-    }
-  }, []);
+    {
+      key: '5',
+      date: 'June 26, 2024',
+      name: 'Name',
+      amount: '60000',
+    },
+    {
+      key: '6',
+      date: 'June 26, 2024',
+      name: 'Name',
+      amount: '60000',
+    },
+    {
+      key: '7',
+      date: 'June 26, 2024',
+      name: 'Name',
+      amount: '60000',
+    },
+    {
+      key: '8',
+      date: 'June 26, 2024',
+      name: 'Name',
+      amount: '60000',
+    },
+  ];
+
+  const listCarbonColumns = [
+    {
+      key: 'date',
+      label: 'Date',
+    },
+    {
+      key: 'amount',
+      label: 'List of Dcarbon',
+    },
+
+    {
+      key: 'action',
+      label: 'Action',
+    },
+  ];
+
+  const renderCell = React.useCallback(
+    (user: any, columnKey: React.Key, type?: 'transaction' | 'list-carbon') => {
+      const cellValue = user[columnKey as keyof any];
+
+      switch (columnKey) {
+        case 'action': {
+          if (type === 'transaction' || type === 'list-carbon') {
+            return (
+              <div className="relative flex gap-4">
+                <Image
+                  src={solanaExplorerIcon.src}
+                  alt="Solana Explorer"
+                  as={NextImage}
+                  width={24}
+                  height={24}
+                  draggable={false}
+                  radius="none"
+                  className="min-w-[24px]"
+                />
+
+                <Image
+                  src={solScanIcon.src}
+                  alt="Solscan"
+                  as={NextImage}
+                  width={24}
+                  height={24}
+                  draggable={false}
+                  radius="none"
+                  className="min-w-[24px]"
+                />
+              </div>
+            );
+          }
+          return (
+            <div className="relative flex">
+              <Image
+                src={viewIcon.src}
+                alt="View"
+                as={NextImage}
+                width={24}
+                height={24}
+                draggable={false}
+              />
+            </div>
+          );
+        }
+        case 'amount': {
+          if (type === 'transaction') {
+            return <span>{currencyFormatter.format(user?.amount || 0)}</span>;
+          }
+
+          return (
+            <div className="relative flex gap-2 items-center">
+              <Image
+                src={logo.src}
+                alt="DCarbon"
+                as={NextImage}
+                width={24}
+                height={24}
+                draggable={false}
+              />
+
+              <span>
+                {(user?.amount || 0)?.toLocaleString('en-US')} DCarbon
+              </span>
+            </div>
+          );
+        }
+        default:
+          return cellValue;
+      }
+    },
+    [],
+  );
 
   return (
     <Tabs
@@ -136,12 +264,12 @@ function CertificateListContent() {
             wrapper: 'p-0',
           }}
         >
-          <TableHeader columns={columns}>
+          <TableHeader columns={certificateColumns}>
             {(column) => (
               <TableColumn key={column.key}>{column.label}</TableColumn>
             )}
           </TableHeader>
-          <TableBody items={rows}>
+          <TableBody items={certificateRows}>
             {(item) => (
               <TableRow key={item.key}>
                 {(columnKey) => (
@@ -154,7 +282,7 @@ function CertificateListContent() {
       </Tab>
       <Tab key="transaction" title="Transaction">
         <Table
-          aria-label="Certificated Table"
+          aria-label="Transaction Table"
           shadow="none"
           radius="none"
           classNames={{
@@ -164,16 +292,65 @@ function CertificateListContent() {
             wrapper: 'p-0',
           }}
         >
-          <TableHeader columns={columns}>
+          <TableHeader columns={certificateColumns}>
             {(column) => (
               <TableColumn key={column.key}>{column.label}</TableColumn>
             )}
           </TableHeader>
-          <TableBody items={rows}>
+          <TableBody items={transactionRows}>
             {(item) => (
               <TableRow key={item.key}>
                 {(columnKey) => (
-                  <TableCell>{renderCell(item, columnKey)}</TableCell>
+                  <TableCell>
+                    {renderCell(item, columnKey, 'transaction')}
+                  </TableCell>
+                )}
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </Tab>
+
+      <Tab key="list-carbon" title="List Carbon">
+        <div>
+          <DCarbonButton color="primary" className="min-w-[150px] h-[34px]">
+            Burn
+          </DCarbonButton>
+        </div>
+        <Table
+          checkboxesProps={{
+            radius: 'none',
+            size: 'sm',
+            classNames: {
+              wrapper:
+                'before:border-[#454545] before:border-1 after:bg-primary-color',
+            },
+          }}
+          selectionMode="multiple"
+          selectedKeys={selectedKeys}
+          onSelectionChange={setSelectedKeys}
+          aria-label="List Carbon Table"
+          shadow="none"
+          radius="none"
+          classNames={{
+            th: 'bg-white h-[56px] border-b-1 border-[#DDE1E6] text-sm text-[#4F4F4F] font-medium',
+            td: 'h-[48px] rounded-[4px]',
+            tbody: '[&>*:nth-child(odd)]:bg-[#F6F6F6]',
+            wrapper: 'p-0',
+          }}
+        >
+          <TableHeader columns={listCarbonColumns}>
+            {(column) => (
+              <TableColumn key={column.key}>{column.label}</TableColumn>
+            )}
+          </TableHeader>
+          <TableBody items={certificateRows}>
+            {(item) => (
+              <TableRow key={item.key}>
+                {(columnKey) => (
+                  <TableCell>
+                    {renderCell(item, columnKey, 'list-carbon')}
+                  </TableCell>
                 )}
               </TableRow>
             )}

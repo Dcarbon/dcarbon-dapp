@@ -368,8 +368,10 @@ function NotConnectButton() {
                       placeholder="Your email address"
                       radius="none"
                       classNames={{
-                        inputWrapper:
+                        inputWrapper: cn(
                           'rounded-[4px] bg-[#F6F6F6] group-data-[focus=true]:ring-1 group-data-[focus=true]:bg-white group-data-[focus=true]:ring-primary-color max-w-[408px]',
+                          isInvalidEmail && 'group-data-[focus=true]:ring-0',
+                        ),
                         label: '!text-[#21272A]',
                         helperWrapper: 'px-0',
                       }}

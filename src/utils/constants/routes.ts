@@ -7,6 +7,9 @@ const API_ROUTES = {
     LIST: '/v1/projects',
     DETAIL: '/v1/projects/[slug]',
   },
+  COMMON: {
+    SEND_FEEDBACK: '/v1/common/send-feedback',
+  },
 };
 
 const WEB_ROUTES = {

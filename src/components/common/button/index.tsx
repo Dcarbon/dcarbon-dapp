@@ -7,6 +7,7 @@ function DCarbonButton({
   className,
   endContent,
   startContent,
+  isLoading,
   ...props
 }: {
   color?: 'primary';
@@ -14,6 +15,7 @@ function DCarbonButton({
   className?: string;
   endContent?: ReactNode;
   startContent?: ReactNode;
+  isLoading?: boolean;
   [key: string]: any;
 }) {
   return (
@@ -27,6 +29,7 @@ function DCarbonButton({
       color={color}
       endContent={endContent}
       startContent={startContent}
+      isLoading={isLoading}
       {...props}
     >
       {children}

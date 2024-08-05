@@ -2,7 +2,7 @@
 
 import React from 'react';
 import NextImage from 'next/image';
-import { Image, useDisclosure } from '@nextui-org/react';
+import { Image } from '@nextui-org/react';
 import swapIcon from 'public/images/projects/swap-icon.png';
 import transferIcon from 'public/images/projects/transfer-icon.svg';
 import { NumericFormat } from 'react-number-format';
@@ -10,16 +10,21 @@ import { NumericFormat } from 'react-number-format';
 import DCarbonButton from '../common/button';
 import DCarbonModal from '../common/modal';
 
-function SwapModal() {
-  const { onClose } = useDisclosure();
+function SwapModal({
+  isOpen,
+  onClose,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+}) {
   return (
     <DCarbonModal
       onClose={onClose}
-      isOpen
+      isOpen={isOpen}
       title="Swap Token"
       icon={swapIcon.src}
       cancelBtn={
-        <DCarbonButton fullWidth className="bg-[#F6F6F6]">
+        <DCarbonButton fullWidth className="bg-[#F6F6F6]" onClick={onClose}>
           Cancel
         </DCarbonButton>
       }

@@ -16,6 +16,7 @@ import {
 import fullLogoDarkIcon from 'public/images/common/full-logo-dark.svg';
 import fullLogoImage from 'public/images/common/full-logo.svg';
 
+// import SwapButton from '../features/swap-button';
 import ConnectButton from './button/connect-button';
 
 function Header() {
@@ -112,6 +113,9 @@ function Header() {
         </Link>
       </NavbarBrand>
       <NavbarContent justify="end">
+        {/* <NavbarItem>
+          <SwapButton />
+        </NavbarItem> */}
         <NavbarItem>
           <ConnectButton />
         </NavbarItem>

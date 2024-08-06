@@ -4,17 +4,24 @@ import React from 'react';
 import NextImage from 'next/image';
 import { ShowAlert } from '@/components/common/toast';
 import { Image } from '@nextui-org/react';
+import { useWallet } from '@solana/wallet-adapter-react';
 import copyIcon from 'public/images/common/copy.svg';
 import { useCopyToClipboard } from 'usehooks-ts';
 
 function CertificateProfile() {
   const [, copy] = useCopyToClipboard();
+  const { publicKey } = useWallet();
+
+  const shortWalletAddress =
+    (publicKey?.toBase58()?.slice(0, 5) || '') +
+    '...' +
+    (publicKey?.toBase58()?.slice(-5) || '');
   return (
     <div className="mt-[10px] text-sm font-light flex gap-[5px]">
-      <span>0x9157...jatmisiopakg48jga8smb</span>
+      <span>{publicKey ? shortWalletAddress : ''}</span>
       <button
         onClick={async () => {
-          await copy('0x9157...jatmisiopakg48jga8smb');
+          await copy(publicKey?.toBase58() || '');
           ShowAlert.success({ message: 'Copied to clipboard' });
         }}
       >

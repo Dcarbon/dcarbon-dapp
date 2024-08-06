@@ -87,50 +87,50 @@ function CertificateListContent() {
       {
         key: '1',
         date: 'June 26, 2024',
-        name: 'Name',
+        name: 'Cert',
         amount: '60000',
       },
       {
         key: '2',
         date: 'June 26, 2024',
-        name: 'Name',
+        name: 'Cert',
         amount: '60',
       },
       {
         key: '3',
         date: 'June 26, 2024',
-        name: 'Name',
+        name: 'Cert',
         amount: '60',
       },
       {
         key: '4',
         date: 'June 26, 2024',
-        name: 'Name',
+        name: 'Cert',
         amount: '60',
       },
 
       {
         key: '5',
         date: 'June 26, 2024',
-        name: 'Name',
+        name: 'Cert',
         amount: '60',
       },
       {
         key: '6',
         date: 'June 26, 2024',
-        name: 'Name',
+        name: 'Cert',
         amount: '60',
       },
       {
         key: '7',
         date: 'June 26, 2024',
-        name: 'Name',
+        name: 'Cert',
         amount: '60',
       },
       {
         key: '8',
         date: 'June 26, 2024',
-        name: 'Name',
+        name: 'Cert',
         amount: '60',
       },
     ],
@@ -160,50 +160,50 @@ function CertificateListContent() {
     {
       key: '1',
       date: 'June 26, 2024',
-      name: 'Name',
+      name: 'Cert',
       amount: '60',
     },
     {
       key: '2',
       date: 'June 26, 2024',
-      name: 'Name',
+      name: 'Cert',
       amount: '60',
     },
     {
       key: '3',
       date: 'June 26, 2024',
-      name: 'Name',
+      name: 'Cert',
       amount: '60',
     },
     {
       key: '4',
       date: 'June 26, 2024',
-      name: 'Name',
+      name: 'Cert',
       amount: '60000',
     },
 
     {
       key: '5',
       date: 'June 26, 2024',
-      name: 'Name',
+      name: 'Cert',
       amount: '60000',
     },
     {
       key: '6',
       date: 'June 26, 2024',
-      name: 'Name',
+      name: 'Cert',
       amount: '60000',
     },
     {
       key: '7',
       date: 'June 26, 2024',
-      name: 'Name',
+      name: 'Cert',
       amount: '60000',
     },
     {
       key: '8',
       date: 'June 26, 2024',
-      name: 'Name',
+      name: 'Cert',
       amount: '60000',
     },
   ];
@@ -214,7 +214,10 @@ function CertificateListContent() {
       key: 'amount',
       label: 'Total Carbon',
     },
-
+    {
+      key: 'symbol',
+      label: 'Token Symbol',
+    },
     {
       key: 'action',
       label: 'Action',
@@ -261,6 +264,9 @@ function CertificateListContent() {
         }
         case 'name': {
           return <span className="text-base">{cellValue}</span>;
+        }
+        case 'symbol': {
+          return <span className="text-base">{user?.symbol}</span>;
         }
         case 'action': {
           if (type === 'transaction' || type === 'list-carbon') {
@@ -334,7 +340,8 @@ function CertificateListContent() {
               />
 
               <span>
-                {(+user?.amount || 0)?.toLocaleString('en-US')} DCarbon
+                {(+user?.amount || 0)?.toLocaleString('en-US')}{' '}
+                {user?.name || 'Carbon'}
               </span>
             </div>
           );

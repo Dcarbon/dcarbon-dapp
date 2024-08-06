@@ -10,16 +10,15 @@ const env = createEnv({
   },
   client: {
     NEXT_PUBLIC_API_ENDPOINT: z.string().min(1).includes('http'),
-    NEXT_PUBLIC_AUTH_METHOD: z.union([
-      z.literal('header'),
-      z.literal('cookie'),
-      z.string().nullish(),
-    ]),
+    NEXT_PUBLIC_AUTH_METHOD: z
+      .union([z.literal('header'), z.literal('cookie')])
+      .nullish(),
     NEXT_PUBLIC_BASE_URL: z.string().min(1).includes('http'),
     NEXT_PUBLIC_ALLOWED_COOKIE_DOMAIN: z.string().min(1),
     NEXT_PUBLIC_SENTRY_DSN: z.string().min(1).includes('http').nullish(),
     NEXT_PUBLIC_DEBUG: z.string().nullish(),
     NEXT_PUBLIC_PO_RESET_PASSWORD: z.string().includes('http').nullish(),
+    NEXT_PUBLIC_MODE: z.union([z.literal('dev'), z.literal('prod')]).nullish(),
   },
   runtimeEnv: {
     NEXT_PUBLIC_API_ENDPOINT: process.env.NEXT_PUBLIC_API_ENDPOINT,
@@ -34,6 +33,7 @@ const env = createEnv({
     SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
     NEXT_PUBLIC_DEBUG: process.env.NEXT_PUBLIC_DEBUG,
     NEXT_PUBLIC_PO_RESET_PASSWORD: process.env.NEXT_PUBLIC_PO_RESET_PASSWORD,
+    NEXT_PUBLIC_MODE: process.env.NEXT_PUBLIC_MODE,
   },
 });
 

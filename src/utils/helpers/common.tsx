@@ -1,6 +1,8 @@
+import { PublicKey } from '@solana/web3.js';
 import chalk from 'chalk';
 import clsx, { ClassValue } from 'clsx';
 import { SweetAlertOptions } from 'sweetalert2';
+import { Cache } from 'swr';
 import { twMerge } from 'tailwind-merge';
 
 function isEmpty(obj: Array<any> | object): boolean {
@@ -84,6 +86,49 @@ const currencyFormatter = new Intl.NumberFormat('en-US', {
   minimumFractionDigits: 0,
 });
 
+const getAllCacheDataByKey = (
+  key: string,
+  cache: Cache<any>,
+  pick: string,
+): any[] => {
+  const keys = Array.from(cache.keys());
+  const targetKeys = keys.filter((k) => k.includes(key));
+  const result: any = [];
+  targetKeys.forEach((k) => {
+    const data = cache.get(k);
+    if (data?.data) {
+      result.push(...(data.data?.[pick] || []));
+    }
+  });
+
+  return result;
+};
+
+const shortAddress = (
+  type: 'text' | 'address',
+  address?: string | PublicKey,
+) => {
+  if (!address) {
+    return '';
+  }
+  let result = '';
+  if (type === 'address') {
+    result =
+      ((address as PublicKey)?.toBase58()?.slice(0, 5) || '') +
+      '...' +
+      ((address as PublicKey)?.toBase58()?.slice(-5) || '');
+  }
+
+  if (type === 'text') {
+    result =
+      ((address as string)?.slice(0, 5) || '') +
+      '...' +
+      ((address as string)?.slice(-5) || '');
+  }
+
+  return result;
+};
+
 export {
   removeUndefinedAndNull,
   isEmpty,
@@ -92,4 +137,6 @@ export {
   getInfoDevice,
   cn,
   currencyFormatter,
+  getAllCacheDataByKey,
+  shortAddress,
 };

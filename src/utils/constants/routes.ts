@@ -10,6 +10,9 @@ const API_ROUTES = {
   COMMON: {
     SEND_FEEDBACK: '/v1/common/send-feedback',
   },
+  USER: {
+    GET_LIST_CARBON: '/v1/user/list-carbon',
+  },
 };
 
 const WEB_ROUTES = {

@@ -2,10 +2,21 @@
 
 import React, { useMemo, useState } from 'react';
 import NextImage from 'next/image';
+import { doGetListCarbon } from '@/adapters/user';
 import DCarbonButton from '@/components/common/button';
-import { currencyFormatter } from '@/utils/helpers/common';
+import DCarbonLoading from '@/components/common/loading/base-loading';
+import { ShowAlert } from '@/components/common/toast';
+import { QUERY_KEYS } from '@/utils/constants';
 import {
+  currencyFormatter,
+  getAllCacheDataByKey,
+  shortAddress,
+} from '@/utils/helpers/common';
+import {
+  Button,
   Image,
+  Link,
+  Pagination,
   Tab,
   Table,
   TableBody,
@@ -16,16 +27,54 @@ import {
   Tabs,
   useDisclosure,
 } from '@nextui-org/react';
+import { useWallet } from '@solana/wallet-adapter-react';
+import { env } from 'env.mjs';
+import copyIcon from 'public/images/common/copy.svg';
 import logo from 'public/images/common/logo.svg';
 import solScanIcon from 'public/images/common/sol-scan.avif';
 import solanaExplorerIcon from 'public/images/common/solana-explorer.avif';
 import viewIcon from 'public/images/common/view-icon.svg';
+import useSWR, { useSWRConfig } from 'swr';
+import { useCopyToClipboard } from 'usehooks-ts';
 
 import BurnModal from './burn-modal';
+
+const rowsPerPage = 10;
 
 function CertificateListContent() {
   const [selectedKeys, setSelectedKeys] = useState<any>(new Set([]));
   const { isOpen, onClose, onOpen } = useDisclosure();
+  const { publicKey } = useWallet();
+  const [listCarbonPage, setListCarbonPage] = useState<number>(1);
+  const { cache } = useSWRConfig();
+  const listCarbonCacheData = getAllCacheDataByKey(
+    QUERY_KEYS.USER.GET_LIST_CARBON,
+    cache,
+    'data',
+  );
+  const [, copy] = useCopyToClipboard();
+
+  const { data, isLoading } = useSWR(
+    [QUERY_KEYS.USER.GET_LIST_CARBON, publicKey, listCarbonPage],
+    ([, wallet, page]) => {
+      return doGetListCarbon({
+        wallet: wallet?.toBase58(),
+        page,
+        limit: rowsPerPage,
+      });
+    },
+    {
+      keepPreviousData: true,
+    },
+  );
+
+  const listCarbonPages = useMemo(() => {
+    return data?.paging?.total
+      ? Math.ceil(data?.paging?.total / rowsPerPage)
+      : 0;
+  }, [data?.paging?.total]);
+
+  const listCarbonLoadingState = isLoading ? 'loading' : 'idle';
 
   const certificateRows = useMemo(
     () => [
@@ -154,6 +203,7 @@ function CertificateListContent() {
   ];
 
   const listCarbonColumns = [
+    { key: 'mint', label: 'Token address' },
     {
       key: 'amount',
       label: 'List of Dcarbon',
@@ -170,6 +220,36 @@ function CertificateListContent() {
       const cellValue = user[columnKey as keyof any];
 
       switch (columnKey) {
+        case 'mint': {
+          return (
+            <div className="mt-[10px] text-sm font-light flex gap-[5px] items-center">
+              <span className="text-[#4F4F4F]">
+                {shortAddress('text', cellValue)}
+              </span>
+              <Button
+                onClick={async () => {
+                  await copy(publicKey?.toBase58() || '');
+                  ShowAlert.success({ message: 'Copied to clipboard' });
+                }}
+                variant="light"
+                isIconOnly
+                className="h-[24px] min-w-[24px] w-[24px] data-[hover=true]:bg-transparent"
+                radius="none"
+                disableRipple
+                disableAnimation
+              >
+                <Image
+                  src={copyIcon.src}
+                  alt="Copy"
+                  width={20}
+                  height={20}
+                  as={NextImage}
+                  draggable={false}
+                />
+              </Button>
+            </div>
+          );
+        }
         case 'date': {
           return <span className="text-[#4F4F4F]">{cellValue}</span>;
         }
@@ -180,27 +260,37 @@ function CertificateListContent() {
           if (type === 'transaction' || type === 'list-carbon') {
             return (
               <div className="relative flex gap-4">
-                <Image
-                  src={solanaExplorerIcon.src}
-                  alt="Solana Explorer"
-                  as={NextImage}
-                  width={24}
-                  height={24}
-                  draggable={false}
-                  radius="none"
-                  className="min-w-[24px]"
-                />
+                <Link
+                  href={`https://explorer.solana.com/address/${user?.token_account || ''}${env.NEXT_PUBLIC_MODE === 'prod' ? '' : '?cluster=devnet'}`}
+                  isExternal
+                >
+                  <Image
+                    src={solanaExplorerIcon.src}
+                    alt="Solana Explorer"
+                    as={NextImage}
+                    width={24}
+                    height={24}
+                    draggable={false}
+                    radius="none"
+                    className="min-w-[24px]"
+                  />
+                </Link>
 
-                <Image
-                  src={solScanIcon.src}
-                  alt="Solscan"
-                  as={NextImage}
-                  width={24}
-                  height={24}
-                  draggable={false}
-                  radius="none"
-                  className="min-w-[24px]"
-                />
+                <Link
+                  href={`https://solscan.io/account/${user?.token_account || ''}${env.NEXT_PUBLIC_MODE === 'prod' ? '' : '?cluster=devnet'}`}
+                  isExternal
+                >
+                  <Image
+                    src={solScanIcon.src}
+                    alt="Solscan"
+                    as={NextImage}
+                    width={24}
+                    height={24}
+                    draggable={false}
+                    radius="none"
+                    className="min-w-[24px]"
+                  />
+                </Link>
               </div>
             );
           }
@@ -255,20 +345,20 @@ function CertificateListContent() {
       return 0;
     }
     if (selectedKeys === 'all') {
-      return certificateRows?.reduce((current, item) => {
+      return listCarbonCacheData?.reduce((current, item) => {
         return current + (+item.amount || 0);
       }, 0);
     }
     let count = 0;
     selectedKeys.forEach((value: any) => {
       const newAmount = +(
-        certificateRows?.find((item) => item.key === value)?.amount || 0
+        listCarbonCacheData?.find((item) => item.mint === value)?.amount || 0
       );
       count += newAmount;
     });
 
     return count;
-  }, [certificateRows, selectedKeys]);
+  }, [listCarbonCacheData, selectedKeys]);
 
   return (
     <>
@@ -346,7 +436,7 @@ function CertificateListContent() {
         </Tab>
 
         <Tab key="list-carbon" title="List Carbon">
-          <div>
+          <div className="mb-2">
             <DCarbonButton
               color="primary"
               className="min-w-[150px] h-[34px]"
@@ -355,45 +445,68 @@ function CertificateListContent() {
               Burn
             </DCarbonButton>
           </div>
-          <Table
-            checkboxesProps={{
-              radius: 'none',
-              size: 'sm',
-              classNames: {
-                wrapper:
-                  'before:border-[#454545] before:border-1 after:bg-primary-color',
-              },
-            }}
-            selectionMode="multiple"
-            selectedKeys={selectedKeys}
-            onSelectionChange={setSelectedKeys}
-            aria-label="List Carbon Table"
-            shadow="none"
-            radius="none"
-            classNames={{
-              th: 'bg-white h-[56px] border-b-1 border-[#DDE1E6] text-sm text-[#4F4F4F] font-medium',
-              td: 'h-[48px] rounded-[4px] group-aria-[selected=false]:group-data-[hover=true]:before:bg-[#EAFFC7] cursor-pointer data-[selected=true]:before:bg-[#EAFFC7]',
-              tbody: '[&>*:nth-child(odd)]:bg-[#F6F6F6]',
-              wrapper: 'p-0',
-            }}
-          >
-            <TableHeader columns={listCarbonColumns}>
-              {(column) => (
-                <TableColumn key={column.key}>{column.label}</TableColumn>
-              )}
-            </TableHeader>
-            <TableBody items={certificateRows}>
-              {(item) => (
-                <TableRow key={item.key}>
-                  {(columnKey) => (
-                    <TableCell>
-                      {renderCell(item, columnKey, 'list-carbon')}
-                    </TableCell>
-                  )}
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+          <div>
+            <Table
+              bottomContent={
+                listCarbonPages > 1 ? (
+                  <div className="flex w-full justify-center z-[11]">
+                    <Pagination
+                      isCompact
+                      showControls
+                      showShadow
+                      color="success"
+                      page={listCarbonPage}
+                      total={listCarbonPages}
+                      onChange={(page) => setListCarbonPage(page)}
+                    />
+                  </div>
+                ) : null
+              }
+              checkboxesProps={{
+                radius: 'none',
+                size: 'sm',
+                classNames: {
+                  wrapper:
+                    'before:border-[#454545] before:border-1 after:bg-primary-color',
+                },
+              }}
+              selectionMode="multiple"
+              selectedKeys={selectedKeys}
+              onSelectionChange={setSelectedKeys}
+              aria-label="List Carbon Table"
+              shadow="none"
+              radius="none"
+              classNames={{
+                th: 'bg-white h-[56px] border-b-1 border-[#DDE1E6] text-sm text-[#4F4F4F] font-medium',
+                td: 'h-[48px] rounded-[4px] group-aria-[selected=false]:group-data-[hover=true]:before:bg-[#EAFFC7] cursor-pointer data-[selected=true]:before:bg-[#EAFFC7]',
+                tbody: '[&>*:nth-child(odd)]:bg-[#F6F6F6]',
+                wrapper: 'p-0',
+              }}
+              removeWrapper
+            >
+              <TableHeader columns={listCarbonColumns}>
+                {(column) => (
+                  <TableColumn key={column.key}>{column.label}</TableColumn>
+                )}
+              </TableHeader>
+              <TableBody
+                emptyContent={'No Carbon found!'}
+                items={data?.data || []}
+                loadingContent={<DCarbonLoading />}
+                loadingState={listCarbonLoadingState}
+              >
+                {(item) => (
+                  <TableRow key={item.mint}>
+                    {(columnKey) => (
+                      <TableCell>
+                        {renderCell(item, columnKey, 'list-carbon')}
+                      </TableCell>
+                    )}
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </Tab>
       </Tabs>
       <BurnModal

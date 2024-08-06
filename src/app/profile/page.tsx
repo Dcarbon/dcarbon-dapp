@@ -8,7 +8,7 @@ import avatar from 'public/images/certificates/avatar.png';
 import cameraIcon from 'public/images/certificates/camera.svg';
 import editIcon from 'public/images/certificates/edit.svg';
 
-function CertificatesPage() {
+async function CertificatesPage() {
   return (
     <>
       <main className="px-4 lg:px-[64px] pb-[32px] mt-[90px] lg:mt-[60px] min-h-screen flex gap-[48px] bg-[url('/images/certificates/cover.avif')] bg-no-repeat bg-fixed bg-[length:1920px_291px] bg-[#F6F6F6]">

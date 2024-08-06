@@ -20,7 +20,7 @@ function BurnModal({
     <DCarbonModal
       onClose={onClose}
       isOpen={isOpen}
-      title="Burn your DCarbon"
+      title="Burned CARBON can not be recirculated"
       icon={burnIcon.src}
       cancelBtn={
         <DCarbonButton fullWidth className="bg-[#F6F6F6]" onClick={onClose}>
@@ -32,7 +32,7 @@ function BurnModal({
           Next
         </DCarbonButton>
       }
-      description="Lorem ipsum dolor sit amet consectetur. Feugiat pellentesque."
+      description="Every CARBON counts towards a net zero future. Are you ready to make a difference today?"
     >
       <div className="flex flex-col gap-2 items-center mb-2">
         <div className="flex flex-col gap-2 w-full">

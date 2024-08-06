@@ -14,7 +14,6 @@ import {
   Image,
   Link,
   Spinner,
-  useDisclosure,
 } from '@nextui-org/react';
 import { useInView } from 'framer-motion';
 import quickBuyImage from 'public/images/projects/quick-buy-cover.avif';
@@ -22,8 +21,6 @@ import ReactCountryFlag from 'react-country-flag';
 import useSWRInfinite from 'swr/infinite';
 import { useDebounceValue } from 'usehooks-ts';
 import { useProjectStore } from '@/app/project-store-provider';
-
-import BuyModal from './buy-modal';
 
 type ProjectResponse = {
   id: string;
@@ -150,8 +147,6 @@ function ProjectContent({
     setLoading(isLoading);
   }, [isLoading]);
 
-  const { isOpen, onClose, onOpen } = useDisclosure();
-
   const dataMerged = useMemo(
     () =>
       (data as any)?.reduce((prevData: any, current: any) => {
@@ -162,20 +157,26 @@ function ProjectContent({
 
   return (
     <>
-      <BuyModal isOpen={isOpen} onClose={onClose} />
-
       <div className="w-full relative">
         {mode === 'quick-buy' ? (
-          <Image
-            src={quickBuyImage.src}
-            alt="quick buy"
-            draggable={false}
-            as={NextImage}
-            width={1336}
-            height={807}
-            radius="none"
-            className="rounded-[16px]"
-          />
+          <div className="relative w-full min-h-[807px]">
+            <Image
+              src={quickBuyImage.src}
+              alt="quick buy"
+              draggable={false}
+              as={NextImage}
+              width={1336}
+              height={807}
+              sizes="100vw"
+              style={{
+                width: '100%',
+                height: 'auto',
+              }}
+              radius="none"
+              className="rounded-[16px]"
+              removeWrapper
+            />
+          </div>
         ) : dataMerged?.length !== 0 ? (
           <>
             <div className="gap-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 mt-[2px]">
@@ -242,13 +243,17 @@ function ProjectContent({
                           </p>
                         </Link>
 
-                        <DCarbonButton
-                          color="primary"
-                          fullWidth
-                          onClick={onOpen}
+                        <Link
+                          href={WEB_ROUTES.PROJECT_DETAIL?.replace(
+                            '[slug]',
+                            item?.slug || '',
+                          )}
+                          className="w-full"
                         >
-                          Buy Now
-                        </DCarbonButton>
+                          <DCarbonButton color="primary" fullWidth>
+                            Buy Now
+                          </DCarbonButton>
+                        </Link>
                       </CardFooter>
                     </Card>
                   </div>

@@ -1,12 +1,23 @@
 'use client';
 
 import React, { useState } from 'react';
+import NextImage from 'next/image';
 import DCarbonButton from '@/components/common/button';
+import { Image, Select, Selection, SelectItem } from '@nextui-org/react';
+import arrowDownIcon from 'public/images/common/arrow-down-icon.svg';
 import { NumericFormat } from 'react-number-format';
+
+const assetSelectOptions = [
+  {
+    label: 'USDC',
+    value: 'usdc',
+  },
+];
 
 function InformationDetailSidebar({ data }: { data: any }) {
   const [quantity, setQuantity] = useState<string>('');
   const carbonCreditInfo = data?.data?.carbon_credit_info;
+  const [asset, setAsset] = useState<Selection>(new Set(['usdc']));
 
   return (
     <>
@@ -43,7 +54,7 @@ function InformationDetailSidebar({ data }: { data: any }) {
                   setQuantity(q.value);
                 }}
                 id="quantity"
-                className="text-sm w-full bg-white p-3 pr-[82.63px] rounded h-[40px] outline-none hover:bg-gray-50 transition-all focus:ring-1 focus:ring-primary-color placeholder:text-[#888] placeholder:text-sm placeholder:font-normal focus:bg-white"
+                className="text-sm w-full bg-white p-3 pr-[82.63px] rounded h-[40px] outline-none hover:bg-default-200 transition-all focus:ring-1 focus:ring-primary-color placeholder:text-[#888] placeholder:text-sm placeholder:font-normal focus:bg-white"
                 placeholder="0.1"
               />
 
@@ -58,17 +69,43 @@ function InformationDetailSidebar({ data }: { data: any }) {
               Asset
             </label>
             <div className="relative">
-              <NumericFormat
-                thousandSeparator
-                allowNegative={false}
-                id="asset"
-                className="text-sm w-full bg-white p-3 pr-[52.63px] rounded h-[40px] outline-none hover:bg-gray-50 transition-all focus:ring-1 focus:ring-primary-color placeholder:text-[#888] placeholder:text-sm placeholder:font-normal focus:bg-white"
-                placeholder="0"
-              />
-
-              <div className="text-sm text-[#4F4F4F] absolute right-3 top-1/2 -translate-y-1/2 cursor-default">
-                ETH
-              </div>
+              <Select
+                aria-label="Asset"
+                label=""
+                items={assetSelectOptions}
+                classNames={{
+                  trigger: 'bg-white shadow-none rounded-[4px]',
+                  popoverContent: 'rounded-[4px]',
+                }}
+                listboxProps={{
+                  itemClasses: {
+                    base: 'data-[selectable=true]:focus:bg-[#EAFFC7] rounded-[4px]',
+                  },
+                }}
+                radius="none"
+                selectedKeys={asset}
+                onSelectionChange={setAsset}
+                disallowEmptySelection
+                selectorIcon={
+                  <div>
+                    <Image
+                      src={arrowDownIcon.src}
+                      as={NextImage}
+                      alt="arrow"
+                      width={20}
+                      height={20}
+                      draggable={false}
+                      radius="none"
+                    />
+                  </div>
+                }
+              >
+                {(item) => (
+                  <SelectItem key={item.value} textValue={item.label}>
+                    <div className="flex gap-2 items-center">{item.label}</div>
+                  </SelectItem>
+                )}
+              </Select>
             </div>
           </div>
 
@@ -78,15 +115,18 @@ function InformationDetailSidebar({ data }: { data: any }) {
             </label>
             <div className="relative">
               <NumericFormat
+                disabled
                 thousandSeparator
                 allowNegative={false}
                 id="total"
-                className="text-sm w-full bg-white p-3 pr-[52.63px] rounded h-[40px] outline-none hover:bg-gray-50 transition-all focus:ring-1 focus:ring-primary-color placeholder:text-[#888] placeholder:text-sm placeholder:font-normal focus:bg-white"
+                className="text-sm w-full bg-[#E7E7E7] p-3 pr-[52.63px] rounded h-[40px] outline-none hover:bg-default-200 transition-all focus:ring-1 focus:ring-primary-color placeholder:text-[#888] placeholder:text-sm placeholder:font-normal focus:bg-white"
                 placeholder="0"
               />
 
               <div className="text-sm text-[#4F4F4F] absolute right-3 top-1/2 -translate-y-1/2 cursor-default">
-                ETH
+                {(
+                  Array.from((asset as any)?.values())?.[0] as string
+                )?.toUpperCase() || ''}
               </div>
             </div>
           </div>

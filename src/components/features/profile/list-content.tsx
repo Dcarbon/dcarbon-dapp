@@ -7,11 +7,7 @@ import DCarbonButton from '@/components/common/button';
 import DCarbonLoading from '@/components/common/loading/base-loading';
 import { ShowAlert } from '@/components/common/toast';
 import { QUERY_KEYS } from '@/utils/constants';
-import {
-  currencyFormatter,
-  getAllCacheDataByKey,
-  shortAddress,
-} from '@/utils/helpers/common';
+import { getAllCacheDataByKey, shortAddress } from '@/utils/helpers/common';
 import {
   Button,
   Image,
@@ -31,8 +27,8 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { env } from 'env.mjs';
 import copyIcon from 'public/images/common/copy.svg';
 import logo from 'public/images/common/logo.svg';
-import solScanIcon from 'public/images/common/sol-scan.avif';
-import solanaExplorerIcon from 'public/images/common/solana-explorer.avif';
+import solScanIcon from 'public/images/common/sol-scan.png';
+import solanaExplorerIcon from 'public/images/common/solana-explorer.png';
 import viewIcon from 'public/images/common/view-icon.svg';
 import useSWR, { useSWRConfig } from 'swr';
 import { useCopyToClipboard } from 'usehooks-ts';
@@ -53,10 +49,19 @@ function CertificateListContent() {
     'data',
   );
   const [, copy] = useCopyToClipboard();
+  const [selectedTab, setSelectedTab] = useState<
+    'certificated' | 'transaction' | 'list-carbon'
+  >('certificated');
 
   const { data, isLoading } = useSWR(
-    [QUERY_KEYS.USER.GET_LIST_CARBON, publicKey, listCarbonPage],
+    () =>
+      publicKey && listCarbonPage && selectedTab === 'list-carbon'
+        ? [QUERY_KEYS.USER.GET_LIST_CARBON, publicKey, listCarbonPage]
+        : null,
     ([, wallet, page]) => {
+      if (!wallet || !page || selectedTab !== 'list-carbon') {
+        return null;
+      }
       return doGetListCarbon({
         wallet: wallet?.toBase58(),
         page,
@@ -65,6 +70,7 @@ function CertificateListContent() {
     },
     {
       keepPreviousData: true,
+      revalidateOnMount: true,
     },
   );
 
@@ -82,7 +88,7 @@ function CertificateListContent() {
         key: '1',
         date: 'June 26, 2024',
         name: 'Name',
-        amount: '60',
+        amount: '60000',
       },
       {
         key: '2',
@@ -206,7 +212,7 @@ function CertificateListContent() {
     { key: 'mint', label: 'Token address' },
     {
       key: 'amount',
-      label: 'List of Dcarbon',
+      label: 'Total Carbon',
     },
 
     {
@@ -228,7 +234,7 @@ function CertificateListContent() {
               </span>
               <Button
                 onClick={async () => {
-                  await copy(publicKey?.toBase58() || '');
+                  await copy(cellValue || '');
                   ShowAlert.success({ message: 'Copied to clipboard' });
                 }}
                 variant="light"
@@ -311,7 +317,7 @@ function CertificateListContent() {
           if (type === 'transaction') {
             return (
               <span className="text-base">
-                {currencyFormatter.format(user?.amount || 0)}
+                {(+user?.amount || 0)?.toLocaleString('en-US')} USDC
               </span>
             );
           }
@@ -328,7 +334,7 @@ function CertificateListContent() {
               />
 
               <span>
-                {(user?.amount || 0)?.toLocaleString('en-US')} DCarbon
+                {(+user?.amount || 0)?.toLocaleString('en-US')} DCarbon
               </span>
             </div>
           );
@@ -374,7 +380,8 @@ function CertificateListContent() {
           tabList: 'p-0',
           panel: 'pt-[24px] pb-0 w-full',
         }}
-        defaultSelectedKey={'certificated'}
+        selectedKey={selectedTab}
+        onSelectionChange={setSelectedTab as any}
       >
         <Tab key="certificated" title="Certificated">
           <Table

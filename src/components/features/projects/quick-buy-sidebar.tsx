@@ -8,7 +8,7 @@ function QuickBuySidebar() {
     <>
       <div>
         <p className="text-sm font-light text-[#454545] mb-16">
-          Lorem ipsum dolor sit amet consectetur. Pellentesque quis.
+          Purchase credits from any of our farms.
         </p>
 
         <Input

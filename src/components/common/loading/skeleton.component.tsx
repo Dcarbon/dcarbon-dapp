@@ -1,14 +1,18 @@
-import { cn } from '@/utils/helpers/common';
+import { cn, Skeleton as NextUISkeleton } from '@nextui-org/react';
 
 function Skeleton({
+  children,
   className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
-    <div
-      className={cn('animate-pulse rounded-md bg-primary/10', className)}
-      {...props}
-    />
+    <NextUISkeleton
+      className={cn('before:!duration-[2000ms] rounded-lg', className)}
+    >
+      {children}
+    </NextUISkeleton>
   );
 }
 

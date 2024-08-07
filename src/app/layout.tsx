@@ -9,6 +9,7 @@ import dynamic from 'next/dynamic';
 import { Lexend as FontSans } from 'next/font/google';
 import Footer from '@/components/common/footer';
 import Header from '@/components/common/header';
+import Ribbon from '@/components/features/ribbon';
 import NextTopLoader from 'nextjs-toploader';
 
 import GlobalStoreProvider from './global-store-provider';
@@ -55,6 +56,7 @@ const RootLayout = (props: { children: React.ReactNode }) => {
           </SWRProvider>
         </NextuiProviders>
         <SonnerToaster position="top-right" />
+        <Ribbon />
       </body>
     </html>
   );

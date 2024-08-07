@@ -1,6 +1,10 @@
+'use client';
+
 import React from 'react';
 import NextImage from 'next/image';
-import { WEB_ROUTES } from '@/utils/constants';
+import { carbonTypes, getWalletInfo } from '@/adapters/user';
+import { QUERY_KEYS, WEB_ROUTES } from '@/utils/constants';
+import { shortAddress } from '@/utils/helpers/common';
 import {
   Button,
   Chip,
@@ -9,37 +13,66 @@ import {
   Dropdown,
   DropdownItem,
   DropdownMenu,
+  DropdownSection,
   DropdownTrigger,
   Image,
+  Link,
 } from '@nextui-org/react';
 import { useWallet } from '@solana/wallet-adapter-react';
+import { env } from 'env.mjs';
+import arrowRight from 'public/images/common/arrow-right-wallet-button.svg';
 import avatarImage from 'public/images/common/avatar.png';
 import closeModal from 'public/images/common/close-modal.svg';
+import dcarbonIcon from 'public/images/common/dcarbon-icon.svg';
+import carbonIcon from 'public/images/common/logo.svg';
 import logoutImage from 'public/images/common/logout.svg';
 import profileImage from 'public/images/common/profile.svg';
+import solScanIcon from 'public/images/common/sol-scan.png';
+import solanaExplorerIcon from 'public/images/common/solana-explorer.png';
 import supportImage from 'public/images/common/support.svg';
+import useSWRMutation from 'swr/mutation';
+
+import { Skeleton } from '../loading/skeleton.component';
 
 function ConnectedButton() {
   const { publicKey, connected, wallet, disconnect, disconnecting } =
     useWallet();
 
+  const {
+    trigger,
+    isMutating,
+    data: walletInfo,
+  } = useSWRMutation(
+    () => (publicKey ? [QUERY_KEYS.USER.GET_WALLET_INFO, publicKey] : null),
+    ([, wallet]) => {
+      if (!wallet) return;
+      return getWalletInfo(wallet.toBase58());
+    },
+  );
   if (!publicKey || !connected || !wallet) {
     return null;
   }
-
-  const shortWalletAddress =
-    (publicKey?.toBase58()?.slice(0, 5) || '') +
-    '...' +
-    (publicKey?.toBase58()?.slice(-5) || '');
+  const isShowCarbonList =
+    !isMutating && walletInfo?.data && walletInfo.data?.carbon_list?.length > 0;
 
   return (
     <Dropdown
       backdrop="blur"
       radius="md"
       classNames={{
-        content: 'p-0',
+        content: 'p-0 h-full',
+        base: 'select-none',
       }}
       offset={-33}
+      onOpenChange={async (open) => {
+        try {
+          if (open) {
+            await trigger();
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      }}
     >
       <DropdownTrigger>
         <Button
@@ -64,7 +97,7 @@ function ConnectedButton() {
             'bg-[#7BDA08] text-[#1B1B1B] hover:bg-[#5DAF01] font-medium rounded-[4px] px-2 py-1 sm:py-[16px] sm:px-[32px]',
           )}
         >
-          {shortWalletAddress}
+          {shortAddress('address', publicKey)}
         </Button>
       </DropdownTrigger>
       <DropdownMenu
@@ -72,7 +105,7 @@ function ConnectedButton() {
         className="p-4 sm:p-[24px] min-w-[250px] sm:min-w-[348px] h-[calc(100vh-32px)] overflow-y-auto"
         disabledKeys={['address', 'wallet_balance', 'divider']}
         classNames={{
-          list: 'gap-4',
+          list: 'h-full justify-start',
         }}
         defaultSelectedKeys={[]}
       >
@@ -90,7 +123,11 @@ function ConnectedButton() {
             radius="none"
           />
         </DropdownItem>
-        <DropdownItem isReadOnly key="address" className="opacity-100 my-1">
+        <DropdownItem
+          isReadOnly
+          key="address"
+          className="opacity-100 my-1 h-fit"
+        >
           <div className="flex gap-[10px] items-center">
             <Image
               src={avatarImage.src}
@@ -102,10 +139,14 @@ function ConnectedButton() {
               radius="none"
             />
 
-            <span>{shortWalletAddress}</span>
+            <span>{shortAddress('address', publicKey)}</span>
           </div>
         </DropdownItem>
-        <DropdownItem isReadOnly key="wallet_balance" className="opacity-100">
+        <DropdownItem
+          isReadOnly
+          key="wallet_balance"
+          className="opacity-100 h-fit"
+        >
           <div className="p-4 bg-[#F6F6F6] rounded-lg flex flex-col gap-4">
             <div className="flex items-center gap-2 justify-between flex-wrap">
               <div className="flex gap-2">
@@ -131,70 +172,204 @@ function ConnectedButton() {
               </Chip>
             </div>
 
-            <div className="flex flex-col gap-2">
-              <span className="text-[22px]">100 DCarbon</span>
-              <span className="text-sm text-[#4F4F4F] font-light">
-                ≈ 10 ETH
-              </span>
+            <div className="flex gap-2 items-center">
+              <Image
+                src={carbonIcon.src}
+                alt="Carbon"
+                as={NextImage}
+                width={36}
+                height={36}
+                draggable={false}
+              />
+              {isMutating ? (
+                <Skeleton className="max-w-48 w-full">
+                  <div className="h-[22px]"></div>
+                </Skeleton>
+              ) : (
+                <span className="text-[22px]">
+                  {walletInfo?.data?.carbon_amount ?? 0} Carbon
+                </span>
+              )}
+            </div>
+            <Divider />
+            <div className="flex gap-2 items-center">
+              <Image
+                src={dcarbonIcon.src}
+                alt="DCarbon"
+                as={NextImage}
+                width={36}
+                height={36}
+                draggable={false}
+              />
+              {isMutating ? (
+                <Skeleton className="max-w-48 w-full">
+                  <div className="h-[22px]"></div>
+                </Skeleton>
+              ) : (
+                <span className="text-[22px]">
+                  {walletInfo?.data?.dcarbon_amount ?? 0} DCarbon
+                </span>
+              )}
             </div>
           </div>
         </DropdownItem>
-        <DropdownItem key="divider" isReadOnly className="opacity-100">
+        <DropdownItem key="divider" isReadOnly className="opacity-100 h-fit">
           <Divider />
         </DropdownItem>
-
-        <DropdownItem
-          key="profile"
-          startContent={
-            <Image
-              src={profileImage.src}
-              alt="Profile"
-              as={NextImage}
-              width={32}
-              height={32}
-              draggable={false}
-              radius="none"
-            />
-          }
-          href={WEB_ROUTES.PROFILE}
-        >
-          Profile
+        <DropdownItem hidden isReadOnly className="py-0 mt-2 h-fit cursor-auto">
+          Amount of Carbon coins available
         </DropdownItem>
+        {isMutating ? (
+          <DropdownSection>
+            <DropdownItem isReadOnly className="w-full overflow-x-hidden py-1">
+              <Skeleton>
+                <div className="h-14"></div>
+              </Skeleton>
+            </DropdownItem>
+            <DropdownItem isReadOnly className="w-full overflow-x-hidden py-1">
+              <Skeleton>
+                <div className="h-14"></div>
+              </Skeleton>
+            </DropdownItem>
+            <DropdownItem isReadOnly className="w-full overflow-x-hidden py-1">
+              <Skeleton>
+                <div className="h-14"></div>
+              </Skeleton>
+            </DropdownItem>
+          </DropdownSection>
+        ) : (
+          <DropdownItem isReadOnly className="!hidden" />
+        )}
+        {isShowCarbonList && walletInfo.data ? (
+          <DropdownSection>
+            {walletInfo.data.carbon_list.map(
+              (item: carbonTypes, index: number) => (
+                <DropdownItem isReadOnly key={index} className="py-1">
+                  <div className="flex justify-between p-4 bg-[#F6F6F6] rounded-lg cursor-auto">
+                    <span className="text-medium font-normal">
+                      {item.amount} {' ' + item.name}
+                    </span>
+                    <div className="flex gap-3">
+                      <Link
+                        href={`https://explorer.solana.com/address/${item?.token_account || ''}${env.NEXT_PUBLIC_MODE === 'prod' ? '' : '?cluster=devnet'}`}
+                        isExternal
+                      >
+                        <Image
+                          src={solanaExplorerIcon.src}
+                          alt="Solana Explorer"
+                          as={NextImage}
+                          width={24}
+                          height={24}
+                          draggable={false}
+                          radius="none"
+                          className="min-w-[24px]"
+                        />
+                      </Link>
 
-        <DropdownItem
-          key="support"
-          startContent={
-            <Image
-              src={supportImage.src}
-              alt="Support"
-              as={NextImage}
-              width={32}
-              height={32}
-              draggable={false}
-              radius="none"
-            />
-          }
-        >
-          Support
-        </DropdownItem>
+                      <Link
+                        href={`https://solscan.io/account/${item?.token_account || ''}${env.NEXT_PUBLIC_MODE === 'prod' ? '' : '?cluster=devnet'}`}
+                        isExternal
+                      >
+                        <Image
+                          src={solScanIcon.src}
+                          alt="Solscan"
+                          as={NextImage}
+                          width={24}
+                          height={24}
+                          draggable={false}
+                          radius="none"
+                          className="min-w-[24px]"
+                        />
+                      </Link>
+                    </div>
+                  </div>
+                </DropdownItem>
+              ),
+            )}
+          </DropdownSection>
+        ) : (
+          <DropdownItem isReadOnly className="!hidden" />
+        )}
+        {isShowCarbonList ? (
+          <DropdownItem
+            isReadOnly
+            endContent={
+              <Link
+                href={WEB_ROUTES.PROFILE + '?tab=list-carbon'}
+                className="flex gap-2 flex-nowrap items-center hover:underline transition-all text-primary-color"
+              >
+                <span className="text-sm">Detail</span>
+                <Image
+                  src={arrowRight.src}
+                  alt="Arrow Right"
+                  as={NextImage}
+                  width={14}
+                  height={14}
+                  draggable={false}
+                />
+              </Link>
+            }
+            className="translate-y-[-10px] items-baseline justify-end cursor-auto py-1"
+          />
+        ) : (
+          <DropdownItem isReadOnly className="!hidden" />
+        )}
 
-        <DropdownItem
-          key="disconnect"
-          onClick={disconnect}
-          startContent={
-            <Image
-              src={logoutImage.src}
-              alt="Disconnect"
-              as={NextImage}
-              width={32}
-              height={32}
-              draggable={false}
-              radius="none"
-            />
-          }
-        >
-          Disconnect
-        </DropdownItem>
+        <DropdownSection>
+          <DropdownItem
+            key="profile"
+            className="flex items-center"
+            startContent={
+              <Image
+                src={profileImage.src}
+                alt="Profile"
+                as={NextImage}
+                width={32}
+                height={32}
+                draggable={false}
+                radius="none"
+              />
+            }
+            href={WEB_ROUTES.PROFILE}
+          >
+            Profile
+          </DropdownItem>
+
+          <DropdownItem
+            key="support"
+            startContent={
+              <Image
+                src={supportImage.src}
+                alt="Support"
+                as={NextImage}
+                width={32}
+                height={32}
+                draggable={false}
+                radius="none"
+              />
+            }
+          >
+            Support
+          </DropdownItem>
+
+          <DropdownItem
+            key="disconnect"
+            onClick={disconnect}
+            startContent={
+              <Image
+                src={logoutImage.src}
+                alt="Disconnect"
+                as={NextImage}
+                width={32}
+                height={32}
+                draggable={false}
+                radius="none"
+              />
+            }
+          >
+            Disconnect
+          </DropdownItem>
+        </DropdownSection>
       </DropdownMenu>
     </Dropdown>
   );

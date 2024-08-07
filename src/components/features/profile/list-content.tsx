@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import NextImage from 'next/image';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { doGetListCarbon } from '@/adapters/user';
 import DCarbonButton from '@/components/common/button';
 import DCarbonLoading from '@/components/common/loading/base-loading';
@@ -37,7 +38,12 @@ import BurnModal from './burn-modal';
 
 const rowsPerPage = 10;
 
+type tabTypes = 'certificated' | 'transaction' | 'list-carbon';
+
 function CertificateListContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
   const [selectedKeys, setSelectedKeys] = useState<any>(new Set([]));
   const { isOpen, onClose, onOpen } = useDisclosure();
   const { publicKey } = useWallet();
@@ -49,9 +55,9 @@ function CertificateListContent() {
     'data',
   );
   const [, copy] = useCopyToClipboard();
-  const [selectedTab, setSelectedTab] = useState<
-    'certificated' | 'transaction' | 'list-carbon'
-  >('certificated');
+  const [selectedTab, setSelectedTab] = useState<tabTypes>(
+    (searchParams.get('tab') as tabTypes) || 'certificated',
+  );
 
   const { data, isLoading } = useSWR(
     () =>
@@ -73,7 +79,17 @@ function CertificateListContent() {
       revalidateOnMount: true,
     },
   );
+  const handleChangeTab = useCallback(
+    (tab: tabTypes) => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set('tab', tab);
 
+      const newParams = params.toString();
+      setSelectedTab(tab);
+      router.push(pathname + '?' + newParams);
+    },
+    [pathname, router, searchParams],
+  );
   const listCarbonPages = useMemo(() => {
     return data?.paging?.total
       ? Math.ceil(data?.paging?.total / rowsPerPage)
@@ -388,7 +404,7 @@ function CertificateListContent() {
           panel: 'pt-[24px] pb-0 w-full',
         }}
         selectedKey={selectedTab}
-        onSelectionChange={setSelectedTab as any}
+        onSelectionChange={(tab) => handleChangeTab(tab as tabTypes)}
       >
         <Tab key="certificated" title="Certificated">
           <Table

@@ -290,13 +290,20 @@ function ConnectedButton() {
         ) : (
           <DropdownItem isReadOnly className="!hidden" />
         )}
-        {isShowCarbonList ? (
-          <DropdownItem
-            isReadOnly
-            endContent={
+
+        <DropdownItem
+          isReadOnly
+          className="translate-y-[-10px] items-baseline justify-end cursor-auto py-1 h-fit"
+        >
+          <div className="flex justify-end">
+            {isMutating ? (
+              <Skeleton className="!max-w-16 w-full">
+                <div className="h-[14px]"></div>
+              </Skeleton>
+            ) : (
               <Link
                 href={WEB_ROUTES.PROFILE + '?tab=list-carbon'}
-                className="flex gap-2 flex-nowrap items-center hover:underline transition-all text-primary-color"
+                className="flex gap-2 flex-nowrap justify-end items-center hover:underline transition-all text-primary-color"
               >
                 <span className="text-sm">Detail</span>
                 <Image
@@ -308,17 +315,14 @@ function ConnectedButton() {
                   draggable={false}
                 />
               </Link>
-            }
-            className="translate-y-[-10px] items-baseline justify-end cursor-auto py-1"
-          />
-        ) : (
-          <DropdownItem isReadOnly className="!hidden" />
-        )}
+            )}
+          </div>
+        </DropdownItem>
 
-        <DropdownSection>
+        <DropdownSection className="flex-auto flex flex-col justify-end">
           <DropdownItem
             key="profile"
-            className="flex items-center"
+            className="flex items-center h-fit"
             startContent={
               <Image
                 src={profileImage.src}
@@ -337,6 +341,7 @@ function ConnectedButton() {
 
           <DropdownItem
             key="support"
+            className="h-fit"
             startContent={
               <Image
                 src={supportImage.src}
@@ -354,6 +359,7 @@ function ConnectedButton() {
 
           <DropdownItem
             key="disconnect"
+            className="h-fit"
             onClick={disconnect}
             startContent={
               <Image

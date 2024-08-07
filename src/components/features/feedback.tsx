@@ -103,6 +103,11 @@ function FeedbackModal() {
                 });
 
                 onClose();
+
+                setFeeling(undefined);
+                setEmail('');
+                setName('');
+                setDescription('');
               } catch (e) {
                 const error = e as Error;
                 console.error(error.message || '');

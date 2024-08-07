@@ -380,7 +380,7 @@ function CertificateListContent() {
         variant="light"
         aria-label="Certificate List"
         classNames={{
-          tab: 'h-[49px] w-full sm:min-w-[204px]',
+          tab: 'h-[49px] w-full sm:min-w-[204px] data-[focus-visible=true]:outline-0',
           cursor: 'shadow-none bg-[#F6F6F6]',
           tabContent:
             'xl:text-[23px] font-medium group-data-[selected=true]:text-[#21272A]',

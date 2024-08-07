@@ -85,8 +85,8 @@ function Footer() {
               alt="Facebook"
               draggable={false}
               as={NextImage}
-              width={10}
-              height={8}
+              width={16}
+              height={16}
               radius="none"
             />
           </Link>

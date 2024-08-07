@@ -86,7 +86,7 @@ function CertificateListContent() {
 
       const newParams = params.toString();
       setSelectedTab(tab);
-      router.push(pathname + '?' + newParams);
+      router.push(pathname + '?' + newParams, { scroll: false });
     },
     [pathname, router, searchParams],
   );
@@ -247,7 +247,7 @@ function CertificateListContent() {
       switch (columnKey) {
         case 'mint': {
           return (
-            <div className="mt-[10px] text-sm font-light flex gap-[5px] items-center">
+            <div className="text-sm font-light flex gap-[5px] items-center">
               <span className="text-[#4F4F4F]">
                 {shortAddress('text', cellValue)}
               </span>
@@ -353,6 +353,7 @@ function CertificateListContent() {
                 width={24}
                 height={24}
                 draggable={false}
+                className="min-w-[24px]"
               />
 
               <span>
@@ -396,6 +397,7 @@ function CertificateListContent() {
         variant="light"
         aria-label="Certificate List"
         classNames={{
+          base: 'flex',
           tab: 'h-[49px] w-full sm:min-w-[204px] data-[focus-visible=true]:outline-0',
           cursor: 'shadow-none bg-[#F6F6F6]',
           tabContent:
@@ -512,7 +514,6 @@ function CertificateListContent() {
                 tbody: '[&>*:nth-child(odd)]:bg-[#F6F6F6]',
                 wrapper: 'p-0',
               }}
-              removeWrapper
             >
               <TableHeader columns={listCarbonColumns}>
                 {(column) => (

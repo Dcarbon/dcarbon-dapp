@@ -64,6 +64,7 @@ function ConnectedButton() {
       classNames={{
         content: 'p-0 h-full',
         base: 'select-none',
+        backdrop: 'backdrop-wallet',
       }}
       offset={-33}
       onOpenChange={async (open) => {
@@ -303,27 +304,29 @@ function ConnectedButton() {
                 <div className="h-[14px]"></div>
               </Skeleton>
             ) : (
-              <DropdownTrigger>
-                <Button
-                  onClick={() => {
-                    router.push(WEB_ROUTES.PROFILE + '?tab=list-carbon');
-                  }}
-                  variant="light"
-                  endContent={
-                    <Image
-                      src={arrowRight.src}
-                      alt="Arrow Right"
-                      as={NextImage}
-                      width={14}
-                      height={14}
-                      draggable={false}
-                    />
-                  }
-                  className="hover:underline transition-all text-primary-color text-sm p-0 h-fit w-fit justify-end data-[hover=true]:bg-transparent"
-                >
-                  Detail
-                </Button>
-              </DropdownTrigger>
+              <Button
+                onClick={() => {
+                  const backdropWalletEl = document.querySelector(
+                    '.backdrop-wallet',
+                  ) as any;
+                  backdropWalletEl?.click && backdropWalletEl.click();
+                  router.push(WEB_ROUTES.PROFILE + '?tab=list-carbon');
+                }}
+                variant="light"
+                endContent={
+                  <Image
+                    src={arrowRight.src}
+                    alt="Arrow Right"
+                    as={NextImage}
+                    width={14}
+                    height={14}
+                    draggable={false}
+                  />
+                }
+                className="hover:underline transition-all text-primary-color text-sm p-0 h-fit w-fit justify-end data-[hover=true]:bg-transparent"
+              >
+                Detail
+              </Button>
             )}
           </div>
         </DropdownItem>

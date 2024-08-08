@@ -20,6 +20,7 @@ import {
   Link,
 } from '@nextui-org/react';
 import { useWallet } from '@solana/wallet-adapter-react';
+import { Big } from 'big.js';
 import { env } from 'env.mjs';
 import arrowRight from 'public/images/common/arrow-right-wallet-button.svg';
 import avatarImage from 'public/images/common/avatar.png';
@@ -190,7 +191,10 @@ function ConnectedButton() {
                 </Skeleton>
               ) : (
                 <span className="text-[22px]">
-                  {walletInfo?.data?.carbon_amount ?? 0} Carbon
+                  {Number(
+                    Big(walletInfo?.data?.carbon_amount ?? 0).toFixed(4),
+                  ).toLocaleString('en-US')}{' '}
+                  Carbon
                 </span>
               )}
             </div>
@@ -210,7 +214,10 @@ function ConnectedButton() {
                 </Skeleton>
               ) : (
                 <span className="text-[22px]">
-                  {walletInfo?.data?.dcarbon_amount ?? 0} DCarbon
+                  {Number(
+                    Big(walletInfo?.data?.dcarbon_amount ?? 0).toFixed(4),
+                  ).toLocaleString('en-US')}{' '}
+                  DCarbon
                 </span>
               )}
             </div>
@@ -219,11 +226,23 @@ function ConnectedButton() {
         <DropdownItem key="divider" isReadOnly className="opacity-100 h-fit">
           <Divider />
         </DropdownItem>
-        <DropdownItem hidden isReadOnly className="py-0 mt-2 h-fit cursor-auto">
-          Amount of Carbon coins available
-        </DropdownItem>
+        {isShowCarbonList ? (
+          <DropdownItem isReadOnly className="py-0 mt-2 h-fit cursor-auto">
+            Amount of Carbon coins available
+          </DropdownItem>
+        ) : (
+          <DropdownItem className="!hidden" />
+        )}
         {isMutating ? (
           <DropdownSection>
+            <DropdownItem
+              isReadOnly
+              className="w-full overflow-x-hidden py-1 mt-2"
+            >
+              <Skeleton>
+                <div className="h-[16px]"></div>
+              </Skeleton>
+            </DropdownItem>
             <DropdownItem isReadOnly className="w-full overflow-x-hidden py-1">
               <Skeleton>
                 <div className="h-14"></div>
@@ -250,7 +269,10 @@ function ConnectedButton() {
                 <DropdownItem isReadOnly key={index} className="py-1">
                   <div className="flex justify-between p-4 bg-[#F6F6F6] rounded-lg cursor-auto">
                     <span className="text-medium font-normal">
-                      {item.amount} {' ' + item.name}
+                      {Number(Big(item.amount).toFixed(4)).toLocaleString(
+                        'en-US',
+                      )}{' '}
+                      {' ' + item.name}
                     </span>
                     <div className="flex gap-3">
                       <Link
@@ -294,42 +316,48 @@ function ConnectedButton() {
           <DropdownItem isReadOnly className="!hidden" />
         )}
 
-        <DropdownItem
-          isReadOnly
-          className="translate-y-[-10px] items-baseline justify-end cursor-auto py-1 h-fit"
-        >
-          <div className="flex justify-end">
-            {isMutating ? (
-              <Skeleton className="!max-w-16 w-full">
-                <div className="h-[14px]"></div>
-              </Skeleton>
-            ) : (
-              <Button
-                onClick={() => {
-                  const backdropWalletEl = document.querySelector(
-                    '.backdrop-wallet',
-                  ) as any;
-                  backdropWalletEl?.click && backdropWalletEl.click();
-                  router.push(WEB_ROUTES.PROFILE + '?tab=list-carbon');
-                }}
-                variant="light"
-                endContent={
-                  <Image
-                    src={arrowRight.src}
-                    alt="Arrow Right"
-                    as={NextImage}
-                    width={14}
-                    height={14}
-                    draggable={false}
-                  />
-                }
-                className="hover:underline transition-all text-primary-color text-sm p-0 h-fit w-fit justify-end data-[hover=true]:bg-transparent"
-              >
-                Detail
-              </Button>
-            )}
-          </div>
-        </DropdownItem>
+        {
+          <DropdownItem
+            isReadOnly
+            className="translate-y-[-10px] items-baseline justify-end cursor-auto py-1 h-fit"
+          >
+            <div className="flex justify-end">
+              {isMutating ? (
+                <Skeleton className="!max-w-16 w-full">
+                  <div className="h-[14px]"></div>
+                </Skeleton>
+              ) : (
+                <>
+                  {isShowCarbonList && (
+                    <Button
+                      onClick={() => {
+                        const backdropWalletEl = document.querySelector(
+                          '.backdrop-wallet',
+                        ) as any;
+                        backdropWalletEl?.click && backdropWalletEl.click();
+                        router.push(WEB_ROUTES.PROFILE + '?tab=list-carbon');
+                      }}
+                      variant="light"
+                      endContent={
+                        <Image
+                          src={arrowRight.src}
+                          alt="Arrow Right"
+                          as={NextImage}
+                          width={14}
+                          height={14}
+                          draggable={false}
+                        />
+                      }
+                      className="hover:underline transition-all text-primary-color text-sm p-0 h-fit w-fit justify-end data-[hover=true]:bg-transparent"
+                    >
+                      Detail
+                    </Button>
+                  )}
+                </>
+              )}
+            </div>
+          </DropdownItem>
+        }
 
         <DropdownSection className="flex-auto flex flex-col justify-end">
           <DropdownItem

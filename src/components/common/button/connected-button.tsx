@@ -2,6 +2,7 @@
 
 import React from 'react';
 import NextImage from 'next/image';
+import { useRouter } from 'next/navigation';
 import { carbonTypes, getWalletInfo } from '@/adapters/user';
 import { QUERY_KEYS, WEB_ROUTES } from '@/utils/constants';
 import { shortAddress } from '@/utils/helpers/common';
@@ -37,6 +38,7 @@ import { Skeleton } from '../loading/skeleton.component';
 function ConnectedButton() {
   const { publicKey, connected, wallet, disconnect, disconnecting } =
     useWallet();
+  const router = useRouter();
 
   const {
     trigger,
@@ -301,20 +303,27 @@ function ConnectedButton() {
                 <div className="h-[14px]"></div>
               </Skeleton>
             ) : (
-              <Link
-                href={WEB_ROUTES.PROFILE + '?tab=list-carbon'}
-                className="flex gap-2 flex-nowrap justify-end items-center hover:underline transition-all text-primary-color"
-              >
-                <span className="text-sm">Detail</span>
-                <Image
-                  src={arrowRight.src}
-                  alt="Arrow Right"
-                  as={NextImage}
-                  width={14}
-                  height={14}
-                  draggable={false}
-                />
-              </Link>
+              <DropdownTrigger>
+                <Button
+                  onClick={() => {
+                    router.push(WEB_ROUTES.PROFILE + '?tab=list-carbon');
+                  }}
+                  variant="light"
+                  endContent={
+                    <Image
+                      src={arrowRight.src}
+                      alt="Arrow Right"
+                      as={NextImage}
+                      width={14}
+                      height={14}
+                      draggable={false}
+                    />
+                  }
+                  className="hover:underline transition-all text-primary-color text-sm p-0 h-fit w-fit justify-end data-[hover=true]:bg-transparent"
+                >
+                  Detail
+                </Button>
+              </DropdownTrigger>
             )}
           </div>
         </DropdownItem>

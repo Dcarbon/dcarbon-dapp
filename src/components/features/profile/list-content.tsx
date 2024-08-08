@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import NextImage from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { doGetListCarbon } from '@/adapters/user';
@@ -58,6 +58,16 @@ function CertificateListContent() {
   const [selectedTab, setSelectedTab] = useState<tabTypes>(
     (searchParams.get('tab') as tabTypes) || 'certificated',
   );
+
+  useEffect(() => {
+    setSelectedTab((prev) => {
+      if (prev !== searchParams.get('tab')) {
+        return (searchParams.get('tab') as tabTypes) || 'certificated';
+      }
+
+      return prev;
+    });
+  }, [searchParams]);
 
   const { data, isLoading } = useSWR(
     () =>

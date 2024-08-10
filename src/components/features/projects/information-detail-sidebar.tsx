@@ -6,8 +6,21 @@ import { useParams } from 'next/navigation';
 import { doGetProjectListingInfo } from '@/adapters/project';
 import DCarbonButton from '@/components/common/button';
 import { Skeleton } from '@/components/common/loading';
+import { ShowAlert } from '@/components/common/toast';
+import { CARBON_IDL } from '@/contracts/carbon/carbon.idl';
+import { ICarbonContract } from '@/contracts/carbon/carbon.interface';
 import { QUERY_KEYS } from '@/utils/constants';
+import { logger } from '@/utils/helpers/common';
+import { AnchorProvider, Program } from '@coral-xyz/anchor';
+import { TOKEN_PROGRAM_ID } from '@coral-xyz/anchor/dist/cjs/utils/token';
 import { Image, Select, Selection, SelectItem } from '@nextui-org/react';
+import { getAssociatedTokenAddressSync } from '@solana/spl-token';
+import {
+  useAnchorWallet,
+  useConnection,
+  useWallet,
+} from '@solana/wallet-adapter-react';
+import { PublicKey, Transaction } from '@solana/web3.js';
 import Big from 'big.js';
 import arrowDownIcon from 'public/images/common/arrow-down-icon.svg';
 import { NumericFormat } from 'react-number-format';
@@ -24,6 +37,11 @@ function InformationDetailSidebar(props: { data: any }) {
   const [quantity, setQuantity] = useState<string>('');
   const [asset, setAsset] = useState<Selection>(new Set(['usdc']));
   const { slug } = useParams();
+  const [total, setTotal] = useState<number>(0);
+  const [quantityError, setQuantityError] = useState<string | null>(null);
+  const { connection } = useConnection();
+  const anchorWallet = useAnchorWallet();
+  const { publicKey, wallet } = useWallet();
 
   const { data, isLoading } = useSWR(
     [QUERY_KEYS.PROJECTS.GET_PROJECT_LISTING_INFO],
@@ -34,6 +52,86 @@ function InformationDetailSidebar(props: { data: any }) {
       revalidateOnMount: true,
     },
   );
+
+  const handleBuyCarbon = async () => {
+    if (!publicKey || !wallet || !anchorWallet || !connection) {
+      ShowAlert.warning({ message: 'Please connect to wallet first!' });
+      return;
+    }
+
+    if (!data?.data?.payment_info?.currency?.mint) {
+      logger({ message: 'No payment information found!', type: 'ERROR' });
+      return;
+    }
+
+    const mint = new PublicKey(data.data.payment_info.currency.mint);
+
+    const provider = new AnchorProvider(connection, anchorWallet);
+    const program = new Program<ICarbonContract>(
+      CARBON_IDL as ICarbonContract,
+      provider,
+    );
+    const anchorProvider = program.provider as AnchorProvider;
+    const upgradableAuthority = anchorProvider.wallet;
+    const token_owner = upgradableAuthority.publicKey;
+
+    const tokenListingInfo = new PublicKey(
+      'BRZF19M2JPy8CPrcP9zEbXkqD5jq32ymHFeJQeJuxXrZ',
+    );
+
+    const sourceAta = getAssociatedTokenAddressSync(mint, token_owner);
+    const toAta = getAssociatedTokenAddressSync(mint, publicKey);
+
+    const sourceAtaToken = (
+      await getOrCreateAssociatedTokenAccount(
+        connection,
+        payer,
+        mint,
+        publicKey,
+      )
+    ).address;
+
+    const buyIns = await program.methods
+      .buy(3)
+      .accounts({
+        signer: publicKey,
+        mint: mint,
+        sourceAta: sourceAta,
+        toAta: toAta,
+        tokenListingInfo: tokenListingInfo,
+        tokenOwner: token_owner,
+        tokenProgram: TOKEN_PROGRAM_ID,
+      })
+      .remainingAccounts([
+        {
+          pubkey: TOKEN_PROGRAM_ID,
+          isSigner: false,
+          isWritable: false,
+        },
+        {
+          pubkey: mint,
+          isWritable: false,
+          isSigner: false,
+        },
+        {
+          pubkey: sourceAtaToken,
+          isSigner: false,
+          isWritable: true,
+        },
+        {
+          pubkey: destinationAtaToken,
+          isSigner: false,
+          isWritable: true,
+        },
+      ])
+      .instruction();
+
+    const tx = new Transaction().add(buyIns);
+    tx.feePayer = publicKey;
+    tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+
+    // tx.partialSign(buyer);
+  };
 
   return (
     <>
@@ -83,12 +181,11 @@ function InformationDetailSidebar(props: { data: any }) {
                 {data?.data?.available_carbon ||
                 data?.data?.available_carbon === 0 ? (
                   <div className="text-sm font-light flex flex-wrap gap-3 items-baseline">
-                    <span>Available DCarbon:</span>
+                    <span>Available Carbon:</span>
                     <span className="font-medium text-lg text-primary-color">
                       {Number(
                         Big(data.data.available_carbon).toFixed(4),
-                      ).toLocaleString('en-US')}{' '}
-                      DC
+                      ).toLocaleString('en-US')}
                     </span>
                   </div>
                 ) : null}
@@ -108,7 +205,31 @@ function InformationDetailSidebar(props: { data: any }) {
                 thousandSeparator
                 allowNegative={false}
                 onValueChange={(q) => {
-                  setQuantity(q.value);
+                  setQuantity(q?.value);
+                  if (
+                    data?.data?.available_carbon &&
+                    Big(q?.value || 0).gt(data.data.available_carbon)
+                  ) {
+                    setQuantityError('Quantity exceeds available Carbon.');
+                  }
+
+                  if (
+                    data?.data?.available_carbon &&
+                    Big(q?.value || 0).lte(data.data.available_carbon) &&
+                    quantityError
+                  ) {
+                    setQuantityError(null);
+                  }
+
+                  if (data?.data?.payment_info?.exchange_rate) {
+                    setTotal(
+                      Number(
+                        Big(q?.value || 0)
+                          .mul(Big(data.data.payment_info.exchange_rate))
+                          .toFixed(4),
+                      ),
+                    );
+                  }
                 }}
                 id="quantity"
                 className="text-sm w-full bg-white p-3 pr-[82.63px] rounded h-[40px] outline-none hover:bg-default-200 transition-all focus:ring-1 focus:ring-primary-color placeholder:text-[#888] placeholder:text-sm placeholder:font-normal focus:bg-white"
@@ -119,6 +240,9 @@ function InformationDetailSidebar(props: { data: any }) {
                 CARBON
               </div>
             </div>
+            {quantityError && (
+              <div className="text-xs text-danger">{quantityError}</div>
+            )}
           </div>
 
           <div className="flex flex-col gap-2">
@@ -178,6 +302,7 @@ function InformationDetailSidebar(props: { data: any }) {
                 id="total"
                 className="text-sm w-full bg-[#E7E7E7] p-3 pr-[52.63px] rounded h-[40px] outline-none hover:bg-default-200 transition-all focus:ring-1 focus:ring-primary-color placeholder:text-[#888] placeholder:text-sm placeholder:font-normal focus:bg-white"
                 placeholder="0"
+                value={total}
               />
 
               <div className="text-sm text-[#4F4F4F] absolute right-3 top-1/2 -translate-y-1/2 cursor-default">
@@ -188,7 +313,9 @@ function InformationDetailSidebar(props: { data: any }) {
             </div>
           </div>
 
-          <DCarbonButton color="primary">Buy</DCarbonButton>
+          <DCarbonButton color="primary" onClick={handleBuyCarbon}>
+            Buy
+          </DCarbonButton>
         </div>
       </div>
 

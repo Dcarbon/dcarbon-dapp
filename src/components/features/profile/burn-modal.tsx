@@ -3,6 +3,7 @@ import NextImage from 'next/image';
 import DCarbonButton from '@/components/common/button';
 import DCarbonModal from '@/components/common/modal';
 import { Image } from '@nextui-org/react';
+import Big from 'big.js';
 import logoIcon from 'public/images/common/logo.svg';
 import burnIcon from 'public/images/profile/burn-icon.png';
 import { NumericFormat } from 'react-number-format';
@@ -46,7 +47,9 @@ function BurnModal({
                 as={NextImage}
                 draggable={false}
               />
-              <span className="text-xl">{amount || 0} DCarbon</span>
+              <span className="text-xl">
+                {Number(Big(amount).toFixed(4)).toLocaleString('en-US')} Carbon
+              </span>
             </div>
           ) : (
             <div className="relative">
@@ -59,7 +62,7 @@ function BurnModal({
               />
 
               <div className="text-sm text-[#4F4F4F] absolute right-3 top-1/2 -translate-y-1/2 cursor-default">
-                DCarbon
+                Carbon
               </div>
             </div>
           )}

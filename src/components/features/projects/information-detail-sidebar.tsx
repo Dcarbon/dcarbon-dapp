@@ -2,10 +2,16 @@
 
 import React, { useState } from 'react';
 import NextImage from 'next/image';
+import { useParams } from 'next/navigation';
+import { doGetProjectListingInfo } from '@/adapters/project';
 import DCarbonButton from '@/components/common/button';
+import { Skeleton } from '@/components/common/loading';
+import { QUERY_KEYS } from '@/utils/constants';
 import { Image, Select, Selection, SelectItem } from '@nextui-org/react';
+import Big from 'big.js';
 import arrowDownIcon from 'public/images/common/arrow-down-icon.svg';
 import { NumericFormat } from 'react-number-format';
+import useSWR from 'swr';
 
 const assetSelectOptions = [
   {
@@ -14,31 +20,82 @@ const assetSelectOptions = [
   },
 ];
 
-function InformationDetailSidebar({ data }: { data: any }) {
+function InformationDetailSidebar(props: { data: any }) {
   const [quantity, setQuantity] = useState<string>('');
-  const carbonCreditInfo = data?.data?.carbon_credit_info;
   const [asset, setAsset] = useState<Selection>(new Set(['usdc']));
+  const { slug } = useParams();
+
+  const { data, isLoading } = useSWR(
+    [QUERY_KEYS.PROJECTS.GET_PROJECT_LISTING_INFO],
+    () => {
+      return doGetProjectListingInfo(slug as string);
+    },
+    {
+      revalidateOnMount: true,
+    },
+  );
 
   return (
     <>
       <div className="bg-[#F6F6F6] p-4 rounded-lg text-[#21272A]">
         <h3 className="text-[23px] font-medium mb-6">Information</h3>
 
-        <div className="bg-[#FFFFFF] p-4 rounded">
-          <div className="text-sm font-light mb-2">
-            1 carbon credit ={' '}
-            {carbonCreditInfo?.exchange_rate &&
-            carbonCreditInfo?.exchange_rate_currency
-              ? `${carbonCreditInfo?.exchange_rate} ${carbonCreditInfo?.exchange_rate_currency}`
-              : ''}
+        {isLoading ? (
+          <div className="bg-[#FFFFFF] p-4 rounded flex flex-col gap-2">
+            <Skeleton className="rounded">
+              <div className="h-[20px]" />
+            </Skeleton>
+            <Skeleton className="rounded">
+              <div className="h-[28px]" />
+            </Skeleton>
           </div>
-          <div className="text-sm font-light flex flex-wrap gap-3 items-baseline">
-            <span>Available DCarbon:</span>
-            <span className="font-medium text-lg text-primary-color">
-              {carbonCreditInfo?.carbon_total || 0} DC
-            </span>
-          </div>
-        </div>
+        ) : (
+          <>
+            {data?.data?.available_carbon ||
+            data?.data?.available_carbon === 0 ||
+            (data?.data?.payment_info?.exchange_rate &&
+              data?.data?.payment_info?.currency?.symbol) ? (
+              <div className="bg-[#FFFFFF] p-4 rounded">
+                {data?.data?.payment_info?.exchange_rate &&
+                data?.data?.payment_info?.currency?.symbol ? (
+                  <div className="text-sm font-light mb-2 flex flex-wrap gap-2 items-center">
+                    <span>1 carbon credit = </span>
+                    <span className="flex items-center gap-2">
+                      {Number(
+                        Big(data.data.payment_info.exchange_rate).toFixed(4),
+                      ).toLocaleString('en-US')}{' '}
+                      <span className="flex items-center gap-1">
+                        {data.data.payment_info.currency.icon && (
+                          <Image
+                            src={data.data.payment_info.currency.icon}
+                            alt={data.data.payment_info.currency.name}
+                            as={NextImage}
+                            width={16}
+                            height={16}
+                            draggable={false}
+                          />
+                        )}
+                        <span>{data.data.payment_info.currency.symbol}</span>
+                      </span>
+                    </span>
+                  </div>
+                ) : null}
+                {data?.data?.available_carbon ||
+                data?.data?.available_carbon === 0 ? (
+                  <div className="text-sm font-light flex flex-wrap gap-3 items-baseline">
+                    <span>Available DCarbon:</span>
+                    <span className="font-medium text-lg text-primary-color">
+                      {Number(
+                        Big(data.data.available_carbon).toFixed(4),
+                      ).toLocaleString('en-US')}{' '}
+                      DC
+                    </span>
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
+          </>
+        )}
 
         <div className="mt-8 flex flex-col gap-6">
           <div className="flex flex-col gap-2">
@@ -135,14 +192,14 @@ function InformationDetailSidebar({ data }: { data: any }) {
         </div>
       </div>
 
-      {data?.data?.location?.iframe && (
+      {props?.data?.data?.location?.iframe && (
         <div className="bg-[#F6F6F6] p-4 rounded-lg text-[#21272A] mt-6">
           <h3 className="text-[23px] font-medium mb-6">Address</h3>
           <div className="text-sm mb-2">Location</div>
           <div
             id="project-detail"
             dangerouslySetInnerHTML={{
-              __html: data.data.location.iframe,
+              __html: props?.data.data.location.iframe,
             }}
           />
         </div>

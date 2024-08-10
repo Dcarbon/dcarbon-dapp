@@ -6,6 +6,7 @@ const API_ROUTES = {
   PROJECT: {
     LIST: '/v1/projects',
     DETAIL: '/v1/projects/[slug]',
+    LISTING_INFO: '/v1/projects/[slug]/listing-info',
   },
   COMMON: {
     SEND_FEEDBACK: '/v1/common/send-feedback',

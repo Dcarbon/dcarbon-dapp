@@ -16,7 +16,7 @@ function ProjectDetailCarousel({ data }: { data: string[] }) {
         watchDrag: false,
       },
     },
-    loop: true,
+    loop: data?.length > 4,
   });
   const [currentSlideIndex, setCurrentSlideIndex] = useState<number>(0);
   const [canNext, setCanNext] = useState<boolean>(true);

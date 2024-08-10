@@ -2,6 +2,29 @@ import { API_ROUTES } from '@/utils/constants';
 
 import { request } from './xhr';
 
+interface IGetProjectListingInfoResponse extends Response {
+  request_id: string;
+  statusCode: number;
+  paging?: {
+    total: number;
+    page: number;
+    limit: number;
+  };
+  data?: {
+    available_carbon: number;
+    payment_info: {
+      currency: {
+        name: string;
+        symbol: string;
+        mint: string;
+        icon: string;
+      };
+      exchange_rate: number;
+    };
+  };
+  message?: string | string[];
+}
+
 const doGetProjetList = async ({
   keyword,
   page,
@@ -42,4 +65,19 @@ const doGetProjectDetail = async (slug: string) => {
   );
 };
 
-export { doGetProjetList, doGetProjectDetail };
+const doGetProjectListingInfo = async (
+  slug: string,
+): Promise<IGetProjectListingInfoResponse> => {
+  return request(
+    'GET',
+    API_ROUTES.PROJECT.LISTING_INFO.replace('[slug]', slug),
+    undefined,
+    {
+      cache: 'no-store',
+    },
+  ) as Promise<IGetProjectListingInfoResponse>;
+};
+
+export { doGetProjetList, doGetProjectDetail, doGetProjectListingInfo };
+
+export type { IGetProjectListingInfoResponse };

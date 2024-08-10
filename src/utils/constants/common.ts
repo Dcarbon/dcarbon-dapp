@@ -3,6 +3,7 @@ const NO_IMAGE = '/common/no-avatar.png';
 const QUERY_KEYS = {
   PROJECTS: {
     GET_PROJECTS: 'GET_PROJECTS',
+    GET_PROJECT_LISTING_INFO: 'GET_PROJECT_LISTING_INFO',
   },
   COMMON: {
     SEND_FEEDBACK: 'SEND_FEEDBACK',

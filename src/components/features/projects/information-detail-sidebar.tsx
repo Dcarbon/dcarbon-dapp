@@ -112,6 +112,8 @@ function InformationDetailSidebar(props: { data: any }) {
         blockhash: RpcResponseAndContext<BlockhashWithExpiryBlockHeight>;
       }[] = [];
 
+      console.info('conn', connection);
+
       for await (const item of listingList?.result || []) {
         const carbonMint = new PublicKey(item.mint);
         console.info('carbonMint', carbonMint);
@@ -141,16 +143,13 @@ function InformationDetailSidebar(props: { data: any }) {
         );
         console.info('sourceAta', sourceAta);
         const toAta = getAssociatedTokenAddressSync(carbonMint, publicKey);
-        console.info('toAta', toAta);
-        const createAtaIns = createAssociatedTokenAccountInstruction(
-          publicKey,
-          toAta,
-          publicKey,
-          carbonMint,
+        console.info(
+          'Test',
+          tokenListingInfo.toString(),
+          Big(item.available).toNumber(),
         );
-
         const buyIns = await program.methods
-          .buy(Big(quantity).toNumber())
+          .buy(Big(item.available).toNumber())
           .accounts({
             signer: publicKey,
             mint: carbonMint,
@@ -183,11 +182,24 @@ function InformationDetailSidebar(props: { data: any }) {
             },
           ])
           .instruction();
-
-        const txVer0 = await createTransactionV0(connection, publicKey, [
-          createAtaIns,
-          buyIns,
-        ]);
+        const toAtaAccount = await connection.getAccountInfo(toAta);
+        console.info('toAta', toAta);
+        const listIns = [buyIns];
+        if (!toAtaAccount) {
+          const createAtaIns = createAssociatedTokenAccountInstruction(
+            publicKey,
+            toAta,
+            publicKey,
+            carbonMint,
+          );
+          listIns.unshift(createAtaIns);
+        }
+        console.info('listIns', listIns);
+        const txVer0 = await createTransactionV0(
+          connection,
+          publicKey,
+          listIns,
+        );
 
         if (txVer0) {
           transactions.push(txVer0);
@@ -195,7 +207,7 @@ function InformationDetailSidebar(props: { data: any }) {
       }
       const result = await sendTx({ connection, wallet, transactions });
 
-      console.log(result, 'log');
+      console.info(result, 'log');
     } catch (e) {
       const error = e as Error;
       logger({ message: error?.stack || error?.message, type: 'ERROR' });

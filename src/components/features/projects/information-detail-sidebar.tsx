@@ -11,16 +11,26 @@ import { CARBON_IDL } from '@/contracts/carbon/carbon.idl';
 import { ICarbonContract } from '@/contracts/carbon/carbon.interface';
 import { QUERY_KEYS } from '@/utils/constants';
 import { logger } from '@/utils/helpers/common';
+import { generateListingList } from '@/utils/helpers/project';
+import { createTransactionV0, sendTx } from '@/utils/helpers/solana';
 import { AnchorProvider, Program } from '@coral-xyz/anchor';
 import { TOKEN_PROGRAM_ID } from '@coral-xyz/anchor/dist/cjs/utils/token';
 import { Image, Select, Selection, SelectItem } from '@nextui-org/react';
-import { getAssociatedTokenAddressSync } from '@solana/spl-token';
+import {
+  createAssociatedTokenAccountInstruction,
+  getAssociatedTokenAddressSync,
+} from '@solana/spl-token';
 import {
   useAnchorWallet,
   useConnection,
   useWallet,
 } from '@solana/wallet-adapter-react';
-import { PublicKey, Transaction } from '@solana/web3.js';
+import {
+  BlockhashWithExpiryBlockHeight,
+  PublicKey,
+  RpcResponseAndContext,
+  VersionedTransaction,
+} from '@solana/web3.js';
 import Big from 'big.js';
 import arrowDownIcon from 'public/images/common/arrow-down-icon.svg';
 import { NumericFormat } from 'react-number-format';
@@ -42,6 +52,7 @@ function InformationDetailSidebar(props: { data: any }) {
   const { connection } = useConnection();
   const anchorWallet = useAnchorWallet();
   const { publicKey, wallet } = useWallet();
+  const [loading, setLoading] = useState<boolean>(false);
 
   const { data, isLoading } = useSWR(
     [QUERY_KEYS.PROJECTS.GET_PROJECT_LISTING_INFO],
@@ -64,73 +75,133 @@ function InformationDetailSidebar(props: { data: any }) {
       return;
     }
 
-    const mint = new PublicKey(data.data.payment_info.currency.mint);
+    if (
+      !data?.data?.listing_carbon ||
+      data?.data?.listing_carbon?.length === 0
+    ) {
+      logger({ message: 'No listing found!', type: 'ERROR' });
+      return;
+    }
 
-    const provider = new AnchorProvider(connection, anchorWallet);
-    const program = new Program<ICarbonContract>(
-      CARBON_IDL as ICarbonContract,
-      provider,
-    );
-    const anchorProvider = program.provider as AnchorProvider;
-    const upgradableAuthority = anchorProvider.wallet;
-    const token_owner = upgradableAuthority.publicKey;
+    if (Big(quantity).lte(0)) {
+      ShowAlert.error({ message: 'Quantity must be greater than 0.' });
+      return;
+    }
 
-    const tokenListingInfo = new PublicKey(
-      'BRZF19M2JPy8CPrcP9zEbXkqD5jq32ymHFeJQeJuxXrZ',
-    );
+    if (!(wallet?.adapter as any)?.signAllTransactions) {
+      ShowAlert.error({ message: 'Not support signAllTransactions!' });
+      return;
+    }
 
-    const sourceAta = getAssociatedTokenAddressSync(mint, token_owner);
-    const toAta = getAssociatedTokenAddressSync(mint, publicKey);
+    setLoading(true);
 
-    const sourceAtaToken = (
-      await getOrCreateAssociatedTokenAccount(
-        connection,
-        payer,
-        mint,
-        publicKey,
-      )
-    ).address;
+    try {
+      const provider = new AnchorProvider(connection, anchorWallet);
+      const program = new Program<ICarbonContract>(
+        CARBON_IDL as ICarbonContract,
+        provider,
+      );
 
-    const buyIns = await program.methods
-      .buy(3)
-      .accounts({
-        signer: publicKey,
-        mint: mint,
-        sourceAta: sourceAta,
-        toAta: toAta,
-        tokenListingInfo: tokenListingInfo,
-        tokenOwner: token_owner,
-        tokenProgram: TOKEN_PROGRAM_ID,
-      })
-      .remainingAccounts([
-        {
-          pubkey: TOKEN_PROGRAM_ID,
-          isSigner: false,
-          isWritable: false,
-        },
-        {
-          pubkey: mint,
-          isWritable: false,
-          isSigner: false,
-        },
-        {
-          pubkey: sourceAtaToken,
-          isSigner: false,
-          isWritable: true,
-        },
-        {
-          pubkey: destinationAtaToken,
-          isSigner: false,
-          isWritable: true,
-        },
-      ])
-      .instruction();
+      const listingList = generateListingList(
+        data.data.listing_carbon,
+        Big(quantity).toNumber(),
+      );
 
-    const tx = new Transaction().add(buyIns);
-    tx.feePayer = publicKey;
-    tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+      const transactions: {
+        tx: VersionedTransaction;
+        blockhash: RpcResponseAndContext<BlockhashWithExpiryBlockHeight>;
+      }[] = [];
 
-    // tx.partialSign(buyer);
+      for await (const item of listingList?.result || []) {
+        const carbonMint = new PublicKey(item.mint);
+        console.info('carbonMint', carbonMint);
+        const carbonOwner = new PublicKey(item.seller);
+        console.info('carbonOwner', carbonOwner);
+        const stableTokenMint = new PublicKey(
+          (data as any).data.payment_info.currency.mint,
+        );
+        console.info('stableTokenMint', stableTokenMint);
+        const tokenListingInfo = new PublicKey(item.key);
+        console.info('tokenListingInfo', tokenListingInfo);
+        const destinationAtaToken = getAssociatedTokenAddressSync(
+          stableTokenMint,
+          carbonOwner,
+        );
+        console.info('destinationAtaToken', destinationAtaToken);
+
+        const sourceAtaToken = getAssociatedTokenAddressSync(
+          stableTokenMint,
+          publicKey,
+        );
+        console.info('sourceAtaToken', sourceAtaToken);
+
+        const sourceAta = getAssociatedTokenAddressSync(
+          carbonMint,
+          carbonOwner,
+        );
+        console.info('sourceAta', sourceAta);
+        const toAta = getAssociatedTokenAddressSync(carbonMint, publicKey);
+        console.info('toAta', toAta);
+        const createAtaIns = createAssociatedTokenAccountInstruction(
+          publicKey,
+          toAta,
+          publicKey,
+          carbonMint,
+        );
+
+        const buyIns = await program.methods
+          .buy(Big(quantity).toNumber())
+          .accounts({
+            signer: publicKey,
+            mint: carbonMint,
+            sourceAta: sourceAta,
+            toAta: toAta,
+            tokenListingInfo: tokenListingInfo,
+            tokenOwner: carbonOwner,
+            tokenProgram: TOKEN_PROGRAM_ID,
+          })
+          .remainingAccounts([
+            {
+              pubkey: TOKEN_PROGRAM_ID,
+              isSigner: false,
+              isWritable: false,
+            },
+            {
+              pubkey: stableTokenMint,
+              isWritable: false,
+              isSigner: false,
+            },
+            {
+              pubkey: sourceAtaToken,
+              isSigner: false,
+              isWritable: true,
+            },
+            {
+              pubkey: destinationAtaToken,
+              isSigner: false,
+              isWritable: true,
+            },
+          ])
+          .instruction();
+
+        const txVer0 = await createTransactionV0(connection, publicKey, [
+          createAtaIns,
+          buyIns,
+        ]);
+
+        if (txVer0) {
+          transactions.push(txVer0);
+        }
+      }
+      const result = await sendTx({ connection, wallet, transactions });
+
+      console.log(result, 'log');
+    } catch (e) {
+      const error = e as Error;
+      logger({ message: error?.stack || error?.message, type: 'ERROR' });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -313,8 +384,12 @@ function InformationDetailSidebar(props: { data: any }) {
             </div>
           </div>
 
-          <DCarbonButton color="primary" onClick={handleBuyCarbon}>
-            Buy
+          <DCarbonButton
+            color="primary"
+            onClick={handleBuyCarbon}
+            isLoading={loading}
+          >
+            {loading ? 'Buying...' : 'Buy'}
           </DCarbonButton>
         </div>
       </div>

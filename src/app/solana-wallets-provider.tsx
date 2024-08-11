@@ -1,7 +1,6 @@
 'use client';
 
 import { useMemo } from 'react';
-import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 import {
   ConnectionProvider,
   WalletProvider,
@@ -10,12 +9,9 @@ import {
   PhantomWalletAdapter,
   SolflareWalletAdapter,
 } from '@solana/wallet-adapter-wallets';
-import { clusterApiUrl } from '@solana/web3.js';
+import { env } from 'env.mjs';
 
 function SolanaWalletProvider({ children }: { children: React.ReactNode }) {
-  const network = WalletAdapterNetwork.Devnet;
-
-  const endpoint = useMemo(() => clusterApiUrl(network), []);
   const wallets = useMemo(
     () => [new PhantomWalletAdapter(), new SolflareWalletAdapter()],
     [],
@@ -23,7 +19,7 @@ function SolanaWalletProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <ConnectionProvider
-      endpoint={endpoint}
+      endpoint={env.NEXT_PUBLIC_ENDPOINT_RPC}
       config={{
         commitment: 'confirmed',
         confirmTransactionInitialTimeout: 30000,

@@ -1,18 +1,20 @@
 import Big from 'big.js';
 
-interface IMintListing {
-  address: string;
-  total: number;
-  delegated: number;
+interface IListingCarbon {
+  key: string;
+  seller: string;
+  project_id: string;
+  nonce: number;
+  mint: string;
   available: number;
 }
 
 const generateListingList = (
-  list: IMintListing[],
+  list: IListingCarbon[],
   amount: number,
-): { status: 'error' | 'success'; result: IMintListing[] } => {
+): { status: 'error' | 'success'; result: IListingCarbon[] } => {
   let currentAmount = Big(amount);
-  const result: IMintListing[] = [];
+  const result: IListingCarbon[] = [];
   const availableTotal = list.reduce(
     (partialSum, info) => Big(partialSum).plus(Big(info.available)).toNumber(),
     0,
@@ -23,23 +25,23 @@ const generateListingList = (
       result,
     };
   }
-  list.sort((a, b) => b.total - a.total);
+  list.sort((a, b) => b.available - a.available);
   for (let i = 0; i < list.length; i++) {
     if (currentAmount.toNumber() <= 0) break;
     if (list[i].available > 0) {
       result.push({
-        address: list[i].address,
+        key: list[i].key,
+        seller: list[i].seller,
+        project_id: list[i].project_id,
+        nonce: list[i].nonce,
+        mint: list[i].mint,
         available: Big(
-          currentAmount.toNumber() >= list[i].available
+          currentAmount.gte(Big(list[i].available))
             ? list[i].available
             : currentAmount.toNumber(),
-        )
-          .plus(Big(list[i].delegated || 0))
-          .toNumber(),
-        delegated: 0,
-        total: 0,
+        ).toNumber(),
       });
-      currentAmount = currentAmount.plus(Big(-list[i].available));
+      currentAmount = currentAmount.minus(Big(list[i].available));
     }
   }
   return {

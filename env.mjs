@@ -20,6 +20,7 @@ const env = createEnv({
     NEXT_PUBLIC_PO_RESET_PASSWORD: z.string().includes('http').nullish(),
     NEXT_PUBLIC_MODE: z.union([z.literal('dev'), z.literal('prod')]).nullish(),
     NEXT_PUBLIC_CONTRACT_CARBON_PROGRAM_ID: z.string().min(1),
+    NEXT_PUBLIC_ENDPOINT_RPC: z.string().min(1).includes('http'),
   },
   runtimeEnv: {
     NEXT_PUBLIC_API_ENDPOINT: process.env.NEXT_PUBLIC_API_ENDPOINT,
@@ -37,6 +38,7 @@ const env = createEnv({
     NEXT_PUBLIC_MODE: process.env.NEXT_PUBLIC_MODE,
     NEXT_PUBLIC_CONTRACT_CARBON_PROGRAM_ID:
       process.env.NEXT_PUBLIC_CONTRACT_CARBON_PROGRAM_ID,
+    NEXT_PUBLIC_ENDPOINT_RPC: process.env.NEXT_PUBLIC_ENDPOINT_RPC,
   },
 });
 

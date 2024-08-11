@@ -113,6 +113,7 @@ function InformationDetailSidebar(props: { data: any }) {
       }[] = [];
 
       console.info('conn', connection);
+      const listAta: string[] = [];
 
       for await (const item of listingList?.result || []) {
         const carbonMint = new PublicKey(item.mint);
@@ -186,13 +187,16 @@ function InformationDetailSidebar(props: { data: any }) {
         console.info('toAta', toAta);
         const listIns = [buyIns];
         if (!toAtaAccount) {
-          const createAtaIns = createAssociatedTokenAccountInstruction(
-            publicKey,
-            toAta,
-            publicKey,
-            carbonMint,
-          );
-          listIns.unshift(createAtaIns);
+          if (!listAta.includes(carbonMint.toString())) {
+            const createAtaIns = createAssociatedTokenAccountInstruction(
+              publicKey,
+              toAta,
+              publicKey,
+              carbonMint,
+            );
+            listIns.unshift(createAtaIns);
+            listAta.push(carbonMint.toString());
+          }
         }
         console.info('listIns', listIns);
         const txVer0 = await createTransactionV0(

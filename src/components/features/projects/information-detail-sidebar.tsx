@@ -32,6 +32,7 @@ import {
   VersionedTransaction,
 } from '@solana/web3.js';
 import Big from 'big.js';
+import { env } from 'env.mjs';
 import arrowDownIcon from 'public/images/common/arrow-down-icon.svg';
 import { NumericFormat } from 'react-number-format';
 import useSWR from 'swr';
@@ -246,7 +247,7 @@ function InformationDetailSidebar(props: { data: any }) {
 
           if (res.status === 'fulfilled') {
             success.push(
-              `<div>Purchase successfully ${Number(Big(listingList?.result[index].available).toFixed(4)).toLocaleString('en-US')} Carbon: <a class="underline" href="https://solscan.io/tx/${result?.tx}" rel="noopener noreferrer" target="_blank">View transaction</a></div>`,
+              `<div>Purchase successfully ${Number(Big(listingList?.result[index].available).toFixed(4)).toLocaleString('en-US')} Carbon: <a class="underline" href="https://explorer.solana.com/tx/${result?.tx}${env.NEXT_PUBLIC_MODE === 'prod' ? '' : '?cluster=devnet'}" rel="noopener noreferrer" target="_blank">View transaction</a></div>`,
             );
           }
           index++;
@@ -277,7 +278,7 @@ function InformationDetailSidebar(props: { data: any }) {
           ShowAlert.success({
             message: `<div>
             <div>Successfully purchased ${Number(Big(listingList?.result[0]?.available || 0).toFixed(4)).toLocaleString('en-US')} Carbon</div>
-            <a class="underline" href="https://solscan.io/tx/${result?.tx}" rel="noopener noreferrer" target="_blank">View transaction</a>
+            <a class="underline" href="https://explorer.solana.com/tx/${result?.tx}${env.NEXT_PUBLIC_MODE === 'prod' ? '' : '?cluster=devnet'}" rel="noopener noreferrer" target="_blank">View transaction</a>
             </div>`,
           });
           return;
@@ -365,6 +366,7 @@ function InformationDetailSidebar(props: { data: any }) {
             <div className="relative">
               <NumericFormat
                 value={quantity}
+                decimalScale={1}
                 thousandSeparator
                 allowNegative={false}
                 onValueChange={(q) => {

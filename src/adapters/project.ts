@@ -21,6 +21,14 @@ interface IGetProjectListingInfoResponse extends Response {
       };
       exchange_rate: number;
     };
+    listing_carbon?: {
+      key: string;
+      seller: string;
+      project_id: string;
+      nonce: number;
+      mint: string;
+      available: 6.4;
+    }[];
   };
   message?: string | string[];
 }

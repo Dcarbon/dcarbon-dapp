@@ -7,6 +7,7 @@ const API_ROUTES = {
     LIST: '/v1/projects',
     DETAIL: '/v1/projects/[slug]',
     LISTING_INFO: '/v1/projects/[slug]/listing-info',
+    QUICK_BUY_LISTING_INFO: '/v1/projects/quick-buy-listing-info',
   },
   COMMON: {
     SEND_FEEDBACK: '/v1/common/send-feedback',

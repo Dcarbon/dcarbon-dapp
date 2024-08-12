@@ -1,20 +1,12 @@
+import { IListingInfo } from '@adapters/project';
 import Big from 'big.js';
 
-interface IListingCarbon {
-  key: string;
-  seller: string;
-  project_id: string;
-  nonce: number;
-  mint: string;
-  available: number;
-}
-
 const generateListingList = (
-  list: IListingCarbon[],
+  list: IListingInfo[],
   amount: number,
-): { status: 'error' | 'success'; result: IListingCarbon[] } => {
+): { status: 'error' | 'success'; result: IListingInfo[] } => {
   let currentAmount = Big(amount);
-  const result: IListingCarbon[] = [];
+  const result: IListingInfo[] = [];
   const availableTotal = list.reduce(
     (partialSum, info) => Big(partialSum).plus(Big(info.available)).toNumber(),
     0,
@@ -40,6 +32,7 @@ const generateListingList = (
             ? list[i].available
             : currentAmount.toNumber(),
         ).toNumber(),
+        payment_info: list[i].payment_info,
       });
       currentAmount = currentAmount.minus(Big(list[i].available));
     }

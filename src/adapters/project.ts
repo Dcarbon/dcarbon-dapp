@@ -33,6 +33,42 @@ interface IGetProjectListingInfoResponse extends Response {
   message?: string | string[];
 }
 
+interface IListingInfo {
+  key: string;
+  seller: string;
+  project_id: string;
+  nonce: number;
+  mint: string;
+  available: number;
+  payment_info?: {
+    currency: string;
+    exchange_rate: number;
+  };
+}
+
+interface IGetQuickBuyListingInfoResponse extends Response {
+  request_id: string;
+  statusCode: number;
+  paging?: {
+    total: number;
+    page: number;
+    limit: number;
+  };
+  data?: {
+    available_carbon: number;
+    listing_carbon?: IListingInfo[];
+    spl_tokens: {
+      id: string;
+      mint: string;
+      symbol: string;
+      name: string;
+      icon: string;
+      is_stable: boolean;
+    }[];
+  };
+  message?: string | string[];
+}
+
 const doGetProjetList = async ({
   keyword,
   page,
@@ -86,6 +122,23 @@ const doGetProjectListingInfo = async (
   ) as Promise<IGetProjectListingInfoResponse>;
 };
 
-export { doGetProjetList, doGetProjectDetail, doGetProjectListingInfo };
+const doGetQuickBuyListingInfo =
+  async (): Promise<IGetQuickBuyListingInfoResponse> => {
+    return request(
+      'GET',
+      API_ROUTES.PROJECT.QUICK_BUY_LISTING_INFO,
+      undefined,
+      {
+        cache: 'no-store',
+      },
+    ) as Promise<IGetQuickBuyListingInfoResponse>;
+  };
 
-export type { IGetProjectListingInfoResponse };
+export {
+  doGetProjetList,
+  doGetProjectDetail,
+  doGetProjectListingInfo,
+  doGetQuickBuyListingInfo,
+};
+
+export type { IGetProjectListingInfoResponse, IListingInfo };

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import NextImage from 'next/image';
+import { useSearchParams } from 'next/navigation';
 import DCarbonButton from '@/components/common/button';
 import { doGetQuickBuyListingInfo, IListingInfo } from '@adapters/project';
 import { CARBON_IDL } from '@contracts/carbon/carbon.idl';
@@ -35,6 +36,8 @@ import { env } from '../../../../env.mjs';
 import arrowDownIcon from '../../../../public/images/common/arrow-down-icon.svg';
 
 function QuickBuySidebar() {
+  const searchParams = useSearchParams();
+  const model = searchParams.get('model');
   const [credits, setCredits] = useState('0');
   const [asset, setAsset] = useState<Selection>(new Set(['']));
   const [listingInfo, setListingInfo] = useState<IListingInfo[]>();
@@ -42,10 +45,23 @@ function QuickBuySidebar() {
   const { connection } = useConnection();
   const anchorWallet = useAnchorWallet();
   const { publicKey, wallet } = useWallet();
+  let iot_model;
+
+  switch (model) {
+    case 'G':
+      iot_model = 'PrjT_G' as const;
+      break;
+    case 'E':
+      iot_model = 'PrjT_E' as const;
+      break;
+    default:
+      iot_model = undefined;
+      break;
+  }
   const { data, isLoading, mutate } = useSWR(
     [QUERY_KEYS.PROJECTS.GET_QUICK_BUY_LISTING_INFO],
     () => {
-      return doGetQuickBuyListingInfo();
+      return doGetQuickBuyListingInfo(iot_model);
     },
     {
       revalidateOnMount: true,

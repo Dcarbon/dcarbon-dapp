@@ -122,17 +122,18 @@ const doGetProjectListingInfo = async (
   ) as Promise<IGetProjectListingInfoResponse>;
 };
 
-const doGetQuickBuyListingInfo =
-  async (): Promise<IGetQuickBuyListingInfoResponse> => {
-    return request(
-      'GET',
-      API_ROUTES.PROJECT.QUICK_BUY_LISTING_INFO,
-      undefined,
-      {
-        cache: 'no-store',
-      },
-    ) as Promise<IGetQuickBuyListingInfoResponse>;
-  };
+const doGetQuickBuyListingInfo = async (
+  iot_model?: 'PrjT_G' | 'PrjT_E' | 'PrjT_S',
+): Promise<IGetQuickBuyListingInfoResponse> => {
+  return request(
+    'GET',
+    API_ROUTES.PROJECT.QUICK_BUY_LISTING_INFO,
+    { iot_model },
+    {
+      cache: 'no-store',
+    },
+  ) as Promise<IGetQuickBuyListingInfoResponse>;
+};
 
 export {
   doGetProjetList,

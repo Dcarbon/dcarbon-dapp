@@ -111,7 +111,7 @@ function InformationDetailSidebar(props: { data: any }) {
     }
 
     setLoading(true);
-    const isSol = Array.from(asset)?.[0] === 'SOL';
+    const isSol = Array.from(asset)?.[0]?.toString().toLowerCase() === 'sol';
 
     try {
       const provider = new AnchorProvider(connection, anchorWallet);

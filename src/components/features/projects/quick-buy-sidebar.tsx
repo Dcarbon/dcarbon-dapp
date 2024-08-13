@@ -115,7 +115,7 @@ function QuickBuySidebar() {
     }
 
     setLoading(true);
-    const isSol = Array.from(asset)?.[0] === 'SOL';
+    const isSol = Array.from(asset)?.[0]?.toString().toLowerCase() === 'sol';
     if (Number(credits) > availableCarbon) {
       setCredits(Big(availableCarbon).toString);
     }

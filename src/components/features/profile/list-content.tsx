@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import NextImage from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { doGetListCarbon } from '@/adapters/user';
+import { doGetListCarbon, doGetListTx } from '@/adapters/user';
 import DCarbonButton from '@/components/common/button';
 import DCarbonLoading from '@/components/common/loading/base-loading';
 import { ShowAlert } from '@/components/common/toast';
@@ -48,6 +48,7 @@ function CertificateListContent() {
   const { isOpen, onClose, onOpen } = useDisclosure();
   const { publicKey } = useWallet();
   const [listCarbonPage, setListCarbonPage] = useState<number>(1);
+  const [listTxPage, setListTxPage] = useState<number>(1);
   const { cache } = useSWRConfig();
   const listCarbonCacheData = getAllCacheDataByKey(
     QUERY_KEYS.USER.GET_LIST_CARBON,
@@ -89,6 +90,26 @@ function CertificateListContent() {
       revalidateOnMount: true,
     },
   );
+  const { data: listTx, isLoading: listTxLoading } = useSWR(
+    () =>
+      publicKey && listTxPage && selectedTab === 'transaction'
+        ? [QUERY_KEYS.USER.GET_LIST_TX, publicKey, listTxPage]
+        : null,
+    ([, wallet, page]) => {
+      if (!wallet || !page || selectedTab !== 'transaction') {
+        return null;
+      }
+      return doGetListTx({
+        wallet: wallet?.toBase58(),
+        page,
+        limit: rowsPerPage,
+      });
+    },
+    {
+      keepPreviousData: true,
+      revalidateOnMount: true,
+    },
+  );
   const handleChangeTab = useCallback(
     (tab: tabTypes) => {
       const params = new URLSearchParams(searchParams.toString());
@@ -106,7 +127,14 @@ function CertificateListContent() {
       : 0;
   }, [data?.paging?.total]);
 
+  const listTxPages = useMemo(() => {
+    return listTx?.paging?.total
+      ? Math.ceil(listTx?.paging?.total / rowsPerPage)
+      : 0;
+  }, [listTx?.paging?.total]);
+
   const listCarbonLoadingState = isLoading ? 'loading' : 'idle';
+  const listTxLoadingState = listTxLoading ? 'loading' : 'idle';
 
   const certificateRows = useMemo(
     () => [
@@ -182,55 +210,26 @@ function CertificateListContent() {
     },
   ];
 
-  const transactionRows = [
+  const txColumns = [
     {
-      key: '1',
-      date: 'June 26, 2024',
-      name: 'Cert',
-      amount: '60',
+      key: 'tx_time',
+      label: 'Date',
     },
     {
-      key: '2',
-      date: 'June 26, 2024',
-      name: 'Cert',
-      amount: '60',
+      key: 'mint',
+      label: 'Token address',
     },
     {
-      key: '3',
-      date: 'June 26, 2024',
-      name: 'Cert',
-      amount: '60',
+      key: 'quality',
+      label: 'Quality',
     },
     {
-      key: '4',
-      date: 'June 26, 2024',
-      name: 'Cert',
-      amount: '60000',
-    },
-
-    {
-      key: '5',
-      date: 'June 26, 2024',
-      name: 'Cert',
-      amount: '60000',
+      key: 'amount',
+      label: 'Amount',
     },
     {
-      key: '6',
-      date: 'June 26, 2024',
-      name: 'Cert',
-      amount: '60000',
-    },
-    {
-      key: '7',
-      date: 'June 26, 2024',
-      name: 'Cert',
-      amount: '60000',
-    },
-    {
-      key: '8',
-      date: 'June 26, 2024',
-      name: 'Cert',
-      amount: '60000',
+      key: 'action',
+      label: 'Action',
     },
   ];
 
@@ -288,6 +287,13 @@ function CertificateListContent() {
         case 'date': {
           return <span className="text-[#4F4F4F]">{cellValue}</span>;
         }
+        case 'tx_time': {
+          return (
+            <span className="text-[#4F4F4F]">
+              {new Date(cellValue).toLocaleString()}
+            </span>
+          );
+        }
         case 'name': {
           return <span className="text-base">{cellValue}</span>;
         }
@@ -296,12 +302,15 @@ function CertificateListContent() {
         }
         case 'action': {
           if (type === 'transaction' || type === 'list-carbon') {
+            let urlSolScan = `https://explorer.solana.com/address/${user?.token_account || ''}${env.NEXT_PUBLIC_MODE === 'prod' ? '' : '?cluster=devnet'}`;
+            let urlSolanaIo = `https://solscan.io/account/${user?.token_account || ''}${env.NEXT_PUBLIC_MODE === 'prod' ? '' : '?cluster=devnet'}`;
+            if (type === 'transaction') {
+              urlSolScan = `https://explorer.solana.com/tx/${user?.tx || ''}${env.NEXT_PUBLIC_MODE === 'prod' ? '' : '?cluster=devnet'}`;
+              urlSolanaIo = `https://solscan.io/tx/${user?.tx || ''}${env.NEXT_PUBLIC_MODE === 'prod' ? '' : '?cluster=devnet'}`;
+            }
             return (
               <div className="relative flex gap-4">
-                <Link
-                  href={`https://explorer.solana.com/address/${user?.token_account || ''}${env.NEXT_PUBLIC_MODE === 'prod' ? '' : '?cluster=devnet'}`}
-                  isExternal
-                >
+                <Link href={urlSolScan} isExternal>
                   <Image
                     src={solanaExplorerIcon.src}
                     alt="Solana Explorer"
@@ -314,10 +323,7 @@ function CertificateListContent() {
                   />
                 </Link>
 
-                <Link
-                  href={`https://solscan.io/account/${user?.token_account || ''}${env.NEXT_PUBLIC_MODE === 'prod' ? '' : '?cluster=devnet'}`}
-                  isExternal
-                >
+                <Link href={urlSolanaIo} isExternal>
                   <Image
                     src={solScanIcon.src}
                     alt="Solscan"
@@ -348,9 +354,33 @@ function CertificateListContent() {
         case 'amount': {
           if (type === 'transaction') {
             return (
-              <span className="text-base">
-                {(+user?.amount || 0)?.toLocaleString('en-US')} USDC
-              </span>
+              <div className="relative flex gap-2 items-center text-base">
+                <Image
+                  src={user?.payment_info?.currency?.icon}
+                  alt={user?.payment_info?.currency?.symbol}
+                  as={NextImage}
+                  width={24}
+                  height={24}
+                  draggable={false}
+                  className="min-w-[24px]"
+                />
+                <div className={'flex flex-col'}>
+                  <span className={'text-sm'}>
+                    {(+user?.amount || 0)?.toLocaleString('en-US')}{' '}
+                    {user?.payment_info?.currency?.symbol}
+                  </span>
+                  <span className={'text-xs text-[#697077]'}>
+                    {'≈ '}
+                    {Number(
+                      (
+                        (+user?.amount || 0) *
+                        (user?.payment_info?.exchange_rate || 1)
+                      ).toFixed(1),
+                    )?.toLocaleString('en-US')}
+                    {'$'}
+                  </span>
+                </div>
+              </div>
             );
           }
 
@@ -371,6 +401,13 @@ function CertificateListContent() {
                 {user?.name || 'Carbon'}
               </span>
             </div>
+          );
+        }
+        case 'quality': {
+          return (
+            <span className="text-base">
+              {(+user?.quality || 0)?.toLocaleString('en-US')}
+            </span>
           );
         }
         default:
@@ -457,15 +494,34 @@ function CertificateListContent() {
               tbody: '[&>*:nth-child(odd)]:bg-[#F6F6F6]',
               wrapper: 'p-0',
             }}
+            bottomContent={
+              listTxPages > 1 ? (
+                <div className="flex w-full justify-center z-[11]">
+                  <Pagination
+                    isCompact
+                    showControls
+                    showShadow
+                    color="success"
+                    page={listTxPage}
+                    total={listTxPages}
+                    onChange={(page) => setListTxPage(page)}
+                  />
+                </div>
+              ) : null
+            }
           >
-            <TableHeader columns={certificateColumns}>
+            <TableHeader columns={txColumns}>
               {(column) => (
                 <TableColumn key={column.key}>{column.label}</TableColumn>
               )}
             </TableHeader>
-            <TableBody items={transactionRows}>
+            <TableBody
+              items={listTx?.data || []}
+              loadingContent={<DCarbonLoading />}
+              loadingState={listTxLoadingState}
+            >
               {(item) => (
-                <TableRow key={item.key}>
+                <TableRow key={item.tx}>
                   {(columnKey) => (
                     <TableCell>
                       {renderCell(item, columnKey, 'transaction')}

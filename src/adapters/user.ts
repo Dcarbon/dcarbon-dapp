@@ -29,29 +29,6 @@ interface IGetListCarbonResponse extends Response {
   }[];
   message?: string | string[];
 }
-
-const doGetListCarbon = async ({
-  page,
-  limit,
-  sort_field,
-  sort_type,
-  wallet,
-}: IGetListCarbonParams): Promise<IGetListCarbonResponse> => {
-  const params = {
-    ...(page ? { page } : {}),
-    ...(limit ? { limit } : {}),
-    ...(sort_field ? { sort_field } : {}),
-    ...(sort_type ? { sort_type } : {}),
-  };
-
-  return request('GET', API_ROUTES.USER.GET_LIST_CARBON, params, {
-    cache: 'no-store',
-    headers: {
-      ...(wallet ? { 'x-user-wallet': wallet } : {}),
-    },
-  }) as Promise<IGetListCarbonResponse>;
-};
-
 type carbonTypes = {
   mint: string;
   token_account: string;
@@ -85,6 +62,54 @@ type WalletInfoResponseTypes = {
   message?: string | string[];
 };
 
+type UserProfileResponseTypes = {
+  statusCode: number;
+  request_id: string;
+  message: string;
+  paging: {
+    total: number;
+    page: number;
+    limit: number;
+  };
+  data: {
+    name: string;
+    wallet: string;
+    funded: number;
+    offset: number;
+  };
+  error: string;
+};
+const doGetListCarbon = async ({
+  page,
+  limit,
+  sort_field,
+  sort_type,
+  wallet,
+}: IGetListCarbonParams): Promise<IGetListCarbonResponse> => {
+  const params = {
+    ...(page ? { page } : {}),
+    ...(limit ? { limit } : {}),
+    ...(sort_field ? { sort_field } : {}),
+    ...(sort_type ? { sort_type } : {}),
+  };
+
+  return request('GET', API_ROUTES.USER.GET_LIST_CARBON, params, {
+    cache: 'no-store',
+    headers: {
+      ...(wallet ? { 'x-user-wallet': wallet } : {}),
+    },
+  }) as Promise<IGetListCarbonResponse>;
+};
+
+const doGetProfile = async (
+  wallet: string,
+): Promise<UserProfileResponseTypes> => {
+  return request('GET', API_ROUTES.USER.GET_PROFILE_INFO, undefined, {
+    headers: {
+      ...(wallet ? { 'x-user-wallet': wallet } : {}),
+    },
+  }) as Promise<UserProfileResponseTypes>;
+};
 const getWalletInfo = async (
   wallet: string,
 ): Promise<WalletInfoResponseTypes> => {
@@ -95,7 +120,7 @@ const getWalletInfo = async (
   }) as Promise<WalletInfoResponseTypes>;
 };
 
-export { getWalletInfo, doGetListCarbon };
+export { getWalletInfo, doGetListCarbon, doGetProfile };
 export type {
   WalletInfoResponseTypes,
   carbonTypes,

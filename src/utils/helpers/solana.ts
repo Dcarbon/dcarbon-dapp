@@ -3,6 +3,7 @@ import {
   BlockhashWithExpiryBlockHeight,
   ComputeBudgetProgram,
   Connection,
+  Keypair,
   PublicKey,
   RpcResponseAndContext,
   TransactionInstruction,
@@ -21,12 +22,14 @@ interface ISendTxOption {
   connection: Connection;
   wallet: Wallet;
   transactions: TTransaction | TTransaction[];
+  transactions2?: TTransaction[];
 }
 
 const createTransactionV0 = async (
   connection: Connection,
   payerKey: PublicKey,
   txInstructions: TransactionInstruction | TransactionInstruction[],
+  otherSigner?: Keypair[],
 ): Promise<{
   tx: VersionedTransaction;
   blockhash: RpcResponseAndContext<BlockhashWithExpiryBlockHeight>;
@@ -57,7 +60,9 @@ const createTransactionV0 = async (
         ...(Array.isArray(txInstructions) ? txInstructions : [txInstructions]),
       ],
     }).compileToV0Message();
+
     const transactionV0 = new VersionedTransaction(messageV0);
+    if (otherSigner) transactionV0.sign(otherSigner);
     return { tx: transactionV0, blockhash };
   } catch (e) {
     const error = e as Error;
@@ -72,6 +77,7 @@ const createSendRawTransaction = async (
   transaction: VersionedTransaction,
 ): Promise<{
   tx?: string;
+  status?: 'rejected' | 'fulfilled';
 }> => {
   if (!connection) {
     throw new Error('connection is required');
@@ -87,6 +93,7 @@ const createSendRawTransaction = async (
   }
   let tx: string | undefined;
   const signatureEncode = base58.encode(signature?.signatures?.[0]);
+
   const blockHeight = await connection.getBlockHeight({
     commitment: 'confirmed',
     minContextSlot: blockhash.context.slot,
@@ -149,9 +156,14 @@ const sendTx = async ({
   connection,
   wallet,
   transactions,
-}: ISendTxOption): Promise<{
-  tx?: string;
-}> => {
+  transactions2 = [] as any,
+}: ISendTxOption): Promise<
+  | {
+      tx?: string;
+      status?: 'rejected' | 'fulfilled';
+    }
+  | { tx?: string; status: 'rejected' | 'fulfilled' }[]
+> => {
   if (!connection) {
     throw new Error('connection is required');
   }
@@ -164,31 +176,65 @@ const sendTx = async ({
     throw new Error('transactions is required');
   }
 
+  if (transactions2 && !Array.isArray(transactions2)) {
+    throw new Error('transactions2 must be an array');
+  }
+
   try {
     const isMultipleTx = Array.isArray(transactions);
     const signatures = isMultipleTx
-      ? await (wallet?.adapter as any)?.signAllTransactions(
-          transactions?.map((tx) => tx.tx),
-        )
+      ? await (wallet?.adapter as any)?.signAllTransactions([
+          ...[...transactions, ...transactions2].map((tx) => tx.tx),
+        ])
       : await (wallet?.adapter as any)?.signTransaction(transactions.tx);
 
     if (isMultipleTx) {
-      let index = 0;
-      const rawTransactions = [];
-      for await (const tran of transactions) {
-        rawTransactions.push(
+      let index1 = 0;
+      let index2 = 0;
+      const rawTransactions1 = [];
+      const rawTransactions2 = [];
+      const signatures1 = signatures.slice(0, transactions.length);
+      const signatures2 = signatures.slice(transactions.length);
+
+      for await (const tran of [...transactions]) {
+        rawTransactions1.push(
           createSendRawTransaction(
             connection,
-            signatures[index],
+            signatures1[index1],
             tran.blockhash,
             tran.tx,
           ),
         );
-        index++;
+        index1++;
       }
 
-      const results = (await Promise.allSettled(rawTransactions)) as any;
-      return results;
+      const results = await Promise.allSettled(rawTransactions1);
+      const isRejected = results?.find((r) => r.status === 'rejected');
+
+      let results2: {
+        tx?: string;
+        status?: 'rejected' | 'fulfilled';
+      }[] = [];
+
+      if (!isRejected) {
+        for await (const tran of [...transactions2]) {
+          rawTransactions2.push(
+            createSendRawTransaction(
+              connection,
+              signatures2[index2],
+              tran.blockhash,
+              tran.tx,
+            ),
+          );
+          index2++;
+        }
+        results2 = await Promise.allSettled(rawTransactions2);
+      }
+
+      return [...results, ...results2] as {
+        tx?: string;
+        status: 'rejected' | 'fulfilled';
+      }[];
     } else {
       return await createSendRawTransaction(
         connection,

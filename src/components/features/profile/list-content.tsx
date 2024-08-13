@@ -70,7 +70,7 @@ function CertificateListContent() {
     });
   }, [searchParams]);
 
-  const { data, isLoading } = useSWR(
+  const { data, isLoading, mutate } = useSWR(
     () =>
       publicKey && listCarbonPage && selectedTab === 'list-carbon'
         ? [QUERY_KEYS.USER.GET_LIST_CARBON, publicKey, listCarbonPage]
@@ -422,9 +422,7 @@ function CertificateListContent() {
       return 0;
     }
     if (selectedKeys === 'all') {
-      return listCarbonCacheData?.reduce((current, item) => {
-        return current + (+item.amount || 0);
-      }, 0);
+      return data?.common?.total || 0;
     }
     let count = 0;
     selectedKeys.forEach((value: any) => {
@@ -435,7 +433,7 @@ function CertificateListContent() {
     });
 
     return count;
-  }, [listCarbonCacheData, selectedKeys]);
+  }, [data?.common?.total, listCarbonCacheData, selectedKeys]);
 
   return (
     <>
@@ -610,6 +608,15 @@ function CertificateListContent() {
         isOpen={isOpen}
         onClose={onClose}
         amount={totalAmountWillBurn}
+        onOpen={onOpen}
+        mints={
+          selectedKeys === 'all'
+            ? data?.common?.all_data?.map((item) => item?.mint) || []
+            : Array.from(selectedKeys)
+        }
+        allMints={data?.common?.all_data || []}
+        maxAmount={data?.common?.total || 0}
+        mutate={mutate}
       />
     </>
   );

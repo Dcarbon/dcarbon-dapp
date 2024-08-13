@@ -26,6 +26,7 @@ function DCarbonModal({
   centeredTitle,
   classNames,
   description,
+  isDismissable,
 }: {
   children: ReactNode;
   icon?: string;
@@ -39,8 +40,10 @@ function DCarbonModal({
   centeredTitle?: boolean;
   classNames?: {
     title: string;
+    body: string;
   };
   description?: string;
+  isDismissable?: boolean;
 }) {
   return (
     <Modal
@@ -62,11 +65,13 @@ function DCarbonModal({
       classNames={{
         closeButton: 'p-[10px] right-4 top-4 rounded-[8px]',
         base: 'max-w-[480px]',
+        body: classNames?.body || '',
       }}
       radius="md"
       size="lg"
       scrollBehavior="inside"
       hideCloseButton={hideCloseButton}
+      isDismissable={isDismissable}
     >
       <ModalContent>
         {() => (

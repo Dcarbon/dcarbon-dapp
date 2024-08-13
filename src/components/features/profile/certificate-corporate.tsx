@@ -1,19 +1,58 @@
-import React, { useState } from 'react';
-import { Input } from '@nextui-org/react';
+import React from 'react';
+import { cn, Input } from '@nextui-org/react';
 import { NumericFormat } from 'react-number-format';
 
-function CertificateCorporate() {
-  const [name, setName] = useState<string>('');
-  const [isNameInvalid] = useState<boolean>(false);
-  const [projectType, setProjectType] = useState<string>('');
-  const [isProjectTypeInvalid] = useState<boolean>(false);
-  const [projectLocation, setProjectLocation] = useState<string>('');
-  const [isProjectLocationInvalid] = useState<boolean>(false);
-  const [reason, setReason] = useState<string>('');
-  const [address, setAddress] = useState<string>('');
-  const [country, setCountry] = useState<string>('');
-  const [isCountryInvalid] = useState<boolean>(false);
-
+function CertificateCorporate({
+  amount,
+  name,
+  setName,
+  isNameInvalid,
+  setIsNameInvalid,
+  projectType,
+  setProjectType,
+  isProjectTypeInvalid,
+  setIsProjectTypeInvalid,
+  projectLocation,
+  setProjectLocation,
+  isProjectLocationInvalid,
+  setIsProjectLocationInvalid,
+  reason,
+  setReason,
+  address,
+  setAddress,
+  isAddressInvalid,
+  setIsAddressInvalid,
+  country,
+  setCountry,
+  isCountryInvalid,
+  setIsCountryInvalid,
+  loading,
+}: {
+  amount: number;
+  name: string;
+  setName: (value: string) => void;
+  isNameInvalid: boolean;
+  setIsNameInvalid: (value: boolean) => void;
+  projectType: string;
+  setProjectType: (value: string) => void;
+  isProjectTypeInvalid: boolean;
+  setIsProjectTypeInvalid: (value: boolean) => void;
+  projectLocation: string;
+  setProjectLocation: (value: string) => void;
+  isProjectLocationInvalid: boolean;
+  setIsProjectLocationInvalid: (value: boolean) => void;
+  reason?: string;
+  setReason?: (value: string) => void;
+  address: string;
+  setAddress: (value: string) => void;
+  isAddressInvalid: boolean;
+  setIsAddressInvalid: (value: boolean) => void;
+  country: string;
+  setCountry: (value: string) => void;
+  isCountryInvalid: boolean;
+  setIsCountryInvalid: (value: boolean) => void;
+  loading?: boolean;
+}) {
   return (
     <div>
       <div>
@@ -25,8 +64,12 @@ function CertificateCorporate() {
           placeholder="Your name"
           radius="none"
           classNames={{
-            inputWrapper:
+            inputWrapper: cn(
               'rounded-[4px] bg-[#F6F6F6] group-data-[focus=true]:ring-1 group-data-[focus=true]:bg-white group-data-[focus=true]:ring-primary-color',
+              isNameInvalid
+                ? 'group-data-[focus=true]:ring-0 border-small'
+                : '',
+            ),
             label: '!text-[#21272A]',
             helperWrapper: 'px-0',
           }}
@@ -35,8 +78,15 @@ function CertificateCorporate() {
           errorMessage="Please enter your name!"
           variant={isNameInvalid ? 'bordered' : 'flat'}
           value={name}
-          onValueChange={setName}
-          isDisabled={false}
+          onValueChange={(value) => {
+            if (!value) {
+              setIsNameInvalid(true);
+            } else {
+              setIsNameInvalid(false);
+            }
+            setName(value);
+          }}
+          isDisabled={loading}
           isRequired
         />
       </div>
@@ -50,18 +100,29 @@ function CertificateCorporate() {
           placeholder="Address"
           radius="none"
           classNames={{
-            inputWrapper:
+            inputWrapper: cn(
               'rounded-[4px] bg-[#F6F6F6] group-data-[focus=true]:ring-1 group-data-[focus=true]:bg-white group-data-[focus=true]:ring-primary-color',
+              isAddressInvalid
+                ? 'group-data-[focus=true]:ring-0 border-small'
+                : '',
+            ),
             label: '!text-[#21272A]',
             helperWrapper: 'px-0',
           }}
           autoComplete="off"
-          isInvalid={isProjectTypeInvalid}
+          isInvalid={isAddressInvalid}
           errorMessage="Please enter your address!"
-          variant={isProjectTypeInvalid ? 'bordered' : 'flat'}
+          variant={isAddressInvalid ? 'bordered' : 'flat'}
           value={address}
-          onValueChange={setAddress}
-          isDisabled={false}
+          onValueChange={(value) => {
+            if (!value) {
+              setIsAddressInvalid(true);
+            } else {
+              setIsAddressInvalid(false);
+            }
+            setAddress(value);
+          }}
+          isDisabled={loading}
           isRequired
         />
       </div>
@@ -75,8 +136,12 @@ function CertificateCorporate() {
           placeholder="Country"
           radius="none"
           classNames={{
-            inputWrapper:
+            inputWrapper: cn(
               'rounded-[4px] bg-[#F6F6F6] group-data-[focus=true]:ring-1 group-data-[focus=true]:bg-white group-data-[focus=true]:ring-primary-color',
+              isCountryInvalid
+                ? 'group-data-[focus=true]:ring-0 border-small'
+                : '',
+            ),
             label: '!text-[#21272A]',
             helperWrapper: 'px-0',
           }}
@@ -85,8 +150,15 @@ function CertificateCorporate() {
           errorMessage="Please enter your country!"
           variant={isCountryInvalid ? 'bordered' : 'flat'}
           value={country}
-          onValueChange={setCountry}
-          isDisabled={false}
+          onValueChange={(value) => {
+            if (!value) {
+              setIsCountryInvalid(true);
+            } else {
+              setIsCountryInvalid(false);
+            }
+            setCountry(value);
+          }}
+          isDisabled={loading}
           isRequired
         />
       </div>
@@ -97,12 +169,14 @@ function CertificateCorporate() {
         </label>
         <div className="relative">
           <NumericFormat
+            disabled
             thousandSeparator
             allowNegative={false}
-            decimalScale={0}
+            decimalScale={1}
             id="amount"
-            className="text-sm w-full bg-[#F6F6F6] p-3 rounded h-[40px] outline-none hover:bg-default-200 transition-all placeholder:text-[#888] placeholder:text-sm placeholder:font-normal focus:ring-1 focus:ring-primary-color focus:bg-white"
+            className="text-sm w-full bg-[#E7E7E7] focus:bg-[#f6f6f6] p-3 rounded h-[40px] outline-none hover:bg-default-200 transition-all placeholder:text-[#888] placeholder:text-sm placeholder:font-normal"
             placeholder="0"
+            value={amount || 0}
           />
         </div>
       </div>
@@ -116,15 +190,16 @@ function CertificateCorporate() {
           placeholder="Optional"
           radius="none"
           classNames={{
-            inputWrapper:
+            inputWrapper: cn(
               'rounded-[4px] bg-[#F6F6F6] group-data-[focus=true]:ring-1 group-data-[focus=true]:bg-white group-data-[focus=true]:ring-primary-color',
+            ),
             label: '!text-[#21272A]',
             helperWrapper: 'px-0',
           }}
           autoComplete="off"
           value={reason}
           onValueChange={setReason}
-          isDisabled={false}
+          isDisabled={loading}
         />
       </div>
 
@@ -137,8 +212,12 @@ function CertificateCorporate() {
           placeholder="Project type"
           radius="none"
           classNames={{
-            inputWrapper:
+            inputWrapper: cn(
               'rounded-[4px] bg-[#F6F6F6] group-data-[focus=true]:ring-1 group-data-[focus=true]:bg-white group-data-[focus=true]:ring-primary-color',
+              isProjectTypeInvalid
+                ? 'group-data-[focus=true]:ring-0 border-small'
+                : '',
+            ),
             label: '!text-[#21272A]',
             helperWrapper: 'px-0',
           }}
@@ -147,8 +226,15 @@ function CertificateCorporate() {
           errorMessage="Please enter your project type!"
           variant={isProjectTypeInvalid ? 'bordered' : 'flat'}
           value={projectType}
-          onValueChange={setProjectType}
-          isDisabled={false}
+          onValueChange={(value) => {
+            if (!value) {
+              setIsProjectTypeInvalid(true);
+            } else {
+              setIsProjectTypeInvalid(false);
+            }
+            setProjectType(value);
+          }}
+          isDisabled={loading}
           isRequired
         />
       </div>
@@ -162,8 +248,12 @@ function CertificateCorporate() {
           placeholder="Project location"
           radius="none"
           classNames={{
-            inputWrapper:
+            inputWrapper: cn(
               'rounded-[4px] bg-[#F6F6F6] group-data-[focus=true]:ring-1 group-data-[focus=true]:bg-white group-data-[focus=true]:ring-primary-color',
+              isProjectLocationInvalid
+                ? 'group-data-[focus=true]:ring-0 border-small'
+                : '',
+            ),
             label: '!text-[#21272A]',
             helperWrapper: 'px-0',
           }}
@@ -172,8 +262,15 @@ function CertificateCorporate() {
           errorMessage="Please enter your project location!"
           variant={isProjectLocationInvalid ? 'bordered' : 'flat'}
           value={projectLocation}
-          onValueChange={setProjectLocation}
-          isDisabled={false}
+          onValueChange={(value) => {
+            if (!value) {
+              setIsProjectLocationInvalid(true);
+            } else {
+              setIsProjectLocationInvalid(false);
+            }
+            setProjectLocation(value);
+          }}
+          isDisabled={loading}
           isRequired
         />
       </div>

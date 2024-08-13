@@ -35,6 +35,16 @@ interface IGetListCarbonResponse extends Response {
     token_account: string;
     amount: number;
   }[];
+  common?: {
+    total: number;
+    all_data: {
+      name: string;
+      symbol: string;
+      mint: string;
+      token_account: string;
+      amount: number;
+    }[];
+  };
   message?: string | string[];
 }
 
@@ -173,15 +183,118 @@ const getWalletInfo = async (
 ): Promise<WalletInfoResponseTypes> => {
   return request('GET', API_ROUTES.USER.GET_WALLET_INFO, null, {
     headers: {
-      'x-user-wallet': wallet,
+      ...(wallet ? { 'x-user-wallet': wallet } : {}),
     },
+    cache: 'no-store',
   }) as Promise<WalletInfoResponseTypes>;
 };
 
-export { getWalletInfo, doGetListCarbon, doGetProfile, doGetListTx };
+interface IGenerateCertificatetaBody {
+  project_location: string;
+  transaction_id: string;
+  owner: string;
+  date: number;
+  amount: number;
+  project_name: string;
+}
+
+interface IGenerateCertificateResponse extends Response {
+  request_id: string;
+  statusCode: number;
+  paging?: {
+    total: number;
+    page: number;
+    limit: number;
+  };
+  data?: {
+    url: string;
+  };
+  message?: string | string[];
+}
+const doGenerateBurnMetadata = async (
+  wallet: string,
+  {
+    project_location,
+    transaction_id,
+    owner,
+    date,
+    amount,
+    project_name,
+  }: IGenerateCertificatetaBody,
+): Promise<IGenerateCertificateResponse> => {
+  const body = {
+    project_location,
+    transaction_id,
+    owner,
+    date,
+    amount,
+    project_name,
+  };
+  return request('POST', API_ROUTES.USER.GENERATE_CERTIFICATE, body, {
+    headers: {
+      ...(wallet ? { 'x-user-wallet': wallet } : {}),
+    },
+    cache: 'no-store',
+  }) as Promise<IGenerateCertificateResponse>;
+};
+
+type TGenerateNftMetadataAtributes = {
+  trait_type: string;
+  value: string;
+};
+interface IGenerateNftMetadataBody {
+  name: string;
+  symbol: string;
+  description?: string;
+  image: string;
+  attributes?: TGenerateNftMetadataAtributes[];
+}
+
+interface IGenerateNftMetadataResponse extends Response {
+  request_id: string;
+  statusCode: number;
+  paging?: {
+    total: number;
+    page: number;
+    limit: number;
+  };
+  data?: {
+    uri: string;
+  };
+  message?: string | string[];
+}
+
+const doGenerateNftMetadata = async (
+  wallet: string,
+  { name, symbol, description, image, attributes }: IGenerateNftMetadataBody,
+): Promise<IGenerateNftMetadataResponse> => {
+  const body = {
+    name,
+    symbol,
+    ...(description ? { description } : {}),
+    image,
+    ...(attributes ? { attributes } : {}),
+  };
+  return request('POST', API_ROUTES.USER.GENERATE_NFT_METADATA, body, {
+    cache: 'no-store',
+    headers: {
+      ...(wallet ? { 'x-user-wallet': wallet } : {}),
+    },
+  }) as Promise<IGenerateNftMetadataResponse>;
+};
+
+export {
+  getWalletInfo,
+  doGetListCarbon,
+  doGenerateBurnMetadata,
+  doGenerateNftMetadata,
+  doGetListTx,
+  doGetProfile,
+};
 export type {
   WalletInfoResponseTypes,
   carbonTypes,
   IGetListCarbonParams,
   TFeeling,
+  IGetListCarbonResponse,
 };

@@ -8,7 +8,10 @@ const generateListingList = (
   let currentAmount = Big(amount);
   const result: IListingInfo[] = [];
   const availableTotal = list.reduce(
-    (partialSum, info) => Big(partialSum).plus(Big(info.available)).toNumber(),
+    (partialSum, info) =>
+      Big(partialSum)
+        .plus(Big(info?.available || 0))
+        .toNumber(),
     0,
   );
   if (amount > availableTotal) {
@@ -22,19 +25,19 @@ const generateListingList = (
     if (currentAmount.toNumber() <= 0) break;
     if (list[i].available > 0) {
       result.push({
-        key: list[i].key,
-        seller: list[i].seller,
-        project_id: list[i].project_id,
-        nonce: list[i].nonce,
-        mint: list[i].mint,
+        key: list[i]?.key,
+        seller: list[i]?.seller,
+        project_id: list[i]?.project_id,
+        nonce: list[i]?.nonce,
+        mint: list[i]?.mint,
         available: Big(
-          currentAmount.gte(Big(list[i].available))
-            ? list[i].available
+          currentAmount.gte(Big(list[i]?.available || 0))
+            ? list[i]?.available
             : currentAmount.toNumber(),
         ).toNumber(),
         payment_info: list[i].payment_info,
       });
-      currentAmount = currentAmount.minus(Big(list[i].available));
+      currentAmount = currentAmount.minus(Big(list[i]?.available || 0));
     }
   }
   return {

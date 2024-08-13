@@ -2,7 +2,7 @@
 
 import { ReactNode } from 'react';
 import NextImage from 'next/image';
-import { Image } from '@nextui-org/react';
+import { Image, Spinner } from '@nextui-org/react';
 import closeIcon from 'public/images/common/close-modal.svg';
 import errorIcon from 'public/images/common/error-icon.svg';
 import successIcon from 'public/images/common/success-icon.svg';
@@ -127,28 +127,71 @@ const ShowAlert = {
   },
 
   warning: (props?: IShowAlert) => {
-    return toast.error(
-      <div className="flex flex-col gap-6">
-        <div className="flex gap-3 flex-col items-center">
+    return toast.custom((t) => (
+      <div className="flex flex-col gap-6 font-sans">
+        <div className="flex gap-4">
           <div>
             <Image
-              src={warningIcon}
+              src={warningIcon.src}
               alt="warning"
               draggable={false}
               as={NextImage}
+              width={48}
+              height={48}
             />
           </div>
-          <h2 className="text-2xl font-bold text-[#F8A627]">
-            {props?.title || 'Warning'}
-          </h2>
+
+          <div>
+            <h2 className="text-lg font-medium">{props?.title || 'Warning'}</h2>
+
+            {props?.message && (
+              <div
+                className="font-light text-[#4F4F4F] text-sm"
+                dangerouslySetInnerHTML={{ __html: props.message }}
+              />
+            )}
+          </div>
         </div>
+        <button
+          className="absolute top-3 right-3 hover:bg-default-100 transition-all"
+          onClick={() => toast.dismiss(t)}
+        >
+          <Image
+            src={closeIcon.src}
+            alt="close"
+            as={NextImage}
+            draggable={false}
+            width={24}
+            height={24}
+          />
+        </button>
+      </div>
+    ));
+  },
 
-        {props?.message && <div className="h-[1px] bg-black" />}
+  loading: (props: any) => {
+    return toast.loading(
+      <div className="flex flex-col gap-6 font-sans">
+        <div className="flex gap-4">
+          <div>
+            <Spinner color="success" />
+          </div>
 
-        {props?.message && (
-          <div className="text-center font-medium">{props.message}</div>
-        )}
+          <div>
+            <h2 className="text-lg font-medium">
+              {props?.title || 'Processing'}
+            </h2>
+
+            {props?.message && (
+              <div
+                className="font-light text-[#4F4F4F] text-sm"
+                dangerouslySetInnerHTML={{ __html: props.message }}
+              />
+            )}
+          </div>
+        </div>
       </div>,
+      { id: 'loading' },
     );
   },
 };

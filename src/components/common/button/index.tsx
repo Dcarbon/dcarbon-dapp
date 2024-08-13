@@ -8,6 +8,7 @@ function DCarbonButton({
   endContent,
   startContent,
   isLoading,
+  isDisabled,
   variant,
   ...props
 }: {
@@ -18,11 +19,13 @@ function DCarbonButton({
   startContent?: ReactNode;
   isLoading?: boolean;
   variant?: 'bordered' | 'flat';
+  isDisabled?: boolean;
   [key: string]: any;
 }) {
   return (
     <Button
       type="button"
+      isDisabled={isDisabled}
       className={cn(
         'rounded-[4px] py-[16px] px-[32px] font-medium data-[disabled=true]:bg-[#D1D1D1] data-[disabled=true]:opacity-100 data-[disabled=true]:!text-[#888]',
         color === 'primary' &&

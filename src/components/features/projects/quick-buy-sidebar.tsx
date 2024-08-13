@@ -115,7 +115,7 @@ function QuickBuySidebar() {
     }
 
     setLoading(true);
-    const isSol = Array.from(asset)?.[0] === 'sol';
+    const isSol = Array.from(asset)?.[0] === 'SOL';
     if (Number(credits) > availableCarbon) {
       setCredits(Big(availableCarbon).toString);
     }
@@ -137,15 +137,13 @@ function QuickBuySidebar() {
       for await (const item of listingList?.result || []) {
         const carbonMint = new PublicKey(item.mint);
         const carbonOwner = new PublicKey(item.seller);
-        const stableTokenMint = new PublicKey(
-          item.payment_info?.currency || '',
-        );
         const tokenListingInfo = new PublicKey(item.key);
 
         let sourceAtaToken: PublicKey | undefined;
         let destinationAtaToken: PublicKey | undefined;
-
+        let stableTokenMint: PublicKey | undefined;
         if (!isSol) {
+          stableTokenMint = new PublicKey(item.payment_info?.currency || '');
           destinationAtaToken = getAssociatedTokenAddressSync(
             stableTokenMint,
             carbonOwner,
@@ -179,11 +177,15 @@ function QuickBuySidebar() {
               isSigner: false,
               isWritable: false,
             },
-            {
-              pubkey: stableTokenMint,
-              isWritable: false,
-              isSigner: false,
-            },
+            ...(isSol
+              ? ([] as any)
+              : [
+                  {
+                    pubkey: stableTokenMint,
+                    isWritable: false,
+                    isSigner: false,
+                  },
+                ]),
             ...(isSol
               ? ([] as any)
               : [

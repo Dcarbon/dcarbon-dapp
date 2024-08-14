@@ -932,6 +932,33 @@ export type ICarbonContract = {
           };
         },
         {
+          name: 'contractConfig';
+          pda: {
+            seeds: [
+              {
+                kind: 'const';
+                value: [
+                  99,
+                  111,
+                  110,
+                  116,
+                  114,
+                  97,
+                  99,
+                  116,
+                  95,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103,
+                ];
+              },
+            ];
+          };
+        },
+        {
           name: 'systemProgram';
           address: '11111111111111111111111111111111';
         },
@@ -1421,8 +1448,7 @@ export type ICarbonContract = {
     },
     {
       code: 6001;
-      name: 'invalidProjectIdLength';
-      msg: 'The length of the device Id must be equal to 24';
+      name: 'invalidProjectId';
     },
     {
       code: 6002;
@@ -1456,7 +1482,6 @@ export type ICarbonContract = {
     {
       code: 6008;
       name: 'invalidNonce';
-      msg: '';
     },
     {
       code: 6009;
@@ -1473,6 +1498,26 @@ export type ICarbonContract = {
     {
       code: 6012;
       name: 'invalidAmount';
+    },
+    {
+      code: 6013;
+      name: 'invalidValue';
+    },
+    {
+      code: 6014;
+      name: 'invalidStringLength';
+    },
+    {
+      code: 6015;
+      name: 'invalidNumber';
+    },
+    {
+      code: 6016;
+      name: 'invalidDeviceId';
+    },
+    {
+      code: 6017;
+      name: 'invalidDeviceType';
     },
   ];
   types: [

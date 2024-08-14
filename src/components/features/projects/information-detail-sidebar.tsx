@@ -140,7 +140,9 @@ function InformationDetailSidebar(props: { data: any }) {
         let destinationAtaToken: PublicKey | undefined;
         let stableTokenMint: PublicKey | undefined;
         if (!isSol) {
-          stableTokenMint = new PublicKey(item.payment_info?.currency || '');
+          stableTokenMint = new PublicKey(
+            (data as any).data.payment_info.currency.mint,
+          );
           destinationAtaToken = getAssociatedTokenAddressSync(
             stableTokenMint,
             carbonOwner,

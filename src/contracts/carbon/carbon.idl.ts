@@ -860,6 +860,20 @@ export const CARBON_IDL = {
           },
         },
         {
+          name: 'contract_config',
+          pda: {
+            seeds: [
+              {
+                kind: 'const',
+                value: [
+                  99, 111, 110, 116, 114, 97, 99, 116, 95, 99, 111, 110, 102,
+                  105, 103,
+                ],
+              },
+            ],
+          },
+        },
+        {
           name: 'system_program',
           address: '11111111111111111111111111111111',
         },
@@ -909,11 +923,11 @@ export const CARBON_IDL = {
               },
               {
                 kind: 'arg',
-                path: '_project_id',
+                path: 'project_id',
               },
               {
                 kind: 'arg',
-                path: '_device_id',
+                path: 'device_id',
               },
             ],
           },
@@ -931,7 +945,7 @@ export const CARBON_IDL = {
               },
               {
                 kind: 'arg',
-                path: '_device_id',
+                path: 'device_id',
               },
             ],
           },
@@ -1298,8 +1312,7 @@ export const CARBON_IDL = {
     },
     {
       code: 6001,
-      name: 'InvalidProjectIdLength',
-      msg: 'The length of the device Id must be equal to 24',
+      name: 'InvalidProjectId',
     },
     {
       code: 6002,
@@ -1333,7 +1346,6 @@ export const CARBON_IDL = {
     {
       code: 6008,
       name: 'InvalidNonce',
-      msg: '',
     },
     {
       code: 6009,
@@ -1350,6 +1362,26 @@ export const CARBON_IDL = {
     {
       code: 6012,
       name: 'InvalidAmount',
+    },
+    {
+      code: 6013,
+      name: 'InvalidValue',
+    },
+    {
+      code: 6014,
+      name: 'InvalidStringLength',
+    },
+    {
+      code: 6015,
+      name: 'InvalidNumber',
+    },
+    {
+      code: 6016,
+      name: 'InvalidDeviceId',
+    },
+    {
+      code: 6017,
+      name: 'InvalidDeviceType',
     },
   ],
   types: [

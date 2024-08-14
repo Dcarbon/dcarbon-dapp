@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import NextImage from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import DCarbonButton from '@/components/common/button';
@@ -78,12 +78,19 @@ function QuickBuySidebar() {
       icon: info?.icon || '',
     };
   });
+
+  useEffect(() => {
+    if ((asset as any)?.currentKey) {
+      const filterData = data?.data?.listing_carbon?.filter(
+        (info) => info.payment_info?.currency === (asset as any)?.currentKey,
+      );
+
+      setListingInfo(filterData);
+    }
+  }, [asset, data?.data?.listing_carbon]);
+
   const selectAsset = (e: any) => {
-    const filterData = data?.data?.listing_carbon?.filter(
-      (info) => info.payment_info?.currency === e.currentKey,
-    );
     setAsset(e);
-    setListingInfo(filterData);
   };
   const availableCarbon = listingInfo
     ? listingInfo.reduce(
@@ -337,17 +344,16 @@ function QuickBuySidebar() {
           Purchase credits from any of our farms.
         </p>
         <label className="text-sm" htmlFor="credits">
-          <div className="flex gap-1 items-center">
+          <div className="flex gap-1 items-center justify-between flex-wrap">
             Carbon Credit{' '}
             {isLoading ? (
               <Skeleton>
-                <div className="h-[18px] w-6" />
+                <div className="h-[24px] w-24" />
               </Skeleton>
             ) : (
-              <span className="-mt-[2px] flex items-center">
-                {'('}
-                <span className="text-primary-color font-medium text-base">{`${Number(Big(maxCredits || 0).toFixed(1)).toLocaleString('en-US')}`}</span>
-                {')'}
+              <span className="flex items-center gap-1">
+                {'Available: '}
+                <span className="text-primary-color font-medium text-base">{` ${Number(Big(maxCredits || 0).toFixed(1)).toLocaleString('en-US')}`}</span>
               </span>
             )}
           </div>
@@ -430,8 +436,8 @@ function QuickBuySidebar() {
                       src={arrowDownIcon.src}
                       as={NextImage}
                       alt="arrow"
-                      width={20}
-                      height={20}
+                      width={16}
+                      height={16}
                       draggable={false}
                       radius="none"
                     />

@@ -77,7 +77,6 @@ const createSendRawTransaction = async (
   transaction: VersionedTransaction,
 ): Promise<{
   tx?: string;
-  status?: 'rejected' | 'fulfilled';
 }> => {
   if (!connection) {
     throw new Error('connection is required');
@@ -159,10 +158,13 @@ const sendTx = async ({
   transactions2 = [] as any,
 }: ISendTxOption): Promise<
   | {
-      tx?: string;
+      value?: {
+        tx?: string;
+      };
       status?: 'rejected' | 'fulfilled';
+      tx?: string;
     }
-  | { tx?: string; status: 'rejected' | 'fulfilled' }[]
+  | { value?: { tx?: string }; status: 'rejected' | 'fulfilled'; tx?: string }[]
 > => {
   if (!connection) {
     throw new Error('connection is required');
@@ -212,7 +214,7 @@ const sendTx = async ({
       const isRejected = results?.find((r) => r.status === 'rejected');
 
       let results2: {
-        tx?: string;
+        value?: { tx?: string };
         status?: 'rejected' | 'fulfilled';
       }[] = [];
 
@@ -232,7 +234,7 @@ const sendTx = async ({
       }
 
       return [...results, ...results2] as {
-        tx?: string;
+        value: { tx?: string };
         status: 'rejected' | 'fulfilled';
       }[];
     } else {

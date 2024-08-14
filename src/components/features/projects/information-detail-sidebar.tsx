@@ -120,7 +120,7 @@ function InformationDetailSidebar(props: { data: any }) {
         provider,
       );
 
-      const listingList = generateListingList(
+      const getlistingList = generateListingList(
         data.data.listing_carbon,
         Big(quantity).toNumber(),
       );
@@ -131,7 +131,7 @@ function InformationDetailSidebar(props: { data: any }) {
       }[] = [];
 
       const listAta: string[] = [];
-      for await (const item of listingList?.result || []) {
+      for await (const item of getlistingList?.result || []) {
         const carbonMint = new PublicKey(item.mint);
         const carbonOwner = new PublicKey(item.seller);
         const tokenListingInfo = new PublicKey(item.key);
@@ -245,13 +245,13 @@ function InformationDetailSidebar(props: { data: any }) {
         for await (const res of result) {
           if (res.status === 'rejected') {
             fails.push(
-              `<div>Purchase failed ${Number(Big(listingList?.result[index].available).toFixed(4)).toLocaleString('en-US')} Carbon: <span class="text-danger">Error</span>.</div>`,
+              `<div>Purchase failed ${Number(Big(getlistingList?.result[index].available).toFixed(1)).toLocaleString('en-US')} Carbon: <span class="text-danger">Error</span>.</div>`,
             );
           }
 
           if (res.status === 'fulfilled') {
             success.push(
-              `<div>Purchase successfully ${Number(Big(listingList?.result[index].available).toFixed(4)).toLocaleString('en-US')} Carbon: <a class="underline" href="https://explorer.solana.com/tx/${res?.tx}${env.NEXT_PUBLIC_MODE === 'prod' ? '' : '?cluster=devnet'}" rel="noopener noreferrer" target="_blank">View transaction</a></div>`,
+              `<div>Purchase successfully ${Number(Big(getlistingList?.result[index].available).toFixed(1)).toLocaleString('en-US')} Carbon: <a class="underline" href="https://explorer.solana.com/tx/${res?.value?.tx || ''}${env.NEXT_PUBLIC_MODE === 'prod' ? '' : '?cluster=devnet'}" rel="noopener noreferrer" target="_blank">View transaction</a></div>`,
             );
           }
           index++;
@@ -281,7 +281,7 @@ function InformationDetailSidebar(props: { data: any }) {
           mutate();
           ShowAlert.success({
             message: `<div>
-            <div>Successfully purchased ${Number(Big(listingList?.result[0]?.available || 0).toFixed(4)).toLocaleString('en-US')} Carbon</div>
+            <div>Successfully purchased ${Number(Big(getlistingList?.result[0]?.available || 0).toFixed(4)).toLocaleString('en-US')} Carbon</div>
             <a class="underline" href="https://explorer.solana.com/tx/${result?.tx}${env.NEXT_PUBLIC_MODE === 'prod' ? '' : '?cluster=devnet'}" rel="noopener noreferrer" target="_blank">View transaction</a>
             </div>`,
           });

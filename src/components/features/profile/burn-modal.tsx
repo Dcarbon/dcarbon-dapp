@@ -22,15 +22,17 @@ function BurnModal({
   maxAmount,
   allMints,
   mutate,
+  reset,
 }: {
   isOpen: boolean;
   onClose: () => void;
   amount?: number;
   onOpen: () => void;
-  mints?: string[];
+  mints?: { mint: string; amount: number }[];
   maxAmount: number;
   allMints: any[];
   mutate: KeyedMutator<IGetListCarbonResponse | null>;
+  reset: () => void;
 }) {
   const certificateModalState = useDisclosure();
   const [manualAmount, setManualAmount] = useState<string>('');
@@ -140,13 +142,12 @@ function BurnModal({
         mints={
           amount
             ? mints
-            : generateBurningList(
-                allMints,
-                Big(manualAmount || 0).toNumber(),
-              ).result?.map((item) => item.mint) || []
+            : generateBurningList(allMints, Big(manualAmount || 0).toNumber())
+                .result || []
         }
         allMints={allMints}
         mutate={mutate}
+        reset={reset}
       />
     </>
   );

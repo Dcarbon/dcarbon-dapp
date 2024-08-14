@@ -9,7 +9,7 @@ import {
 import { ShowAlert } from '@/components/common/toast';
 import { CARBON_IDL } from '@/contracts/carbon/carbon.idl';
 import { ICarbonContract } from '@/contracts/carbon/carbon.interface';
-import { THROW_EXCEPTION } from '@/utils/constants';
+import { QUERY_KEYS, THROW_EXCEPTION } from '@/utils/constants';
 import { logger } from '@/utils/helpers/common';
 import { IBurningCarbon } from '@/utils/helpers/profile';
 import { createTransactionV0, sendTx } from '@/utils/helpers/solana';
@@ -40,7 +40,7 @@ import utc from 'dayjs/plugin/utc';
 import { env } from 'env.mjs';
 import cerfiticateIcon from 'public/images/projects/cerfiticate-icon.png';
 import { toast } from 'sonner';
-import { KeyedMutator } from 'swr';
+import { KeyedMutator, useSWRConfig } from 'swr';
 
 import DCarbonButton from '../../common/button';
 import DCarbonModal from '../../common/modal';
@@ -59,14 +59,16 @@ function CertificateModal({
   mints,
   allMints = [],
   mutate,
+  reset,
 }: {
   isOpen: boolean;
   onClose: () => void;
   onBack: () => void;
   amount: number;
-  mints?: string[];
+  mints?: { mint: string; amount: number }[];
   allMints: IBurningCarbon[];
   mutate: KeyedMutator<IGetListCarbonResponse | null>;
+  reset: () => void;
 }) {
   const { publicKey, wallet } = useWallet();
   const { connection } = useConnection();
@@ -91,6 +93,7 @@ function CertificateModal({
   const [country, setCountry] = useState<string>('');
   const [isCountryInvalid, setIsCountryInvalid] = useState<boolean>(false);
   const [selectedTab, setSelectedTab] = useState<TTab>('individual');
+  const { mutate: globalMutate } = useSWRConfig();
 
   return (
     <DCarbonModal
@@ -185,7 +188,7 @@ function CertificateModal({
                 blockhash: RpcResponseAndContext<BlockhashWithExpiryBlockHeight>;
               }[] = [];
               for await (const mint of mints) {
-                const carbonMint = new PublicKey(mint);
+                const carbonMint = new PublicKey(mint.mint);
 
                 const burnAta = getAssociatedTokenAddressSync(
                   carbonMint,
@@ -200,10 +203,10 @@ function CertificateModal({
                   TOKEN_METADATA_PROGRAM_ID,
                 );
                 const tx = await program.methods
-                  .burnSft(allMints.find((m) => m.mint === mint)?.amount || 0)
+                  .burnSft(mint?.amount || 0)
                   .accounts({
                     signer: publicKey,
-                    mintSft: mint,
+                    mintSft: carbonMint,
                     burnAta,
                     metadataSft: metadata,
                     tokenProgram: TOKEN_PROGRAM_ID,
@@ -390,11 +393,14 @@ function CertificateModal({
                 transactions: burnTransactions,
                 transactions2: [mintTxVer0],
               })) as {
-                tx?: string;
+                value?: {
+                  tx: string;
+                };
                 status: 'rejected' | 'fulfilled';
               }[];
 
               if (!Array.isArray(result)) {
+                ShowAlert.error({ message: THROW_EXCEPTION.NETWORK_CONGESTED });
                 return;
               }
 
@@ -410,7 +416,11 @@ function CertificateModal({
                     );
                   } else {
                     fails.push(
-                      `<div>Burn failed ${Number(Big(allMints.find((item) => item?.mint === mints?.[index])?.amount || 0).toFixed(4)).toLocaleString('en-US')} Carbon: <span class="text-danger">Error</span>.</div>`,
+                      `<div>Burn failed ${Number(
+                        Big(mints?.[index]?.amount || 0).toFixed(1),
+                      ).toLocaleString(
+                        'en-US',
+                      )} Carbon: <span class="text-danger">Error</span>.</div>`,
                     );
                   }
                 }
@@ -418,11 +428,15 @@ function CertificateModal({
                 if (res.status === 'fulfilled') {
                   if (index === result.length - 1) {
                     certificateResult.push(
-                      `<div>Create NFT certificate successfully: <a class="underline" href="https://explorer.solana.com/tx/${res?.tx}${env.NEXT_PUBLIC_MODE === 'prod' ? '' : '?cluster=devnet'}" rel="noopener noreferrer" target="_blank">View transaction</a></div>`,
+                      `<div>Create NFT certificate successfully: <a class="underline" href="https://explorer.solana.com/tx/${res?.value?.tx || ''}${env.NEXT_PUBLIC_MODE === 'prod' ? '' : '?cluster=devnet'}" rel="noopener noreferrer" target="_blank">View transaction</a></div>`,
                     );
                   } else {
                     success.push(
-                      `<div>Burn successfully ${Number(Big(allMints.find((item) => item?.mint === mints?.[index])?.amount || 0).toFixed(4)).toLocaleString('en-US')} Carbon: <a class="underline" href="https://explorer.solana.com/tx/${res?.tx}${env.NEXT_PUBLIC_MODE === 'prod' ? '' : '?cluster=devnet'}" rel="noopener noreferrer" target="_blank">View transaction</a></div>`,
+                      `<div>Burn successfully ${Number(
+                        Big(mints?.[index]?.amount || 0).toFixed(1),
+                      ).toLocaleString(
+                        'en-US',
+                      )} Carbon: <a class="underline" href="https://explorer.solana.com/tx/${res?.value?.tx || ''}${env.NEXT_PUBLIC_MODE === 'prod' ? '' : '?cluster=devnet'}" rel="noopener noreferrer" target="_blank">View transaction</a></div>`,
                     );
                   }
                 }
@@ -433,6 +447,7 @@ function CertificateModal({
 
               if (success.length > 0) {
                 mutate();
+                globalMutate([QUERY_KEYS.USER.GET_PROFILE_INFO, publicKey]);
                 setName('');
                 setProjectType('');
                 setProjectLocation('');
@@ -440,6 +455,7 @@ function CertificateModal({
                 setAddress('');
                 setCountry('');
                 setReason('');
+                reset();
                 onClose();
                 ShowAlert.success({
                   message: merged,
@@ -450,6 +466,7 @@ function CertificateModal({
               if (fails.length > 0) {
                 if (success.length > 0) {
                   mutate();
+                  globalMutate([QUERY_KEYS.USER.GET_PROFILE_INFO, publicKey]);
                   setName('');
                   setProjectType('');
                   setProjectLocation('');
@@ -457,6 +474,7 @@ function CertificateModal({
                   setAddress('');
                   setCountry('');
                   setReason('');
+                  reset();
                   onClose();
                 }
                 ShowAlert.error({

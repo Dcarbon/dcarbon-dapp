@@ -1,6 +1,12 @@
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import NextImage from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
@@ -48,7 +54,7 @@ function CertificateListContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
-  const [selectedKeys, setSelectedKeys] = useState<any>(new Set([]));
+  const [selectedKeys, setSelectedKeys] = useState<any>(new Set());
   const { isOpen, onClose, onOpen } = useDisclosure();
   const { publicKey } = useWallet();
   const [listCarbonPage, setListCarbonPage] = useState<number>(1);
@@ -64,6 +70,21 @@ function CertificateListContent() {
   const [selectedTab, setSelectedTab] = useState<tabTypes>(
     (searchParams.get('tab') as tabTypes) || 'certificated',
   );
+  const publicKeyPrevRef = useRef(publicKey);
+
+  const reset = useCallback(() => {
+    setSelectedKeys(new Set());
+  }, []);
+
+  useEffect(() => {
+    if (
+      publicKey &&
+      publicKeyPrevRef.current?.toBase58() !== publicKey.toBase58()
+    ) {
+      setSelectedKeys(new Set());
+      publicKeyPrevRef.current = publicKey;
+    }
+  }, [publicKey]);
 
   useEffect(() => {
     setSelectedTab((prev) => {
@@ -465,6 +486,22 @@ function CertificateListContent() {
     return count;
   }, [data?.common?.total, listCarbonCacheData, selectedKeys]);
 
+  const listMints = useMemo(() => {
+    if (selectedKeys === 'all') {
+      return [];
+    }
+
+    return Array.from(selectedKeys).map((value: any) => {
+      const currentRecord = listCarbonCacheData?.find(
+        (item) => item.mint === value,
+      );
+      return {
+        mint: currentRecord?.mint || '',
+        amount: currentRecord?.amount || 0,
+      };
+    });
+  }, [listCarbonCacheData, selectedKeys]);
+
   return (
     <>
       <Tabs
@@ -664,12 +701,16 @@ function CertificateListContent() {
         onOpen={onOpen}
         mints={
           selectedKeys === 'all'
-            ? data?.common?.all_data?.map((item) => item?.mint) || []
-            : Array.from(selectedKeys)
+            ? data?.common?.all_data?.map((item) => ({
+                mint: item?.mint || '',
+                amount: item?.amount || 0,
+              })) || []
+            : listMints
         }
         allMints={data?.common?.all_data || []}
         maxAmount={data?.common?.total || 0}
         mutate={mutate}
+        reset={reset}
       />
     </>
   );

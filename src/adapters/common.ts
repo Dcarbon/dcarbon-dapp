@@ -10,7 +10,29 @@ interface ISendFeedbackBody {
   email: string;
   description?: string;
 }
+interface ISendContactBody {
+  firstName: string;
+  lastName: string;
+  email: string;
+  message: string;
+}
+const doSendContact = async ({
+  firstName,
+  lastName,
+  email,
+  message,
+}: ISendContactBody) => {
+  const body = {
+    first_name: firstName,
+    last_name: lastName,
+    email,
+    message,
+  };
 
+  return request('POST', API_ROUTES.COMMON.SEND_CONTACT, body, {
+    cache: 'no-store',
+  });
+};
 const doSendFeedback = async ({
   feeling,
   name,
@@ -29,5 +51,5 @@ const doSendFeedback = async ({
   });
 };
 
-export { doSendFeedback };
-export type { ISendFeedbackBody, TFeeling };
+export { doSendFeedback, doSendContact };
+export type { ISendFeedbackBody, TFeeling, ISendContactBody };

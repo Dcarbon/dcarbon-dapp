@@ -7,7 +7,7 @@ import { CARBON_IDL } from '@contracts/carbon/carbon.idl';
 import { ICarbonContract } from '@contracts/carbon/carbon.interface';
 import { AnchorProvider, Program } from '@coral-xyz/anchor';
 import { TOKEN_PROGRAM_ID } from '@coral-xyz/anchor/dist/cjs/utils/token';
-import { Image, Input, Select, Selection, SelectItem } from '@nextui-org/react';
+import { Image, Select, Selection, SelectItem } from '@nextui-org/react';
 import {
   createAssociatedTokenAccountInstruction,
   getAssociatedTokenAddressSync,
@@ -24,6 +24,7 @@ import {
   VersionedTransaction,
 } from '@solana/web3.js';
 import Big from 'big.js';
+import { NumericFormat } from 'react-number-format';
 import useSWR from 'swr';
 import { Skeleton } from '@components/common/loading';
 import { ShowAlert } from '@components/common/toast';
@@ -58,6 +59,7 @@ function QuickBuySidebar() {
       iot_model = undefined;
       break;
   }
+  const isAsset = Object.prototype.hasOwnProperty.call(asset, 'anchorKey');
   const { data, isLoading, mutate } = useSWR(
     [QUERY_KEYS.PROJECTS.GET_QUICK_BUY_LISTING_INFO],
     () => {
@@ -312,26 +314,35 @@ function QuickBuySidebar() {
         <p className="text-sm font-light text-[#454545] mb-16">
           Purchase credits from any of our farms.
         </p>
-
-        <Input
+        <label className="text-sm" htmlFor="credits">
+          <div className="flex gap-1">
+            Carbon Credit{' '}
+            {isLoading ? (
+              <Skeleton>
+                <div className="h-[14px] w-6" />
+              </Skeleton>
+            ) : (
+              <>
+                {' '}
+                {'('}
+                {listingInfo ? availableCarbon : data?.data?.available_carbon}
+                {')'}{' '}
+              </>
+            )}
+          </div>
+        </label>
+        <NumericFormat
           key="credits"
-          type="number"
-          labelPlacement="outside"
-          label={`Carbon Credit (${isLoading ? 0 : listingInfo ? availableCarbon : data?.data?.available_carbon})`}
-          placeholder="0"
-          radius="none"
-          classNames={{
-            inputWrapper:
-              'rounded-[4px] bg-[#F6F6F6] group-data-[focus=true]:ring-1 group-data-[focus=true]:bg-white group-data-[focus=true]:ring-primary-color',
-            label: '!text-[#21272A]',
-          }}
+          thousandSeparator
+          decimalScale={1}
+          allowNegative={false}
+          id="credits"
+          className="disabled:bg-default-200 disabled:cursor-not-allowed text-sm mt-2 mb-4 w-full bg-[#F6F6F6] p-3 rounded h-[40px] outline-none hover:bg-gray-50 transition-all focus:ring-1 focus:ring-primary-color placeholder:text-[#888] placeholder:text-sm placeholder:font-normal focus:bg-white"
+          placeholder="1"
           autoComplete="off"
           value={credits}
           onValueChange={handleCredits}
-          // isDisabled={loading}
-          // isInvalid={!!email && !password}
-          // errorMessage="Please enter your password!"
-          // variant={!!email && !password ? 'bordered' : 'flat'}
+          disabled={isLoading || !isAsset}
           min={0}
         />
         <div className="flex flex-col gap-2">
@@ -345,11 +356,14 @@ function QuickBuySidebar() {
               </Skeleton>
             ) : (
               <Select
+                isInvalid={!isAsset}
+                errorMessage="Please select asset!"
                 aria-label="Asset"
                 label=""
                 items={assetSelectOptions}
                 classNames={{
-                  trigger: 'bg-white shadow-none rounded-[4px]',
+                  trigger:
+                    'bg-[#F6F6F6] shadow-none rounded-[4px] data-[hover=true]:bg-default-200',
                   popoverContent: 'rounded-[4px]',
                 }}
                 listboxProps={{
@@ -416,8 +430,9 @@ function QuickBuySidebar() {
           isLoading={isLoading || loading}
           color="primary"
           fullWidth
-          className="mt-6"
+          className="mt-6 disabled:bg-default-200 disabled:cursor-not-allowed"
           onClick={handleBuyCarbon}
+          disabled={isLoading || loading || !isAsset}
         >
           Buy Now
         </DCarbonButton>

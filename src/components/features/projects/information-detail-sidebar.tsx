@@ -15,7 +15,7 @@ import { generateListingList } from '@/utils/helpers/project';
 import { createTransactionV0, sendTx } from '@/utils/helpers/solana';
 import { AnchorProvider, Program } from '@coral-xyz/anchor';
 import { TOKEN_PROGRAM_ID } from '@coral-xyz/anchor/dist/cjs/utils/token';
-import { Image, Select, Selection, SelectItem } from '@nextui-org/react';
+import { Image, Link, Select, Selection, SelectItem } from '@nextui-org/react';
 import {
   createAssociatedTokenAccountInstruction,
   getAssociatedTokenAddressSync,
@@ -526,13 +526,29 @@ function InformationDetailSidebar(props: { data: any }) {
             </div>
           </div>
 
-          <DCarbonButton
-            color="primary"
-            onClick={handleBuyCarbon}
-            isLoading={loading}
-          >
-            {loading ? 'Buying...' : 'Buy'}
-          </DCarbonButton>
+          <div className="flex gap-2 lg:gap-6">
+            <Link
+              href="https://calendly.com/tunguyen-m1db/30min"
+              isExternal
+              className="flex-auto w-2/4"
+            >
+              <DCarbonButton
+                variant="bordered"
+                color="primary"
+                className="w-full"
+              >
+                Book A Call
+              </DCarbonButton>
+            </Link>
+            <DCarbonButton
+              color="primary"
+              className="flex-auto w-2/4"
+              onPress={handleBuyCarbon}
+              disabled={loading}
+            >
+              {loading ? 'Processing...' : 'Buy Carbon'}
+            </DCarbonButton>
+          </div>
         </div>
       </div>
 

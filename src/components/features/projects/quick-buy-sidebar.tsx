@@ -7,7 +7,7 @@ import { CARBON_IDL } from '@contracts/carbon/carbon.idl';
 import { ICarbonContract } from '@contracts/carbon/carbon.interface';
 import { AnchorProvider, Program } from '@coral-xyz/anchor';
 import { TOKEN_PROGRAM_ID } from '@coral-xyz/anchor/dist/cjs/utils/token';
-import { Image, Select, Selection, SelectItem } from '@nextui-org/react';
+import { cn, Image, Select, Selection, SelectItem } from '@nextui-org/react';
 import {
   createAssociatedTokenAccountInstruction,
   getAssociatedTokenAddressSync,
@@ -24,6 +24,8 @@ import {
   VersionedTransaction,
 } from '@solana/web3.js';
 import Big from 'big.js';
+import { env } from 'env.mjs';
+import arrowDownIcon from 'public/images/common/arrow-down-icon.svg';
 import { NumericFormat } from 'react-number-format';
 import useSWR from 'swr';
 import { Skeleton } from '@components/common/loading';
@@ -33,19 +35,19 @@ import { logger } from '@utils/helpers/common';
 import { generateListingList } from '@utils/helpers/project';
 import { createTransactionV0, sendTx } from '@utils/helpers/solana';
 
-import { env } from '../../../../env.mjs';
-import arrowDownIcon from '../../../../public/images/common/arrow-down-icon.svg';
-
 function QuickBuySidebar() {
   const searchParams = useSearchParams();
   const model = searchParams.get('model');
-  const [credits, setCredits] = useState('0');
+  const [credits, setCredits] = useState<string>('');
   const [asset, setAsset] = useState<Selection>(new Set(['']));
   const [listingInfo, setListingInfo] = useState<IListingInfo[]>();
   const [loading, setLoading] = useState<boolean>(false);
   const { connection } = useConnection();
   const anchorWallet = useAnchorWallet();
   const { publicKey, wallet } = useWallet();
+  const [touched, setTouched] = useState<boolean>(false);
+  const [creditsError, setCreditsError] = useState<string | null>(null);
+
   let iot_model;
 
   switch (model) {
@@ -90,7 +92,35 @@ function QuickBuySidebar() {
         0,
       )
     : 0;
+
+  const maxCredits = listingInfo
+    ? availableCarbon
+    : data?.data?.available_carbon;
+
   const handleBuyCarbon = async () => {
+    if (credits && Big(maxCredits || 0).eq(0)) {
+      setCreditsError('No credits available, please try another asset');
+    }
+
+    if (Big(credits || 0).lte(0)) {
+      setCreditsError('Credits must be greater than 0');
+      return;
+    }
+
+    if (credits && maxCredits && Big(credits).gt(Big(maxCredits))) {
+      setCreditsError('Max credits is ' + maxCredits);
+      return;
+    }
+
+    if (credits && Big(credits).lte(Big(maxCredits || 0))) {
+      setCreditsError(null);
+    }
+
+    if (!isAsset) {
+      setTouched(true);
+      return;
+    }
+
     if (!publicKey || !wallet || !anchorWallet || !connection) {
       ShowAlert.warning({ message: 'Please connect to wallet first!' });
       return;
@@ -98,11 +128,6 @@ function QuickBuySidebar() {
 
     if (!listingInfo || listingInfo?.length === 0) {
       logger({ message: 'No listing found!', type: 'ERROR' });
-      return;
-    }
-
-    if (Big(credits || 0).lte(0)) {
-      ShowAlert.error({ message: 'Amount must be greater than 0.' });
       return;
     }
 
@@ -118,9 +143,7 @@ function QuickBuySidebar() {
 
     setLoading(true);
     const isSol = Array.from(asset)?.[0]?.toString().toLowerCase() === 'sol';
-    if (Number(credits) > availableCarbon) {
-      setCredits(Big(availableCarbon).toString);
-    }
+
     try {
       const provider = new AnchorProvider(connection, anchorWallet);
       const program = new Program<ICarbonContract>(
@@ -304,47 +327,68 @@ function QuickBuySidebar() {
     }
   };
   const handleCredits = async (e: any) => {
-    setCredits(
-      String(Number(e) > availableCarbon ? availableCarbon : Number(e)),
-    );
+    setCredits(e);
   };
+
   return (
     <>
       <div>
-        <p className="text-sm font-light text-[#454545] mb-16">
+        <p className="text-sm font-light text-[#454545] mb-8">
           Purchase credits from any of our farms.
         </p>
         <label className="text-sm" htmlFor="credits">
-          <div className="flex gap-1">
+          <div className="flex gap-1 items-center">
             Carbon Credit{' '}
             {isLoading ? (
               <Skeleton>
-                <div className="h-[14px] w-6" />
+                <div className="h-[18px] w-6" />
               </Skeleton>
             ) : (
-              <>
-                {' '}
+              <span className="-mt-[2px] flex items-center">
                 {'('}
-                {listingInfo ? availableCarbon : data?.data?.available_carbon}
-                {')'}{' '}
-              </>
+                <span className="text-primary-color font-medium text-base">{`${Number(Big(maxCredits || 0).toFixed(1)).toLocaleString('en-US')}`}</span>
+                {')'}
+              </span>
             )}
           </div>
         </label>
-        <NumericFormat
-          key="credits"
-          thousandSeparator
-          decimalScale={1}
-          allowNegative={false}
-          id="credits"
-          className="disabled:bg-default-200 disabled:cursor-not-allowed text-sm mt-2 mb-4 w-full bg-[#F6F6F6] p-3 rounded h-[40px] outline-none hover:bg-gray-50 transition-all focus:ring-1 focus:ring-primary-color placeholder:text-[#888] placeholder:text-sm placeholder:font-normal focus:bg-white"
-          placeholder="1"
-          autoComplete="off"
-          value={credits}
-          onValueChange={handleCredits}
-          disabled={isLoading || !isAsset}
-          min={0}
-        />
+        <div className="mb-4 flex flex-col gap-1">
+          <NumericFormat
+            key="credits"
+            thousandSeparator
+            decimalScale={1}
+            allowNegative={false}
+            id="credits"
+            className="disabled:bg-default-200 text-sm mt-2 w-full bg-[#F6F6F6] p-3 rounded h-[40px] outline-none hover:bg-gray-50 transition-all focus:ring-1 focus:ring-primary-color placeholder:text-[#888] placeholder:text-sm placeholder:font-normal focus:bg-white"
+            placeholder="Enter credit"
+            autoComplete="off"
+            value={credits}
+            onValueChange={(q) => {
+              if (q?.value && Big(maxCredits || 0).eq(0)) {
+                setCreditsError(
+                  'No credits available, please try another asset',
+                );
+              }
+              if (q?.value && maxCredits && Big(q.value).gt(Big(maxCredits))) {
+                setCreditsError('Max credits is ' + maxCredits);
+              }
+
+              if (q?.value && Big(q?.value).lte(Big(maxCredits || 0))) {
+                setCreditsError(null);
+              }
+
+              if (Big(q?.value || 0).lte(0)) {
+                setCreditsError('Credits must be greater than 0');
+              }
+
+              handleCredits(q?.value || '');
+            }}
+            min={0}
+          />
+          {creditsError && (
+            <div className="text-xs text-danger px-1">{creditsError}</div>
+          )}
+        </div>
         <div className="flex flex-col gap-2">
           <label className="text-sm" htmlFor="asset">
             Asset
@@ -356,14 +400,17 @@ function QuickBuySidebar() {
               </Skeleton>
             ) : (
               <Select
-                isInvalid={!isAsset}
+                isInvalid={isAsset || !touched ? false : true}
                 errorMessage="Please select asset!"
+                variant={isAsset || !touched ? undefined : 'bordered'}
                 aria-label="Asset"
                 label=""
                 items={assetSelectOptions}
                 classNames={{
-                  trigger:
+                  trigger: cn(
                     'bg-[#F6F6F6] shadow-none rounded-[4px] data-[hover=true]:bg-default-200',
+                    isAsset || !touched ? '' : 'border-small',
+                  ),
                   popoverContent: 'rounded-[4px]',
                 }}
                 listboxProps={{
@@ -371,10 +418,12 @@ function QuickBuySidebar() {
                     base: 'data-[selectable=true]:focus:bg-[#EAFFC7] rounded-[4px]',
                   },
                 }}
+                onClose={() => setTouched(true)}
                 radius="none"
                 selectedKeys={asset}
                 onSelectionChange={selectAsset}
                 disallowEmptySelection
+                placeholder="Select asset"
                 selectorIcon={
                   <div>
                     <Image
@@ -427,12 +476,11 @@ function QuickBuySidebar() {
         </div>
 
         <DCarbonButton
-          isLoading={isLoading || loading}
+          isLoading={loading}
           color="primary"
           fullWidth
-          className="mt-6 disabled:bg-default-200 disabled:cursor-not-allowed"
+          className="mt-6"
           onClick={handleBuyCarbon}
-          disabled={isLoading || loading || !isAsset}
         >
           Buy Now
         </DCarbonButton>

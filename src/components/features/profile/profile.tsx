@@ -9,6 +9,7 @@ import { ShowAlert } from '@/components/common/toast';
 import { QUERY_KEYS } from '@/utils/constants';
 import { Avatar, Image } from '@nextui-org/react';
 import { useWallet } from '@solana/wallet-adapter-react';
+import Big from 'big.js';
 import avatar from 'public/images/certificates/avatar.png';
 import cameraIcon from 'public/images/certificates/camera.svg';
 import editIcon from 'public/images/certificates/edit.svg';
@@ -20,8 +21,7 @@ function CertificateProfile() {
   const [, copy] = useCopyToClipboard();
   const { publicKey } = useWallet();
   const { data, isLoading } = useSWR(
-    () => [QUERY_KEYS.USER.GET_PROFILE_INFO, publicKey],
-
+    () => (publicKey ? [QUERY_KEYS.USER.GET_PROFILE_INFO, publicKey] : null),
     ([, publicKey]) => {
       return publicKey ? doGetProfile(publicKey.toBase58()) : null;
     },
@@ -95,28 +95,40 @@ function CertificateProfile() {
         </div>
       </div>
 
-      {isLoading ? (
-        <div className="w-full flex flex-col gap-4">
-          <Skeleton>
-            <div className="w-full h-[52px]" />
-          </Skeleton>
-          <Skeleton>
-            <div className="w-full h-[52px]" />
-          </Skeleton>
+      <div className="w-full flex flex-col gap-4">
+        <div className="p-4 bg-[#F6F6F6] w-full flex gap-6 justify-between h-[52px] rounded-lg items-center">
+          <div className="font-light">Funded</div>
+          {isLoading ? (
+            <Skeleton>
+              <div className="max-w-24 min-w-8 w-full h-[16px]" />
+            </Skeleton>
+          ) : (
+            <div className="font-medium text-nowrap">
+              {Number(Big(data?.data.funded || 0).toFixed(1)).toLocaleString(
+                'en-US',
+              )}{' '}
+              USD
+            </div>
+          )}
         </div>
-      ) : (
-        <div className="w-full flex flex-col gap-4">
-          <div className="p-4 bg-[#F6F6F6] w-full flex gap-6 justify-between h-[52px] rounded-lg items-center">
-            <div className="font-light">Funded</div>
-            <div className="font-medium">{data?.data?.funded || 0} Carbon</div>
-          </div>
 
-          <div className="p-4 bg-[#F6F6F6] w-full flex gap-6 justify-between h-[52px] rounded-lg items-center">
-            <div className="font-light">Offset</div>
-            <div className="font-medium">{data?.data?.offset || 0} Carbon</div>
-          </div>
+        <div className="p-4 bg-[#F6F6F6] w-full flex gap-6 justify-between h-[52px] rounded-lg items-center">
+          <div className="font-light">Offset</div>
+          {isLoading ? (
+            <Skeleton>
+              <div className="h-[16px] max-w-24 min-w-8 w-full" />
+            </Skeleton>
+          ) : (
+            <div className="font-medium text-nowrap">
+              {Number(Big(data?.data?.offset || 0).toFixed(1)).toLocaleString(
+                'en-US',
+              )}{' '}
+              Carbon
+            </div>
+          )}
         </div>
-      )}
+      </div>
+
       <DCarbonButton
         color="primary"
         fullWidth

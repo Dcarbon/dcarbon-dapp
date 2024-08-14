@@ -11,6 +11,7 @@ const API_ROUTES = {
   },
   COMMON: {
     SEND_FEEDBACK: '/v1/common/send-feedback',
+    SEND_CONTACT: '/v1/common/send-contact',
   },
   USER: {
     GET_WALLET_INFO: '/v1/user/wallet-info',

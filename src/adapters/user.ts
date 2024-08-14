@@ -20,6 +20,8 @@ interface IGetListTxParams {
   wallet?: string;
 }
 
+interface IGetListCertificateParams extends IGetListTxParams {}
+
 interface IGetListCarbonResponse extends Response {
   request_id: string;
   statusCode: number;
@@ -73,6 +75,35 @@ interface IGetListTxResponse extends Response {
     };
   }[];
   message?: string | string[];
+}
+
+interface IGetListCertificateResponse extends Response {
+  statusCode: number;
+  request_id: string;
+  message?: string;
+  paging?: {
+    total: number;
+    page: number;
+    limit: number;
+  };
+  data?: {
+    created_at: string;
+    address: string;
+    name: string;
+    symbol: string;
+    metadata: {
+      name: string;
+      symbol: string;
+      image: string;
+      description: string;
+      attributes: {
+        trait_type: string;
+        value: string;
+      }[];
+    };
+  }[];
+
+  error?: string;
 }
 
 type carbonTypes = {
@@ -167,6 +198,28 @@ const doGetListTx = async ({
       ...(wallet ? { 'x-user-wallet': wallet } : {}),
     },
   }) as Promise<IGetListTxResponse>;
+};
+
+const doGetListCertificate = async ({
+  page,
+  limit,
+  sort_field,
+  sort_type,
+  wallet,
+}: IGetListCertificateParams): Promise<IGetListCertificateResponse> => {
+  const params = {
+    ...(page ? { page } : {}),
+    ...(limit ? { limit } : {}),
+    ...(sort_field ? { sort_field } : {}),
+    ...(sort_type ? { sort_type } : {}),
+  };
+
+  return request('GET', API_ROUTES.USER.GET_LIST_CERTIFICATE, params, {
+    cache: 'no-store',
+    headers: {
+      ...(wallet ? { 'x-user-wallet': wallet } : {}),
+    },
+  }) as Promise<IGetListCertificateResponse>;
 };
 
 const doGetProfile = async (
@@ -290,6 +343,7 @@ export {
   doGenerateNftMetadata,
   doGetListTx,
   doGetProfile,
+  doGetListCertificate,
 };
 export type {
   WalletInfoResponseTypes,

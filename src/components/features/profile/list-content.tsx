@@ -3,7 +3,11 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import NextImage from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { doGetListCarbon, doGetListTx } from '@/adapters/user';
+import {
+  doGetListCarbon,
+  doGetListCertificate,
+  doGetListTx,
+} from '@/adapters/user';
 import DCarbonButton from '@/components/common/button';
 import DCarbonLoading from '@/components/common/loading/base-loading';
 import { ShowAlert } from '@/components/common/toast';
@@ -49,6 +53,7 @@ function CertificateListContent() {
   const { publicKey } = useWallet();
   const [listCarbonPage, setListCarbonPage] = useState<number>(1);
   const [listTxPage, setListTxPage] = useState<number>(1);
+  const [listCertificatePage, setListCertificatePage] = useState<number>(1);
   const { cache } = useSWRConfig();
   const listCarbonCacheData = getAllCacheDataByKey(
     QUERY_KEYS.USER.GET_LIST_CARBON,
@@ -110,6 +115,28 @@ function CertificateListContent() {
       revalidateOnMount: true,
     },
   );
+
+  const { data: listCertificate, isLoading: listCertificateLoading } = useSWR(
+    () =>
+      publicKey && listCertificatePage && selectedTab === 'certificated'
+        ? [QUERY_KEYS.USER.GET_LIST_CERTIFICATE, publicKey, listCertificatePage]
+        : null,
+    ([, wallet, page]) => {
+      if (!wallet || !page || selectedTab !== 'certificated') {
+        return null;
+      }
+      return doGetListCertificate({
+        wallet: wallet?.toBase58(),
+        page,
+        limit: rowsPerPage,
+      });
+    },
+    {
+      keepPreviousData: true,
+      revalidateOnMount: true,
+    },
+  );
+
   const handleChangeTab = useCallback(
     (tab: tabTypes) => {
       const params = new URLSearchParams(searchParams.toString());
@@ -133,71 +160,25 @@ function CertificateListContent() {
       : 0;
   }, [listTx?.paging?.total]);
 
+  const listCertificatePages = useMemo(() => {
+    return listCertificate?.paging?.total
+      ? Math.ceil(listCertificate?.paging?.total / rowsPerPage)
+      : 0;
+  }, [listCertificate?.paging?.total]);
+
   const listCarbonLoadingState = isLoading ? 'loading' : 'idle';
   const listTxLoadingState = listTxLoading ? 'loading' : 'idle';
-
-  const certificateRows = useMemo(
-    () => [
-      {
-        key: '1',
-        date: 'June 26, 2024',
-        name: 'Cert',
-        amount: '60000',
-      },
-      {
-        key: '2',
-        date: 'June 26, 2024',
-        name: 'Cert',
-        amount: '60',
-      },
-      {
-        key: '3',
-        date: 'June 26, 2024',
-        name: 'Cert',
-        amount: '60',
-      },
-      {
-        key: '4',
-        date: 'June 26, 2024',
-        name: 'Cert',
-        amount: '60',
-      },
-
-      {
-        key: '5',
-        date: 'June 26, 2024',
-        name: 'Cert',
-        amount: '60',
-      },
-      {
-        key: '6',
-        date: 'June 26, 2024',
-        name: 'Cert',
-        amount: '60',
-      },
-      {
-        key: '7',
-        date: 'June 26, 2024',
-        name: 'Cert',
-        amount: '60',
-      },
-      {
-        key: '8',
-        date: 'June 26, 2024',
-        name: 'Cert',
-        amount: '60',
-      },
-    ],
-    [],
-  );
+  const listCertificateLoadingState = listCertificateLoading
+    ? 'loading'
+    : 'idle';
 
   const certificateColumns = [
     {
-      key: 'date',
+      key: 'created_at',
       label: 'Date',
     },
     {
-      key: 'name',
+      key: 'metadata',
       label: 'Name',
     },
     {
@@ -250,10 +231,24 @@ function CertificateListContent() {
   ];
 
   const renderCell = React.useCallback(
-    (user: any, columnKey: React.Key, type?: 'transaction' | 'list-carbon') => {
+    (
+      user: any,
+      columnKey: React.Key,
+      type?: 'transaction' | 'list-carbon' | 'certificated',
+    ) => {
       const cellValue = user[columnKey as keyof any];
 
       switch (columnKey) {
+        case 'metadata': {
+          return (
+            <span className="text-base">
+              {cellValue?.attributes?.find(
+                (att: any) => att?.trait_type === 'name',
+              )?.value || ''}
+            </span>
+          );
+        }
+
         case 'mint': {
           return (
             <div className="text-sm font-light flex gap-[5px] items-center">
@@ -384,6 +379,41 @@ function CertificateListContent() {
             );
           }
 
+          if (type === 'certificated') {
+            return (
+              <div className="relative flex gap-2 items-center text-base">
+                {user?.metadata?.image ? (
+                  <Image
+                    src={user.metadata.image
+                      .replace('https://arweave.dev', 'https://arweave.dev/raw')
+                      .replace(
+                        'https://arweave.net',
+                        'https://arweave.net/raw',
+                      )}
+                    alt={
+                      cellValue?.attributes?.find(
+                        (att: any) => att?.trait_type === 'name',
+                      )?.value || ''
+                    }
+                    as={NextImage}
+                    width={24}
+                    height={24}
+                    draggable={false}
+                    className="min-w-[24px]"
+                  />
+                ) : null}
+
+                <span>
+                  {Number(
+                    user?.metadata?.attributes?.find(
+                      (att: any) => att?.trait_type === 'amount',
+                    )?.value || 0,
+                  )?.toLocaleString('en-US')}
+                </span>
+              </div>
+            );
+          }
+
           return (
             <div className="relative flex gap-2 items-center text-base">
               <Image
@@ -464,17 +494,39 @@ function CertificateListContent() {
               tbody: '[&>*:nth-child(odd)]:bg-[#F6F6F6]',
               wrapper: 'p-0',
             }}
+            bottomContent={
+              listCertificatePage > 1 ? (
+                <div className="flex w-full justify-center z-[11]">
+                  <Pagination
+                    isCompact
+                    showControls
+                    showShadow
+                    color="success"
+                    page={listCertificatePage}
+                    total={listCertificatePages}
+                    onChange={(page) => setListCertificatePage(page)}
+                  />
+                </div>
+              ) : null
+            }
           >
             <TableHeader columns={certificateColumns}>
               {(column) => (
                 <TableColumn key={column.key}>{column.label}</TableColumn>
               )}
             </TableHeader>
-            <TableBody items={certificateRows}>
+            <TableBody
+              items={listCertificate?.data || []}
+              emptyContent={'No certificated found!'}
+              loadingContent={<DCarbonLoading />}
+              loadingState={listCertificateLoadingState}
+            >
               {(item) => (
-                <TableRow key={item.key}>
+                <TableRow key={item.address}>
                   {(columnKey) => (
-                    <TableCell>{renderCell(item, columnKey)}</TableCell>
+                    <TableCell>
+                      {renderCell(item, columnKey, 'certificated')}
+                    </TableCell>
                   )}
                 </TableRow>
               )}
@@ -517,6 +569,7 @@ function CertificateListContent() {
               items={listTx?.data || []}
               loadingContent={<DCarbonLoading />}
               loadingState={listTxLoadingState}
+              emptyContent={'No transaction found!'}
             >
               {(item) => (
                 <TableRow key={item.tx}>

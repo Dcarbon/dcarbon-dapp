@@ -19,6 +19,7 @@ const API_ROUTES = {
     GET_PROFILE_INFO: '/v1/user/profile-info',
     GENERATE_CERTIFICATE: '/v1/user/generate-certificate',
     GENERATE_NFT_METADATA: '/v1/user/generate-nft-metadata',
+    GET_LIST_CERTIFICATE: '/v1/user/cert-list',
   },
 };
 

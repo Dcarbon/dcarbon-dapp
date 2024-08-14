@@ -252,7 +252,7 @@ function QuickBuySidebar() {
 
           if (res.status === 'fulfilled') {
             success.push(
-              `<div>Purchase successfully ${Number(Big(listingList?.result[index].available).toFixed(4)).toLocaleString('en-US')} Carbon: <a class="underline" href="https://explorer.solana.com/tx/${result?.tx}${env.NEXT_PUBLIC_MODE === 'prod' ? '' : '?cluster=devnet'}" rel="noopener noreferrer" target="_blank">View transaction</a></div>`,
+              `<div>Purchase successfully ${Number(Big(listingList?.result[index].available).toFixed(4)).toLocaleString('en-US')} Carbon: <a class="underline" href="https://explorer.solana.com/tx/${result && result.length > 0 ? result[0].tx : ''}${env.NEXT_PUBLIC_MODE === 'prod' ? '' : '?cluster=devnet'}" rel="noopener noreferrer" target="_blank">View transaction</a></div>`,
             );
           }
           index++;

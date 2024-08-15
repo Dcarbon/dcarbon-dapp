@@ -75,7 +75,12 @@ function Slogan() {
     }
     setError(error);
     if (isEmpty(error)) {
-      trigger({ firstName, lastName, email, message });
+      trigger({
+        firstName,
+        lastName,
+        email,
+        message: JSON.stringify(message).replace(/"/g, ''),
+      });
     }
   };
 

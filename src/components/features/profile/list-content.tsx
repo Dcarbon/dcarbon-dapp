@@ -17,7 +17,7 @@ import {
 import DCarbonButton from '@/components/common/button';
 import DCarbonLoading from '@/components/common/loading/base-loading';
 import { ShowAlert } from '@/components/common/toast';
-import { QUERY_KEYS } from '@/utils/constants';
+import { QUERY_KEYS, WEB_ROUTES } from '@/utils/constants';
 import { getAllCacheDataByKey, shortAddress } from '@/utils/helpers/common';
 import {
   Button,
@@ -354,16 +354,25 @@ function CertificateListContent() {
               </div>
             );
           }
+
           return (
             <div className="relative flex">
-              <Image
-                src={viewIcon.src}
-                alt="View"
-                as={NextImage}
-                width={24}
-                height={24}
-                draggable={false}
-              />
+              <Link
+                href={WEB_ROUTES.CERTIFICATE_DETAIL.replace(
+                  '[id]',
+                  user?.address || '',
+                )}
+                target="_blank"
+              >
+                <Image
+                  src={viewIcon.src}
+                  alt="View"
+                  as={NextImage}
+                  width={24}
+                  height={24}
+                  draggable={false}
+                />
+              </Link>
             </div>
           );
         }

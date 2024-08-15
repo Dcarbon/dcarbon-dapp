@@ -30,6 +30,7 @@ const WEB_ROUTES = {
   PROJECTS: '/projects',
   PROJECT_DETAIL: '/projects/[slug]',
   PROFILE: '/profile',
+  CERTIFICATE_DETAIL: '/certificate/[id]',
 };
 
 export { API_ROUTES, WEB_ROUTES };

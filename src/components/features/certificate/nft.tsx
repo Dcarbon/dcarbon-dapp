@@ -234,9 +234,8 @@ function NftCertificate({ data }: { data?: IGetCertificateDetailResponse }) {
       data?.data?.burn_tx?.forEach((transaction) => {
         ctx.fillStyle = '#979E91';
         ctx.fillText(transactionText, 64, yTx, 136);
-        ctx.fillText(dateText, 64, yDate, 136);
         ctx.fillStyle = '#000';
-        drawWrappedText(
+        const yTxValue = drawWrappedText(
           ctx,
           transaction,
           83 + transactionTextWidth,
@@ -247,9 +246,15 @@ function NftCertificate({ data }: { data?: IGetCertificateDetailResponse }) {
         ctx.fillText(
           data?.data?.burned_at || '',
           83 + transactionTextWidth,
-          yDate,
+          yTxValue + 30,
           136,
         );
+
+        ctx.fillStyle = '#979E91';
+        ctx.fillText(dateText, 64, yTxValue + 30, 136);
+
+        yDate = yTxValue + 30;
+
         yTx = yDate + 50;
         yDate = yTx + 70;
       });

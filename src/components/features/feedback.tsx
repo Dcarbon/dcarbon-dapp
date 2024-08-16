@@ -85,7 +85,7 @@ function FeedbackModal() {
                   feeling,
                   name,
                   email,
-                  description,
+                  description: JSON.stringify(description).replace(/"/g, ''),
                 })) as any;
 
                 if (data?.statusCode === 400) {

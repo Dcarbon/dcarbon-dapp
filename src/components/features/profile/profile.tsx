@@ -104,7 +104,7 @@ function CertificateProfile() {
             </Skeleton>
           ) : (
             <div className="font-medium text-nowrap">
-              {Number(Big(data?.data.funded || 0).toFixed(1)).toLocaleString(
+              {Number(Big(data?.data?.funded || 0).toFixed(1)).toLocaleString(
                 'en-US',
               )}{' '}
               USD

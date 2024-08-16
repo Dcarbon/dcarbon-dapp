@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import { IGetCertificateDetailResponse } from '@/adapters/user';
 import { cn } from '@nextui-org/react';
 import Big from 'big.js';
 import { env } from 'env.mjs';
@@ -10,19 +11,9 @@ import decorBottomLeft from 'public/images/certificates/decor-bottom-left.svg';
 import decorBottomRight from 'public/images/certificates/decor-bottom-right.svg';
 import QRCode from 'qrcode';
 
-function NftCertificate() {
+function NftCertificate({ data }: { data?: IGetCertificateDetailResponse }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  // const project_location =
-  //   'New York, USA (NY) - 10001 - 1234 Street hjád vip duong nam truong duong nam truong duong nam truong';
-  const burnTransactions = [
-    {
-      trait_type: 'burn_tx_1',
-      value:
-        '3NTkrjwQYmHuP3K94j5eXX2J49ssxMeYALr5dWZLq9BwUQtMrP9DhN69Ew2b6jqYhwLLoVpJ5j5o2dSewtyudkV8',
-    },
-  ];
-  const date = '03.04.2024';
-  const owner = 'Noah Duong';
+
   const [canvasHeight, setCanvasHeight] = useState(842);
   const [mounted, setMounted] = useState(false);
 
@@ -211,8 +202,10 @@ function NftCertificate() {
       ctx.drawImage(bg, 0, 0, 595, 842);
       ctx.drawImage(template, 0, 0, 595, 842);
 
-      if (burnTransactions.length > 0) {
-        const page = Math.ceil(burnTransactions.length / perTransactionPerPage);
+      if (data?.data?.burn_tx && data?.data?.burn_tx?.length > 0) {
+        const page = Math.ceil(
+          data?.data?.burn_tx?.length / perTransactionPerPage,
+        );
 
         let y = 842;
         for (let i = 0; i < page; i++) {
@@ -238,25 +231,28 @@ function NftCertificate() {
 
       let yDate = 591;
       let yTx = 521;
-      burnTransactions
-        ?.filter((tx) => tx.trait_type.includes('burn_tx'))
-        .forEach((transaction) => {
-          ctx.fillStyle = '#979E91';
-          ctx.fillText(transactionText, 64, yTx, 136);
-          ctx.fillText(dateText, 64, yDate, 136);
-          ctx.fillStyle = '#000';
-          drawWrappedText(
-            ctx,
-            transaction.value,
-            83 + transactionTextWidth,
-            yTx,
-            300,
-            20,
-          );
-          ctx.fillText(date, 83 + transactionTextWidth, yDate, 136);
-          yTx = yDate + 50;
-          yDate = yTx + 70;
-        });
+      data?.data?.burn_tx?.forEach((transaction) => {
+        ctx.fillStyle = '#979E91';
+        ctx.fillText(transactionText, 64, yTx, 136);
+        ctx.fillText(dateText, 64, yDate, 136);
+        ctx.fillStyle = '#000';
+        drawWrappedText(
+          ctx,
+          transaction,
+          83 + transactionTextWidth,
+          yTx,
+          300,
+          20,
+        );
+        ctx.fillText(
+          data?.data?.burned_at || '',
+          83 + transactionTextWidth,
+          yDate,
+          136,
+        );
+        yTx = yDate + 50;
+        yDate = yTx + 70;
+      });
 
       ctx.restore();
 
@@ -265,14 +261,21 @@ function NftCertificate() {
       ctx.fillText('is the proof that', 64, yDate - 20, 140);
       ctx.fillStyle = '#1C2916';
       ctx.font = '56px Lexend400';
-      const yOwner = drawText(ctx, owner, 64, yDate + 50, 340, 70);
+      const yOwner = drawText(
+        ctx,
+        data?.data?.name || '',
+        64,
+        yDate + 50,
+        340,
+        70,
+      );
 
       ctx.restore();
       ctx.font = '16px LexendDeca400';
       const yCarbon = drawDynamicText(
         ctx,
         'Has retired',
-        ` ${Number(Big(10).toFixed(1)).toLocaleString('en-US')} CARBON `,
+        ` ${Number(Big(data?.data?.amount || 0).toFixed(1)).toLocaleString('en-US')} CARBON `,
         'token from the',
         64,
         yOwner + 50,
@@ -282,16 +285,16 @@ function NftCertificate() {
       ctx.font = '16px LexendDeca400';
       const yProjectName = drawText(
         ctx,
-        'Phu Tho pig farm project',
+        `${data?.data?.project_name || 'multiple projects'}`,
         64,
         yCarbon + 20,
         220,
         20,
       );
 
-      if (burnTransactions.length === 1) {
+      if (data?.data?.burn_tx && data?.data?.burn_tx?.length === 1) {
         const qrUri = await QRCode.toDataURL(
-          `https://explorer.solana.com/tx/${burnTransactions[0].value}${env.NEXT_PUBLIC_MODE === 'prod' ? '' : '?cluster=devnet'}`,
+          `https://explorer.solana.com/tx/${data.data.burn_tx[0]}${env.NEXT_PUBLIC_MODE === 'prod' ? '' : '?cluster=devnet'}`,
           {
             width: 95,
             errorCorrectionLevel: 'low',
@@ -318,7 +321,14 @@ function NftCertificate() {
     };
 
     initCanvas();
-  }, [canvasHeight]);
+  }, [
+    canvasHeight,
+    data?.data?.amount,
+    data?.data?.burn_tx,
+    data?.data?.burned_at,
+    data?.data?.name,
+    data?.data?.project_name,
+  ]);
 
   return (
     <div className="z-10 mx-auto my-12">

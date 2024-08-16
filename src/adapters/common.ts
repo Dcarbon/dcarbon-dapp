@@ -51,5 +51,40 @@ const doSendFeedback = async ({
   });
 };
 
-export { doSendFeedback, doSendContact };
+interface IGetMintMetadataResponse extends Response {
+  request_id: string;
+  statusCode: number;
+  data?: {
+    mint: string;
+    name: string;
+    uri: string;
+    symbol: string;
+    image: string;
+    attributes: {
+      trait_type: string;
+      value: string;
+    }[];
+  };
+}
+
+const doGetMintMetada = async (
+  wallet: string,
+  mint: string,
+): Promise<IGetMintMetadataResponse> => {
+  return request(
+    'GET',
+    API_ROUTES.COMMON.GET_MINT_METADATA,
+    {
+      mint,
+    },
+    {
+      cache: 'no-store',
+      headers: {
+        ...(wallet ? { 'x-user-wallet': wallet } : {}),
+      },
+    },
+  ) as Promise<IGetMintMetadataResponse>;
+};
+
+export { doSendFeedback, doSendContact, doGetMintMetada };
 export type { ISendFeedbackBody, TFeeling, ISendContactBody };

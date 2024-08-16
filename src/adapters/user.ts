@@ -336,6 +336,37 @@ const doGenerateNftMetadata = async (
   }) as Promise<IGenerateNftMetadataResponse>;
 };
 
+interface IGetCertificateDetailResponse extends Response {
+  request_id: string;
+  statusCode: number;
+  paging?: {
+    total: number;
+    page: number;
+    limit: number;
+  };
+  data?: {
+    name?: string;
+    burned_at?: string;
+    burn_tx?: string[];
+    amount?: string;
+    project_name?: string;
+  };
+  message?: string | string[];
+}
+
+const doGetCertificateDetail = async (
+  mint: string,
+): Promise<IGetCertificateDetailResponse> => {
+  return request(
+    'GET',
+    API_ROUTES.USER.GET_CERTIFICATE_DETAIL.replace('[mint]', mint || ''),
+    null,
+    {
+      cache: 'no-store',
+    },
+  ) as Promise<IGetCertificateDetailResponse>;
+};
+
 export {
   getWalletInfo,
   doGetListCarbon,
@@ -344,6 +375,7 @@ export {
   doGetListTx,
   doGetProfile,
   doGetListCertificate,
+  doGetCertificateDetail,
 };
 export type {
   WalletInfoResponseTypes,
@@ -351,4 +383,5 @@ export type {
   IGetListCarbonParams,
   TFeeling,
   IGetListCarbonResponse,
+  IGetCertificateDetailResponse,
 };

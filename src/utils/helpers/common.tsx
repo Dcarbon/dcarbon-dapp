@@ -129,6 +129,15 @@ const shortAddress = (
   return result;
 };
 
+function splitArrayIntoChunks(arr: any[], chunkSize: number): any[][] {
+  const result = [];
+  for (let i = 0; i < arr.length; i += chunkSize) {
+    const chunk = arr.slice(i, i + chunkSize);
+    result.push(chunk);
+  }
+  return result;
+}
+
 export {
   removeUndefinedAndNull,
   isEmpty,
@@ -139,4 +148,5 @@ export {
   currencyFormatter,
   getAllCacheDataByKey,
   shortAddress,
+  splitArrayIntoChunks,
 };

@@ -12,6 +12,7 @@ const API_ROUTES = {
   COMMON: {
     SEND_FEEDBACK: '/v1/common/send-feedback',
     SEND_CONTACT: '/v1/common/send-contact',
+    GET_MINT_METADATA: '/v1/common/mint-metadata',
   },
   USER: {
     GET_WALLET_INFO: '/v1/user/wallet-info',
@@ -21,6 +22,7 @@ const API_ROUTES = {
     GENERATE_CERTIFICATE: '/v1/user/generate-certificate',
     GENERATE_NFT_METADATA: '/v1/user/generate-nft-metadata',
     GET_LIST_CERTIFICATE: '/v1/user/cert-list',
+    GET_CERTIFICATE_DETAIL: '/v1/user/certificate-detail/[mint]',
   },
 };
 

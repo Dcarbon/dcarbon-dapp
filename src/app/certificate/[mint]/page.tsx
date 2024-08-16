@@ -1,10 +1,14 @@
 import React from 'react';
 import NextImage from 'next/image';
+import { doGetCertificateDetail } from '@/adapters/user';
 import { Image } from '@nextui-org/react';
 import blurBackground from 'public/images/certificates/blur-background.svg';
 import NftCertificate from '@components/features/certificate/nft';
 
-function Certificate() {
+async function Certificate({ params }: any) {
+  const { mint } = params;
+
+  const certificateDetail = await doGetCertificateDetail(mint);
   return (
     <main className="px-4 lg:px-[64px] pb-[32px] mt-[90px] lg:mt-[60px] flex gap-[48px] bg-[#F6F6F6] relative">
       <Image
@@ -16,7 +20,7 @@ function Certificate() {
         removeWrapper
         className="object-cover"
       />
-      <NftCertificate />
+      <NftCertificate data={certificateDetail} />
     </main>
   );
 }

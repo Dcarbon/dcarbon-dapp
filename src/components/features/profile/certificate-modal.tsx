@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { doGetMintMetada } from '@/adapters/common';
 import {
   doGenerateBurnMetadata,
   doGenerateNftMetadata,
@@ -10,7 +11,7 @@ import { ShowAlert } from '@/components/common/toast';
 import { CARBON_IDL } from '@/contracts/carbon/carbon.idl';
 import { ICarbonContract } from '@/contracts/carbon/carbon.interface';
 import { QUERY_KEYS, THROW_EXCEPTION } from '@/utils/constants';
-import { logger } from '@/utils/helpers/common';
+import { logger, splitArrayIntoChunks } from '@/utils/helpers/common';
 import { IBurningCarbon } from '@/utils/helpers/profile';
 import { createTransactionV0, sendTx } from '@/utils/helpers/solana';
 import { AnchorProvider, Program } from '@coral-xyz/anchor';
@@ -32,6 +33,7 @@ import {
   PublicKey,
   RpcResponseAndContext,
   SYSVAR_INSTRUCTIONS_PUBKEY,
+  TransactionInstruction,
   VersionedTransaction,
 } from '@solana/web3.js';
 import Big from 'big.js';
@@ -39,7 +41,6 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import { env } from 'env.mjs';
 import cerfiticateIcon from 'public/images/projects/cerfiticate-icon.png';
-import { toast } from 'sonner';
 import { KeyedMutator, useSWRConfig } from 'swr';
 
 import DCarbonButton from '../../common/button';
@@ -173,7 +174,25 @@ function CertificateModal({
             }
 
             setLoading(true);
+            ShowAlert.loading({
+              message: 'Generate transaction to burn Carbon...',
+            });
             try {
+              let burnResult:
+                | {
+                    value?: {
+                      tx: string;
+                    };
+                    status: 'rejected' | 'fulfilled';
+                  }[]
+                | {
+                    tx: string;
+                  }
+                | null = null;
+
+              let mintResult: {
+                tx?: string;
+              } | null = null;
               const provider = new AnchorProvider(connection, anchorWallet);
               const program = new Program<ICarbonContract>(
                 CARBON_IDL as ICarbonContract,
@@ -187,6 +206,7 @@ function CertificateModal({
                 tx: VersionedTransaction;
                 blockhash: RpcResponseAndContext<BlockhashWithExpiryBlockHeight>;
               }[] = [];
+              const burnInstructions: TransactionInstruction[] = [];
               for await (const mint of mints) {
                 const carbonMint = new PublicKey(mint.mint);
 
@@ -215,10 +235,21 @@ function CertificateModal({
                   })
                   .instruction();
 
+                if (tx) {
+                  burnInstructions.push(tx);
+                }
+              }
+
+              const newBurnInstructions = splitArrayIntoChunks(
+                burnInstructions,
+                6,
+              );
+
+              for await (const instruction of newBurnInstructions) {
                 const burnTxV0 = await createTransactionV0(
                   connection,
                   publicKey,
-                  tx,
+                  instruction,
                 );
 
                 if (burnTxV0) {
@@ -226,195 +257,250 @@ function CertificateModal({
                 }
               }
 
-              const nftMint = Keypair.generate();
-              const tokenAccount = getAssociatedTokenAddressSync(
-                nftMint.publicKey,
-                publicKey,
-              );
-              const [collectionPDA] = PublicKey.findProgramAddressSync(
-                [Buffer.from('Collection')],
-                program.programId,
-              );
-              const [collectionMetadataPDA] = PublicKey.findProgramAddressSync(
-                [
-                  Buffer.from('metadata', 'utf8'),
-                  TOKEN_METADATA_PROGRAM_ID.toBuffer(),
-                  collectionPDA.toBuffer(),
-                ],
-                TOKEN_METADATA_PROGRAM_ID,
-              );
-              const [metadataAccount] = PublicKey.findProgramAddressSync(
-                [
-                  Buffer.from('metadata', 'utf8'),
-                  TOKEN_METADATA_PROGRAM_ID.toBuffer(),
-                  nftMint.publicKey.toBuffer(),
-                ],
-                TOKEN_METADATA_PROGRAM_ID,
-              );
-              const [collectionMasterEditionPDA] =
-                PublicKey.findProgramAddressSync(
+              ShowAlert.loading({ message: 'Burning Carbon...' });
+              const resultBurnTx = (await sendTx({
+                connection,
+                wallet,
+                transactions:
+                  burnTransactions?.length > 1
+                    ? burnTransactions
+                    : burnTransactions[0],
+              })) as
+                | {
+                    value?: {
+                      tx: string;
+                    };
+                    status: 'rejected' | 'fulfilled';
+                  }[]
+                | {
+                    tx: string;
+                  };
+
+              burnResult = resultBurnTx;
+
+              if (
+                (Array.isArray(resultBurnTx) &&
+                  !resultBurnTx?.find((tx) => tx?.status === 'rejected')) ||
+                (!Array.isArray(resultBurnTx) && resultBurnTx?.tx)
+              ) {
+                ShowAlert.loading({ message: 'Generating certificate...' });
+                const pdfResponse = await doGenerateBurnMetadata(
+                  publicKey.toBase58(),
+                  {
+                    amount,
+                    transaction_id: Array.isArray(resultBurnTx)
+                      ? resultBurnTx?.[0]?.value?.tx || ' '
+                      : resultBurnTx?.tx || ' ',
+                    date: dayjs().utc().unix(),
+                    owner: name,
+                    project_location: projectLocation,
+                    project_name: 'Example',
+                  },
+                );
+                if (!pdfResponse?.data?.url) {
+                  ShowAlert.dismiss('loading');
+                  ShowAlert.error({
+                    message: 'Failed to generate certificate!',
+                  });
+                  return;
+                }
+
+                ShowAlert.loading({
+                  message: 'Generating NFT certificate metadata...',
+                });
+                const nftMint = Keypair.generate();
+                const tokenAccount = getAssociatedTokenAddressSync(
+                  nftMint.publicKey,
+                  publicKey,
+                );
+                const [collectionPDA] = PublicKey.findProgramAddressSync(
+                  [Buffer.from('Collection')],
+                  program.programId,
+                );
+                const [collectionMetadataPDA] =
+                  PublicKey.findProgramAddressSync(
+                    [
+                      Buffer.from('metadata', 'utf8'),
+                      TOKEN_METADATA_PROGRAM_ID.toBuffer(),
+                      collectionPDA.toBuffer(),
+                    ],
+                    TOKEN_METADATA_PROGRAM_ID,
+                  );
+                const [metadataAccount] = PublicKey.findProgramAddressSync(
                   [
                     Buffer.from('metadata', 'utf8'),
                     TOKEN_METADATA_PROGRAM_ID.toBuffer(),
-                    collectionPDA.toBuffer(),
+                    nftMint.publicKey.toBuffer(),
+                  ],
+                  TOKEN_METADATA_PROGRAM_ID,
+                );
+                const [collectionMasterEditionPDA] =
+                  PublicKey.findProgramAddressSync(
+                    [
+                      Buffer.from('metadata', 'utf8'),
+                      TOKEN_METADATA_PROGRAM_ID.toBuffer(),
+                      collectionPDA.toBuffer(),
+                      Buffer.from('edition', 'utf8'),
+                    ],
+                    TOKEN_METADATA_PROGRAM_ID,
+                  );
+                const [masterEditionPDA] = PublicKey.findProgramAddressSync(
+                  [
+                    Buffer.from('metadata', 'utf8'),
+                    TOKEN_METADATA_PROGRAM_ID.toBuffer(),
+                    nftMint.publicKey.toBuffer(),
                     Buffer.from('edition', 'utf8'),
                   ],
                   TOKEN_METADATA_PROGRAM_ID,
                 );
 
-              const [masterEditionPDA] = PublicKey.findProgramAddressSync(
-                [
-                  Buffer.from('metadata', 'utf8'),
-                  TOKEN_METADATA_PROGRAM_ID.toBuffer(),
-                  nftMint.publicKey.toBuffer(),
-                  Buffer.from('edition', 'utf8'),
-                ],
-                TOKEN_METADATA_PROGRAM_ID,
-              );
+                let projectName: string = '';
+                if (!Array.isArray(resultBurnTx) && resultBurnTx?.tx) {
+                  const mintMetadaResult = await doGetMintMetada(
+                    publicKey.toBase58(),
+                    mints[0].mint,
+                  );
 
-              ShowAlert.loading({ message: 'Generating certificate...' });
-              const pdfResponse = await doGenerateBurnMetadata(
-                publicKey.toBase58(),
-                {
-                  amount,
-                  transaction_id: ' ',
-                  date: dayjs().utc().unix(),
-                  owner: name,
-                  project_location: projectLocation,
-                  project_name: 'Example',
-                },
-              );
+                  const newProjectName =
+                    mintMetadaResult?.data?.attributes?.find((attr) =>
+                      ['Project Name', 'Project'].includes(attr.trait_type),
+                    )?.value;
 
-              if (!pdfResponse?.data?.url) {
-                toast.dismiss('loading');
-                ShowAlert.error({
-                  message: 'Failed to generate certificate!',
-                });
-                return;
-              }
+                  if (!newProjectName) {
+                    ShowAlert.dismiss('loading');
+                    ShowAlert.error({
+                      message: 'Failed to generate NFT Certificate metadata!',
+                    });
+                    return;
+                  }
 
-              ShowAlert.loading({ message: 'Sending transaction...' });
-              const metadata = await doGenerateNftMetadata(
-                publicKey.toBase58(),
-                {
-                  name: 'NFT Carbon',
-                  symbol: 'NCB',
-                  image: 'image',
-                  attributes: [
-                    {
-                      trait_type: 'name',
-                      value: name,
-                    },
-                    {
-                      trait_type: 'amount',
-                      value: amount.toString(),
-                    },
-                    {
-                      trait_type: 'project_type',
-                      value: projectType,
-                    },
-                    {
-                      trait_type: 'project_location',
-                      value: projectLocation,
-                    },
-                    { trait_type: 'file', value: pdfResponse.data.url },
-                    ...(reason
-                      ? [
-                          {
-                            trait_type: 'reason',
-                            value: reason,
-                          },
-                        ]
-                      : []),
-                    ...(selectedTab === 'corporate' && address
-                      ? [
-                          {
-                            trait_type: 'address',
-                            value: address,
-                          },
-                        ]
-                      : []),
-                    ...(selectedTab === 'corporate' && country
-                      ? [
-                          {
-                            trait_type: 'Country',
-                            value: country,
-                          },
-                        ]
-                      : []),
-                  ],
-                },
-              );
+                  projectName = newProjectName;
+                }
+                const metadata = await doGenerateNftMetadata(
+                  publicKey.toBase58(),
+                  {
+                    name: 'NFT Carbon',
+                    symbol: 'NCB',
+                    image: 'image',
+                    attributes: [
+                      {
+                        trait_type: 'name',
+                        value: name,
+                      },
+                      {
+                        trait_type: 'amount',
+                        value: amount.toString(),
+                      },
+                      {
+                        trait_type: 'project_type',
+                        value: projectType,
+                      },
+                      {
+                        trait_type: 'project_location',
+                        value: projectLocation,
+                      },
+                      { trait_type: 'file', value: pdfResponse.data.url },
+                      {
+                        trait_type: 'burned_at',
+                        value: dayjs.utc().format('DD.MM.YYYY'),
+                      },
+                      ...(projectName
+                        ? [{ trait_type: 'project_name', value: projectName }]
+                        : []),
+                      ...(Array.isArray(resultBurnTx)
+                        ? resultBurnTx?.map((tx) => ({
+                            trait_type: 'burn_tx',
+                            value: tx?.value?.tx || '',
+                          })) || []
+                        : [
+                            {
+                              trait_type: 'burn_tx',
+                              value: resultBurnTx?.tx || '',
+                            },
+                          ]),
+                      ...(reason
+                        ? [
+                            {
+                              trait_type: 'reason',
+                              value: reason,
+                            },
+                          ]
+                        : []),
+                      ...(selectedTab === 'corporate' && address
+                        ? [
+                            {
+                              trait_type: 'address',
+                              value: address,
+                            },
+                          ]
+                        : []),
+                      ...(selectedTab === 'corporate' && country
+                        ? [
+                            {
+                              trait_type: 'country',
+                              value: country,
+                            },
+                          ]
+                        : []),
+                    ],
+                  },
+                );
+                if (!metadata?.data?.uri) {
+                  ShowAlert.dismiss('loading');
+                  ShowAlert.error({
+                    message: 'Failed to generate NFT Certificate metadata!',
+                  });
+                  return;
+                }
 
-              if (!metadata?.data?.uri) {
-                toast.dismiss('loading');
-                ShowAlert.error({
-                  message: 'Failed to generate NFT metadata!',
-                });
-                return;
-              }
-
-              const mintNftIns = await program.methods
-                .mintNft(metadata?.data?.uri, 'NFT Carbon', 'NCB', amount)
-                .accounts({
-                  signer: publicKey,
-                  collectionMetadataAccount: collectionMetadataPDA,
-                  collectionMasterEdition: collectionMasterEditionPDA,
-                  nftMint: nftMint.publicKey,
-                  metadataAccount: metadataAccount,
-                  masterEdition: masterEditionPDA,
-                  tokenAccount: tokenAccount,
-                })
-                .instruction();
-
-              const modifyComputeUnits =
-                ComputeBudgetProgram.setComputeUnitLimit({
-                  units: 300_000,
-                });
-
-              const mintTxVer0 = await createTransactionV0(
-                connection,
-                publicKey,
-                [modifyComputeUnits, mintNftIns],
-                [nftMint],
-              );
-
-              if (!mintTxVer0) {
-                toast.dismiss('loading');
-                ShowAlert.error({
-                  message: 'Failed to create mint transaction!',
-                });
-                return;
-              }
-
-              const result = (await sendTx({
-                connection,
-                wallet,
-                transactions: burnTransactions,
-                transactions2: [mintTxVer0],
-              })) as {
-                value?: {
-                  tx: string;
+                ShowAlert.loading({ message: 'Minting NFT certificate...' });
+                const mintNftIns = await program.methods
+                  .mintNft(metadata?.data?.uri, 'NFT Carbon', 'NCB', amount)
+                  .accounts({
+                    signer: publicKey,
+                    collectionMetadataAccount: collectionMetadataPDA,
+                    collectionMasterEdition: collectionMasterEditionPDA,
+                    nftMint: nftMint.publicKey,
+                    metadataAccount: metadataAccount,
+                    masterEdition: masterEditionPDA,
+                    tokenAccount: tokenAccount,
+                  })
+                  .instruction();
+                const modifyComputeUnits =
+                  ComputeBudgetProgram.setComputeUnitLimit({
+                    units: 300_000,
+                  });
+                const mintTxVer0 = await createTransactionV0(
+                  connection,
+                  publicKey,
+                  [modifyComputeUnits, mintNftIns],
+                  [nftMint],
+                );
+                if (!mintTxVer0) {
+                  ShowAlert.dismiss('loading');
+                  ShowAlert.error({
+                    message: 'Failed to create mint transaction!',
+                  });
+                  return;
+                }
+                const result = (await sendTx({
+                  connection,
+                  wallet,
+                  transactions: mintTxVer0,
+                })) as {
+                  tx?: string;
                 };
-                status: 'rejected' | 'fulfilled';
-              }[];
-
-              if (!Array.isArray(result)) {
-                ShowAlert.error({ message: THROW_EXCEPTION.NETWORK_CONGESTED });
-                return;
+                mintResult = result;
               }
 
               let index = 0;
               const success = [];
               const fails = [];
               const certificateResult = [];
-              for await (const res of result) {
-                if (res.status === 'rejected') {
-                  if (index === result.length - 1) {
-                    certificateResult.push(
-                      `<div>Create NFT certificate failed: <span class="text-danger">Error</span>.</div>`,
-                    );
-                  } else {
+
+              if (Array.isArray(burnResult)) {
+                for await (const res of burnResult) {
+                  if (res.status === 'rejected') {
                     fails.push(
                       `<div>Burn failed ${Number(
                         Big(mints?.[index]?.amount || 0).toFixed(1),
@@ -423,14 +509,7 @@ function CertificateModal({
                       )} Carbon: <span class="text-danger">Error</span>.</div>`,
                     );
                   }
-                }
-
-                if (res.status === 'fulfilled') {
-                  if (index === result.length - 1) {
-                    certificateResult.push(
-                      `<div>Create NFT certificate successfully: <a class="underline" href="https://explorer.solana.com/tx/${res?.value?.tx || ''}${env.NEXT_PUBLIC_MODE === 'prod' ? '' : '?cluster=devnet'}" rel="noopener noreferrer" target="_blank">View transaction</a></div>`,
-                    );
-                  } else {
+                  if (res.status === 'fulfilled') {
                     success.push(
                       `<div>Burn successfully ${Number(
                         Big(mints?.[index]?.amount || 0).toFixed(1),
@@ -439,44 +518,48 @@ function CertificateModal({
                       )} Carbon: <a class="underline" href="https://explorer.solana.com/tx/${res?.value?.tx || ''}${env.NEXT_PUBLIC_MODE === 'prod' ? '' : '?cluster=devnet'}" rel="noopener noreferrer" target="_blank">View transaction</a></div>`,
                     );
                   }
+                  index++;
                 }
-                index++;
+              }
+
+              if (!Array.isArray(burnResult)) {
+                if (burnResult?.tx) {
+                  success.push(
+                    `<div>Burn successfully ${Number(
+                      Big(mints?.[index]?.amount || 0).toFixed(1),
+                    ).toLocaleString(
+                      'en-US',
+                    )} Carbon: <a class="underline" href="https://explorer.solana.com/tx/${burnResult?.tx || ''}${env.NEXT_PUBLIC_MODE === 'prod' ? '' : '?cluster=devnet'}" rel="noopener noreferrer" target="_blank">View transaction</a></div>`,
+                  );
+                } else {
+                  fails.push(
+                    `<div>Burn failed ${Number(
+                      Big(mints?.[index]?.amount || 0).toFixed(1),
+                    ).toLocaleString(
+                      'en-US',
+                    )} Carbon: <span class="text-danger">Error</span>.</div>`,
+                  );
+                }
+              }
+
+              if (mintResult?.tx) {
+                certificateResult.push(
+                  `<div>Mint NFT certificate successfully: <a class="underline" href="https://explorer.solana.com/tx/${mintResult.tx}${env.NEXT_PUBLIC_MODE === 'prod' ? '' : '?cluster=devnet'}" rel="noopener noreferrer" target="_blank">View transaction</a></div>`,
+                );
+              } else {
+                certificateResult.push(
+                  `<div>Mint NFT certificate failed: <span class="text-danger">Error</span>.</div>`,
+                );
               }
 
               const merged = `<div class="flex flex-col gap-2">${[...success, ...fails, ...certificateResult].join('')}</div>`;
-
               if (success.length > 0) {
-                mutate();
-                globalMutate([QUERY_KEYS.USER.GET_PROFILE_INFO, publicKey]);
-                setName('');
-                setProjectType('');
-                setProjectLocation('');
-                setReason('');
-                setAddress('');
-                setCountry('');
-                setReason('');
-                reset();
-                onClose();
                 ShowAlert.success({
                   message: merged,
                 });
                 return;
               }
-
               if (fails.length > 0) {
-                if (success.length > 0) {
-                  mutate();
-                  globalMutate([QUERY_KEYS.USER.GET_PROFILE_INFO, publicKey]);
-                  setName('');
-                  setProjectType('');
-                  setProjectLocation('');
-                  setReason('');
-                  setAddress('');
-                  setCountry('');
-                  setReason('');
-                  reset();
-                  onClose();
-                }
                 ShowAlert.error({
                   message: merged,
                 });
@@ -491,8 +574,19 @@ function CertificateModal({
               }
               ShowAlert.error({ message: THROW_EXCEPTION.NETWORK_CONGESTED });
             } finally {
+              mutate();
+              globalMutate([QUERY_KEYS.USER.GET_PROFILE_INFO, publicKey]);
+              setName('');
+              setProjectType('');
+              setProjectLocation('');
+              setReason('');
+              setAddress('');
+              setCountry('');
+              setReason('');
+              reset();
+              onClose();
               setLoading(false);
-              toast.dismiss('loading');
+              ShowAlert.dismiss('loading');
             }
           }}
         >

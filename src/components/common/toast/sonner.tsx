@@ -17,6 +17,7 @@ const SonnerToaster = ({ ...props }: ToasterProps) => {
       richColors
       theme={'light'}
       className="toaster group"
+      visibleToasts={1}
       toastOptions={{
         classNames: {
           toast:
@@ -193,6 +194,22 @@ const ShowAlert = {
       </div>,
       { id: 'loading' },
     );
+  },
+  dismiss: (id?: string) => {
+    let counter = 0;
+    const idInterval = setInterval(() => {
+      if (counter > 10) {
+        clearInterval(idInterval);
+        return;
+      }
+      if (id) {
+        toast.dismiss(id);
+        counter++;
+        return;
+      }
+      toast.dismiss();
+      counter++;
+    }, 1000);
   },
 };
 

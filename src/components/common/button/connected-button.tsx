@@ -25,7 +25,7 @@ import { env } from 'env.mjs';
 import arrowRight from 'public/images/common/arrow-right-wallet-button.svg';
 import avatarImage from 'public/images/common/avatar.png';
 import closeModal from 'public/images/common/close-modal.svg';
-import dcarbonIcon from 'public/images/common/dcarbon-icon.svg';
+import dcarbonIcon from 'public/images/common/dcarbon-white.svg';
 import carbonIcon from 'public/images/common/logo.svg';
 import logoutImage from 'public/images/common/logout.svg';
 import profileImage from 'public/images/common/profile.svg';

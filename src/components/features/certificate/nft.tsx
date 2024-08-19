@@ -11,7 +11,13 @@ import decorBottomLeft from 'public/images/certificates/decor-bottom-left.svg';
 import decorBottomRight from 'public/images/certificates/decor-bottom-right.svg';
 import QRCode from 'qrcode';
 
-function NftCertificate({ data }: { data?: IGetCertificateDetailResponse }) {
+function NftCertificate({
+  data,
+  className,
+}: {
+  data?: IGetCertificateDetailResponse;
+  className?: string;
+}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const [canvasHeight, setCanvasHeight] = useState(842);
@@ -341,7 +347,11 @@ function NftCertificate({ data }: { data?: IGetCertificateDetailResponse }) {
         ref={canvasRef}
         width={595}
         height={canvasHeight}
-        className={cn('w-full h-auto ring-[#cfcfcf]', mounted ? 'ring-2' : '')}
+        className={cn(
+          'w-full h-auto ring-[#cfcfcf]',
+          mounted ? 'ring-2' : '',
+          className ? className : '',
+        )}
         style={{
           aspectRatio: `595/${canvasHeight}`,
         }}

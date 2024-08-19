@@ -12,6 +12,7 @@ import {
 } from '@solana/web3.js';
 import base58 from 'bs58';
 import { env } from 'env.mjs';
+import { THROW_EXCEPTION } from '@utils/constants/exception';
 
 type TTransaction = {
   tx: VersionedTransaction;
@@ -163,6 +164,7 @@ const sendTx = async ({
       };
       status?: 'rejected' | 'fulfilled';
       tx?: string;
+      error?: string;
     }
   | { value?: { tx?: string }; status: 'rejected' | 'fulfilled'; tx?: string }[]
 > => {
@@ -247,8 +249,8 @@ const sendTx = async ({
     }
   } catch (e) {
     const error = e as Error;
-    if (error?.message === 'User rejected the request.') {
-      return { tx: undefined };
+    if (error?.message === THROW_EXCEPTION.USER_REJECTED_REQUEST) {
+      return { tx: undefined, error: THROW_EXCEPTION.USER_REJECTED_REQUEST };
     }
     throw error;
   }

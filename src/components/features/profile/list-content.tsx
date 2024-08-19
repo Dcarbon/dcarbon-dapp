@@ -270,6 +270,23 @@ function CertificateListContent() {
           );
         }
 
+        case 'created_at': {
+          if (type === 'certificated') {
+            return (
+              <span className="text-[#4F4F4F]">
+                {cellValue === 'Calculating'
+                  ? cellValue
+                  : new Date(cellValue).toLocaleString()}
+              </span>
+            );
+          }
+          return (
+            <span className="text-[#4F4F4F]">
+              {new Date(cellValue).toLocaleString()}
+            </span>
+          );
+        }
+
         case 'mint': {
           return (
             <div className="text-sm font-light flex gap-[5px] items-center">

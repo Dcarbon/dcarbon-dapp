@@ -2,7 +2,7 @@
 
 import React from 'react';
 import NextImage from 'next/image';
-import { Image } from '@nextui-org/react';
+import { Image, Select, SelectItem } from '@nextui-org/react';
 import swapIcon from 'public/images/projects/swap-icon.png';
 import transferIcon from 'public/images/projects/transfer-icon.svg';
 import { NumericFormat } from 'react-number-format';
@@ -39,7 +39,7 @@ function SwapModal({
             Balance:{' '}
           </span>
           <span className="text-sm text-[#5DAF01] font-normal leading-none">
-            40 DCarbon
+            40 Carbon
           </span>
         </div>
       }
@@ -59,7 +59,23 @@ function SwapModal({
             />
 
             <div className="text-sm text-[#4F4F4F] absolute right-3 top-1/2 -translate-y-1/2 cursor-default">
-              DCarbon
+              <Select
+                classNames={{
+                  trigger:
+                    'data-[hover=true]:bg-transparent group-data-[focus=true]:bg-transparent',
+                  innerWrapper: '*:text-center',
+                }}
+                className="w-fit hover:bg-transparent min-w-[180px]"
+                defaultSelectedKeys={'all'}
+                fullWidth
+              >
+                <SelectItem key={'nft'} value="nft">
+                  Carbon NFT
+                </SelectItem>
+                <SelectItem key={'fungliable'} value="fungliable">
+                  Carbon Fungliable
+                </SelectItem>
+              </Select>
             </div>
           </div>
         </div>
@@ -87,7 +103,7 @@ function SwapModal({
             />
 
             <div className="text-sm text-[#4F4F4F] absolute right-3 top-1/2 -translate-y-1/2 cursor-default">
-              DCarbon2
+              Carbon
             </div>
           </div>
         </div>

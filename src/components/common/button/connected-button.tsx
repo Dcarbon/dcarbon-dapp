@@ -1,11 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import NextImage from 'next/image';
 import { useRouter } from 'next/navigation';
 import { carbonTypes, getWalletInfo } from '@/adapters/user';
+import SwapButton from '@/components/features/swap-button';
 import { QUERY_KEYS, WEB_ROUTES } from '@/utils/constants';
-import { shortAddress } from '@/utils/helpers/common';
+import { getInfoDevice, shortAddress } from '@/utils/helpers/common';
 import {
   Button,
   Chip,
@@ -37,10 +38,16 @@ import useSWRMutation from 'swr/mutation';
 import { Skeleton } from '../loading/skeleton.component';
 
 function ConnectedButton() {
+  const [isMobile, setIsMobile] = useState(false);
   const { publicKey, connected, wallet, disconnect, disconnecting } =
     useWallet();
   const router = useRouter();
-
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const { collapsed } = getInfoDevice();
+      setIsMobile(collapsed);
+    }
+  }, []);
   const {
     trigger,
     isMutating,
@@ -60,6 +67,7 @@ function ConnectedButton() {
 
   return (
     <Dropdown
+      style={{ zIndex: 40 }}
       backdrop="blur"
       radius="md"
       classNames={{
@@ -112,6 +120,7 @@ function ConnectedButton() {
           list: 'h-full justify-start',
         }}
         defaultSelectedKeys={[]}
+        hideEmptyContent
       >
         <DropdownItem
           key="close"
@@ -359,7 +368,10 @@ function ConnectedButton() {
           </DropdownItem>
         }
 
-        <DropdownSection className="flex-auto flex flex-col justify-end">
+        <DropdownSection className="flex-auto flex flex-col justify-end *:h-fit">
+          <DropdownItem className="h-fit" isReadOnly isVirtualized>
+            {isMobile ? <SwapButton /> : null}
+          </DropdownItem>
           <DropdownItem
             key="profile"
             className="flex items-center h-fit"

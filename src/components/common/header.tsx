@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import NextImage from 'next/image';
 import { usePathname } from 'next/navigation';
 import { WEB_ROUTES } from '@/utils/constants';
+import { getInfoDevice } from '@/utils/helpers/common';
 import {
   cn,
   Image,
@@ -16,14 +17,21 @@ import {
 import fullLogoDarkIcon from 'public/images/common/full-logo-dark.svg';
 import fullLogoImage from 'public/images/common/full-logo.svg';
 
+import SwapButton from '../features/swap-button';
 // import SwapButton from '../features/swap-button';
 import ConnectButton from './button/connect-button';
 
 function Header() {
   const [currentScrollPosition, setCurrentScrollPosition] = useState(0);
   const [isHideNavbar, setHideNavbar] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const pathName = usePathname();
-
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const { collapsed } = getInfoDevice();
+      setIsMobile(collapsed);
+    }
+  }, []);
   useEffect(() => {
     if (
       typeof window !== 'undefined' &&
@@ -113,9 +121,11 @@ function Header() {
         </Link>
       </NavbarBrand>
       <NavbarContent justify="end">
-        {/* <NavbarItem>
-          <SwapButton />
-        </NavbarItem> */}
+        {!isMobile ? (
+          <NavbarItem>
+            <SwapButton />
+          </NavbarItem>
+        ) : null}
         <NavbarItem>
           <ConnectButton />
         </NavbarItem>

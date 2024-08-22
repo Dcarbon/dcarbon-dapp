@@ -243,8 +243,7 @@ const getWalletInfo = async (
 };
 
 interface IGenerateCertificatetaBody {
-  project_location: string;
-  transaction_id: string;
+  transactions: string[];
   owner: string;
   date: number;
   amount: number;
@@ -267,8 +266,7 @@ interface IGenerateCertificateResponse extends Response {
 const doGenerateBurnMetadata = async (
   wallet: string,
   {
-    project_location,
-    transaction_id,
+    transactions,
     owner,
     date,
     amount,
@@ -276,12 +274,11 @@ const doGenerateBurnMetadata = async (
   }: IGenerateCertificatetaBody,
 ): Promise<IGenerateCertificateResponse> => {
   const body = {
-    project_location,
-    transaction_id,
+    transactions,
     owner,
     date,
     amount,
-    project_name,
+    ...(project_name ? { project_name } : {}),
   };
   return request('POST', API_ROUTES.USER.GENERATE_CERTIFICATE, body, {
     headers: {
@@ -367,6 +364,22 @@ const doGetCertificateDetail = async (
   ) as Promise<IGetCertificateDetailResponse>;
 };
 
+const doModifyBurnHistoryStatus = async ({
+  info,
+}: {
+  info: {
+    tx: string;
+    status: 'finished' | 'rejected' | 'error';
+  }[];
+}) => {
+  const body = {
+    info,
+  };
+  return request('POST', API_ROUTES.USER.MODIFY_BURN_HISTORY_STATUS, body, {
+    cache: 'no-store',
+  });
+};
+
 export {
   getWalletInfo,
   doGetListCarbon,
@@ -376,6 +389,7 @@ export {
   doGetProfile,
   doGetListCertificate,
   doGetCertificateDetail,
+  doModifyBurnHistoryStatus,
 };
 export type {
   WalletInfoResponseTypes,

@@ -23,6 +23,7 @@ const API_ROUTES = {
     GENERATE_NFT_METADATA: '/v1/user/generate-nft-metadata',
     GET_LIST_CERTIFICATE: '/v1/user/cert-list',
     GET_CERTIFICATE_DETAIL: '/v1/user/certificate-detail/[mint]',
+    MODIFY_BURN_HISTORY_STATUS: '/v1/user/modify_burn_history_status',
   },
 };
 

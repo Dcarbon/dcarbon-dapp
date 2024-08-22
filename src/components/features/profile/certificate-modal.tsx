@@ -5,6 +5,7 @@ import { doGetMintMetada } from '@/adapters/common';
 import {
   doGenerateBurnMetadata,
   doGenerateNftMetadata,
+  doModifyBurnHistoryStatus,
   IGetListCarbonResponse,
 } from '@/adapters/user';
 import { ShowAlert } from '@/components/common/toast';
@@ -110,7 +111,7 @@ function CertificateModal({
       <DCarbonModal
         onClose={onClose}
         isOpen={isOpen}
-        title="Ceritificate Info"
+        title="Certificate Info"
         icon={cerfiticateIcon.src}
         cancelBtn={
           <DCarbonButton
@@ -299,17 +300,31 @@ function CertificateModal({
                   (!Array.isArray(resultBurnTx) && resultBurnTx?.tx)
                 ) {
                   ShowAlert.loading({ message: 'Generating certificate...' });
+
+                  const mintMetadaResult = await doGetMintMetada(
+                    publicKey.toBase58(),
+                    mints?.map((m) => m.mint)?.join(',') || '',
+                  );
+
+                  const newProjectName =
+                    mintMetadaResult?.data?.attributes?.find((attr) =>
+                      ['Project Name', 'Project'].includes(attr.trait_type),
+                    )?.value;
+
+                  if (newProjectName) {
+                    projectName = newProjectName;
+                  }
+
                   const pdfResponse = await doGenerateBurnMetadata(
                     publicKey.toBase58(),
                     {
                       amount,
-                      transaction_id: Array.isArray(resultBurnTx)
-                        ? resultBurnTx?.[0]?.value?.tx || ' '
-                        : resultBurnTx?.tx || ' ',
+                      transactions: Array.isArray(resultBurnTx)
+                        ? resultBurnTx.map((tx) => tx?.value?.tx as string)
+                        : [resultBurnTx.tx],
                       date: dayjs().utc().unix(),
                       owner: name,
-                      project_location: projectLocation,
-                      project_name: 'Example',
+                      project_name: projectName,
                     },
                   );
                   if (!pdfResponse?.data?.url) {
@@ -369,27 +384,6 @@ function CertificateModal({
                     TOKEN_METADATA_PROGRAM_ID,
                   );
 
-                  if (!Array.isArray(resultBurnTx) && resultBurnTx?.tx) {
-                    const mintMetadaResult = await doGetMintMetada(
-                      publicKey.toBase58(),
-                      mints[0].mint,
-                    );
-
-                    const newProjectName =
-                      mintMetadaResult?.data?.attributes?.find((attr) =>
-                        ['Project Name', 'Project'].includes(attr.trait_type),
-                      )?.value;
-
-                    if (!newProjectName) {
-                      ShowAlert.dismiss('loading');
-                      ShowAlert.error({
-                        message: 'Failed to generate NFT Certificate metadata!',
-                      });
-                      return;
-                    }
-
-                    projectName = newProjectName;
-                  }
                   const metadata = await doGenerateNftMetadata(
                     publicKey.toBase58(),
                     {
@@ -497,14 +491,78 @@ function CertificateModal({
                     });
                     return;
                   }
-                  const result = (await sendTx({
-                    connection,
-                    wallet,
-                    transactions: mintTxVer0,
-                  })) as {
-                    tx?: string;
-                  };
-                  mintResult = result;
+
+                  const infoBurn = (
+                    status: 'rejected' | 'finished' | 'error',
+                  ) =>
+                    Array.isArray(burnResult)
+                      ? burnResult
+                          ?.filter((tx) => tx.status === 'fulfilled')
+                          ?.map((tx) => ({
+                            tx: tx?.value?.tx as string,
+                            status,
+                          }))
+                      : burnResult?.tx
+                        ? [{ tx: burnResult.tx, status }]
+                        : [];
+
+                  try {
+                    const result = (await sendTx({
+                      connection,
+                      wallet,
+                      transactions: mintTxVer0,
+                    })) as {
+                      tx?: string;
+                    };
+                    mintResult = result;
+
+                    if (mintResult?.tx) {
+                      const infoBurnFinished = infoBurn('finished');
+
+                      if (infoBurnFinished.length > 0) {
+                        await doModifyBurnHistoryStatus({
+                          info: infoBurnFinished,
+                        }).catch((e) => {
+                          const error = e as Error;
+                          logger({
+                            message: error?.toString(),
+                            type: 'ERROR',
+                          });
+                        });
+                      }
+                    }
+
+                    if (
+                      mintResult?.error ===
+                      THROW_EXCEPTION.USER_REJECTED_REQUEST
+                    ) {
+                      const infoBurnRejected = infoBurn('rejected');
+
+                      if (infoBurnRejected.length > 0) {
+                        await doModifyBurnHistoryStatus({
+                          info: infoBurnRejected,
+                        }).catch((e) => {
+                          const error = e as Error;
+                          logger({
+                            message: error?.toString(),
+                            type: 'ERROR',
+                          });
+                        });
+                      }
+                    }
+                  } catch (e) {
+                    const infoBurnError = infoBurn('error');
+
+                    if (infoBurnError.length > 0) {
+                      await doModifyBurnHistoryStatus({
+                        info: infoBurnError,
+                      }).catch((e) => {
+                        const error = e as Error;
+                        logger({ message: error?.toString(), type: 'ERROR' });
+                      });
+                    }
+                    throw e;
+                  }
                 }
 
                 let index = 0;
@@ -577,16 +635,19 @@ function CertificateModal({
                   ShowAlert.success({
                     message: merged,
                   });
-                  setNftSuccessData({
-                    name,
-                    amount: amount.toString(),
-                    burned_at: dayjs.utc().format('DD.MM.YYYY'),
-                    burn_tx: Array.isArray(burnResult)
-                      ? burnResult.map((res) => res?.value?.tx || '')
-                      : [burnResult?.tx || ''],
-                    project_name: projectName,
-                  });
-                  setVisibleNftSuccess(true);
+
+                  if (mintResult?.tx) {
+                    setNftSuccessData({
+                      name,
+                      amount: amount.toString(),
+                      burned_at: dayjs.utc().format('DD.MM.YYYY'),
+                      burn_tx: Array.isArray(burnResult)
+                        ? burnResult.map((res) => res?.value?.tx || '')
+                        : [burnResult?.tx || ''],
+                      project_name: projectName,
+                    });
+                    setVisibleNftSuccess(true);
+                  }
                   return;
                 }
                 if (fails.length > 0) {

@@ -13,10 +13,13 @@ import DCarbonModal from '../common/modal';
 function SwapModal({
   isOpen,
   onClose,
+  allMints,
 }: {
   isOpen: boolean;
   onClose: () => void;
+  allMints: any[];
 }) {
+  console.info(allMints);
   return (
     <DCarbonModal
       onClose={onClose}
@@ -39,7 +42,7 @@ function SwapModal({
             Balance:{' '}
           </span>
           <span className="text-sm text-[#5DAF01] font-normal leading-none">
-            40 DCarbon
+            40 DCO2 sNFT
           </span>
         </div>
       }
@@ -54,12 +57,18 @@ function SwapModal({
               thousandSeparator
               allowNegative={false}
               id="you_send"
+              defaultValue={
+                allMints.length > 0
+                  ? allMints.reduce((acc, mint) => acc + mint.amount, 0)
+                  : null
+              }
               className="text-sm w-full bg-[#F6F6F6] p-3 pr-[88.63px] rounded h-[40px] outline-none hover:bg-gray-50 transition-all focus:ring-1 focus:ring-primary-color placeholder:text-[#888] placeholder:text-sm placeholder:font-normal"
               placeholder="0.1"
+              disabled={allMints.length > 0}
             />
 
             <div className="text-sm text-[#4F4F4F] absolute right-3 top-1/2 -translate-y-1/2 cursor-default">
-              DCarbon
+              DCO2 sNFT
             </div>
           </div>
         </div>
@@ -87,7 +96,7 @@ function SwapModal({
             />
 
             <div className="text-sm text-[#4F4F4F] absolute right-3 top-1/2 -translate-y-1/2 cursor-default">
-              DCarbon2
+              DCO2
             </div>
           </div>
         </div>

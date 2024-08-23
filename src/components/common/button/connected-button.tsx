@@ -40,7 +40,6 @@ function ConnectedButton() {
   const { publicKey, connected, wallet, disconnect, disconnecting } =
     useWallet();
   const router = useRouter();
-
   const {
     trigger,
     isMutating,
@@ -112,6 +111,7 @@ function ConnectedButton() {
           list: 'h-full justify-start',
         }}
         defaultSelectedKeys={[]}
+        hideEmptyContent
       >
         <DropdownItem
           key="close"
@@ -359,7 +359,7 @@ function ConnectedButton() {
           </DropdownItem>
         }
 
-        <DropdownSection className="flex-auto flex flex-col justify-end">
+        <DropdownSection className="flex-auto flex flex-col justify-end *:h-fit">
           <DropdownItem
             key="profile"
             className="flex items-center h-fit"

@@ -236,7 +236,8 @@ function CertificateListContent() {
   ];
 
   const listCarbonColumns = [
-    { key: 'mint', label: 'Token address' },
+    { key: 'mint', label: 'Token Address' },
+    { key: 'attributes', label: 'Project Name' },
     {
       key: 'amount',
       label: 'Total Carbon',
@@ -260,6 +261,22 @@ function CertificateListContent() {
       const cellValue = user[columnKey as keyof any];
 
       switch (columnKey) {
+        case 'attributes': {
+          const value =
+            cellValue?.find(
+              (att: any) =>
+                att?.trait_type === 'Project Name' ||
+                att?.trait_type === 'Project',
+            )?.value || '';
+          return (
+            <span
+              title={value}
+              className="text-base line-clamp-1 max-w-[150px]"
+            >
+              {value}
+            </span>
+          );
+        }
         case 'metadata': {
           return (
             <span className="text-base">
@@ -558,7 +575,7 @@ function CertificateListContent() {
               wrapper: 'p-0',
             }}
             bottomContent={
-              listCertificatePage > 1 ? (
+              listCertificatePages > 1 ? (
                 <div className="flex w-full justify-center z-[11]">
                   <Pagination
                     isCompact

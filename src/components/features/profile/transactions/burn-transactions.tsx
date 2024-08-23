@@ -20,6 +20,7 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { sleep } from '@toruslabs/base-controllers';
 import { env } from 'env.mjs';
 import logo from 'public/images/common/logo.svg';
+import retryIcon from 'public/images/common/retry.svg';
 import solScanIcon from 'public/images/common/sol-scan.png';
 import solanaExplorerIcon from 'public/images/common/solana-explorer.png';
 import useSWR from 'swr';
@@ -152,8 +153,21 @@ const BurnTransaction = () => {
             )
           ) {
             return (
-              <DCarbonButton color="primary" className="min-w-[70px] h-[26px]">
-                Retry
+              <DCarbonButton
+                color="primary"
+                className="h-[26px]"
+                startContent={
+                  <Image
+                    src={retryIcon.src}
+                    alt="retry"
+                    as={NextImage}
+                    width={20}
+                    height={20}
+                    radius="none"
+                  />
+                }
+              >
+                {''}
               </DCarbonButton>
             );
           } else if (user?.status === EMintingStatus.MINTING) {

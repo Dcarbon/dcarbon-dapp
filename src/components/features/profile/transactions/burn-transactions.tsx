@@ -1,9 +1,10 @@
 import React, { useMemo, useState } from 'react';
 import NextImage from 'next/image';
 import { useSearchParams } from 'next/navigation';
-import { doGetListTx } from '@/adapters/user';
+import { doGetListBurnTx } from '@/adapters/user';
 import DCarbonLoading from '@/components/common/loading/base-loading';
 import { QUERY_KEYS } from '@/utils/constants';
+import { EMintingStatus } from '@enums/burn.enum';
 import {
   Image,
   Link,
@@ -16,11 +17,14 @@ import {
   TableRow,
 } from '@nextui-org/react';
 import { useWallet } from '@solana/wallet-adapter-react';
+import { sleep } from '@toruslabs/base-controllers';
 import { env } from 'env.mjs';
 import logo from 'public/images/common/logo.svg';
 import solScanIcon from 'public/images/common/sol-scan.png';
 import solanaExplorerIcon from 'public/images/common/solana-explorer.png';
 import useSWR from 'swr';
+import DCarbonButton from '@components/common/button';
+import Tag, { TTagColor } from '@components/common/tag';
 
 const rowsPerPage = 10;
 const txColumns = [
@@ -29,16 +33,12 @@ const txColumns = [
     label: 'Date',
   },
   {
-    key: 'mint',
-    label: 'Token address',
-  },
-  {
-    key: 'quality',
-    label: 'Quality',
-  },
-  {
     key: 'amount',
-    label: 'Amount',
+    label: 'Token DCO2',
+  },
+  {
+    key: 'status',
+    label: 'Status',
   },
   {
     key: 'action',
@@ -68,7 +68,7 @@ const BurnTransaction = () => {
       ) {
         return null;
       }
-      return doGetListTx({
+      return doGetListBurnTx({
         wallet: wallet?.toBase58(),
         page,
         limit: rowsPerPage,
@@ -79,6 +79,17 @@ const BurnTransaction = () => {
     },
   );
   const listTxLoadingState = listTxLoading ? 'loading' : 'idle';
+
+  const openExplorer = async (type: 'sol_ex' | 'sol_io', txs: string[]) => {
+    for (let i = 0; i < txs.length; i++) {
+      const urlSolScan = `https://explorer.solana.com/tx/${txs[i] || ''}${env.NEXT_PUBLIC_MODE === 'prod' ? '' : '?cluster=devnet'}`;
+      const urlSolanaIo = `https://solscan.io/tx/${txs[i] || ''}${env.NEXT_PUBLIC_MODE === 'prod' ? '' : '?cluster=devnet'}`;
+      if (type === 'sol_ex') {
+        window.open(urlSolScan, '_blank');
+        await sleep(10);
+      } else window.open(urlSolanaIo, '_blank');
+    }
+  };
 
   const listTxPages = useMemo(() => {
     return listTx?.paging?.total
@@ -91,13 +102,22 @@ const BurnTransaction = () => {
       const cellValue = user[columnKey as keyof any];
 
       switch (columnKey) {
-        case 'metadata': {
+        case 'amount': {
           return (
-            <span className="text-base">
-              {cellValue?.attributes?.find(
-                (att: any) => att?.trait_type === 'name',
-              )?.value || ''}
-            </span>
+            <div className="relative flex gap-2 items-center text-base">
+              <Image
+                src={logo.src}
+                alt="DCO2"
+                as={NextImage}
+                width={24}
+                height={24}
+                draggable={false}
+                className="min-w-[24px]"
+              />
+              <span className="text-base">
+                {(+user?.amount || 0)?.toLocaleString('en-US')}
+              </span>
+            </div>
           );
         }
         case 'tx_time': {
@@ -107,21 +127,44 @@ const BurnTransaction = () => {
             </span>
           );
         }
-
-        case 'name': {
-          return <span className="text-base">{cellValue}</span>;
+        case 'status': {
+          let color: TTagColor = 'blue';
+          let text = 'Minting';
+          switch (cellValue) {
+            case EMintingStatus.FINISHED: {
+              color = 'green';
+              text = 'Successful';
+              break;
+            }
+            case EMintingStatus.ERROR:
+            case EMintingStatus.REJECTED: {
+              color = 'red';
+              text = 'Error';
+              break;
+            }
+          }
+          return <Tag color={color} text={text} />;
         }
-
         case 'action': {
-          let urlSolScan = `https://explorer.solana.com/address/${user?.token_account || ''}${env.NEXT_PUBLIC_MODE === 'prod' ? '' : '?cluster=devnet'}`;
-          let urlSolanaIo = `https://solscan.io/account/${user?.token_account || ''}${env.NEXT_PUBLIC_MODE === 'prod' ? '' : '?cluster=devnet'}`;
-          if (type === 'carbon') {
-            urlSolScan = `https://explorer.solana.com/tx/${user?.tx || ''}${env.NEXT_PUBLIC_MODE === 'prod' ? '' : '?cluster=devnet'}`;
-            urlSolanaIo = `https://solscan.io/tx/${user?.tx || ''}${env.NEXT_PUBLIC_MODE === 'prod' ? '' : '?cluster=devnet'}`;
+          if (
+            [EMintingStatus.ERROR, EMintingStatus.REJECTED].includes(
+              user?.status,
+            )
+          ) {
+            return (
+              <DCarbonButton color="primary" className="min-w-[70px] h-[26px]">
+                Retry
+              </DCarbonButton>
+            );
+          } else if (user?.status === EMintingStatus.MINTING) {
+            return '';
           }
           return (
             <div className="relative flex gap-4">
-              <Link href={urlSolScan} isExternal>
+              <Link
+                isExternal
+                onClick={() => openExplorer('sol_ex', user?.txs)}
+              >
                 <Image
                   src={solanaExplorerIcon.src}
                   alt="Solana Explorer"
@@ -134,7 +177,10 @@ const BurnTransaction = () => {
                 />
               </Link>
 
-              <Link href={urlSolanaIo} isExternal>
+              <Link
+                isExternal
+                onClick={() => openExplorer('sol_io', user?.txs)}
+              >
                 <Image
                   src={solScanIcon.src}
                   alt="Solscan"
@@ -147,65 +193,6 @@ const BurnTransaction = () => {
                 />
               </Link>
             </div>
-          );
-        }
-        case 'amount': {
-          if (type === 'burn') {
-            return (
-              <div className="relative flex gap-2 items-center text-base">
-                <Image
-                  src={user?.payment_info?.currency?.icon}
-                  alt={user?.payment_info?.currency?.symbol}
-                  as={NextImage}
-                  width={24}
-                  height={24}
-                  draggable={false}
-                  className="min-w-[24px]"
-                />
-                <div className={'flex flex-col'}>
-                  <span className={'text-sm'}>
-                    {(+user?.amount || 0)?.toLocaleString('en-US')}{' '}
-                    {user?.payment_info?.currency?.symbol}
-                  </span>
-                  <span className={'text-xs text-[#697077]'}>
-                    {'≈ '}
-                    {Number(
-                      (
-                        (+user?.amount || 0) *
-                        (user?.payment_info?.exchange_rate || 1)
-                      ).toFixed(1),
-                    )?.toLocaleString('en-US')}
-                    {'$'}
-                  </span>
-                </div>
-              </div>
-            );
-          }
-
-          return (
-            <div className="relative flex gap-2 items-center text-base">
-              <Image
-                src={logo.src}
-                alt="DCarbon"
-                as={NextImage}
-                width={24}
-                height={24}
-                draggable={false}
-                className="min-w-[24px]"
-              />
-
-              <span>
-                {(+user?.amount || 0)?.toLocaleString('en-US')}{' '}
-                {user?.name || 'Carbon'}
-              </span>
-            </div>
-          );
-        }
-        case 'quality': {
-          return (
-            <span className="text-base">
-              {(+user?.quality || 0)?.toLocaleString('en-US')}
-            </span>
           );
         }
         default:
@@ -252,7 +239,7 @@ const BurnTransaction = () => {
         emptyContent={'No transaction found!'}
       >
         {(item) => (
-          <TableRow key={item.tx}>
+          <TableRow key={item.txs[0]}>
             {(columnKey) => (
               <TableCell>{renderCell(item, columnKey, 'burn')}</TableCell>
             )}

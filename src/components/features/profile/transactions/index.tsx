@@ -3,21 +3,21 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Tab, Tabs } from '@nextui-org/react';
 
 import BurnTransactions from './burn-transactions';
-import CarbonTransaction from './carbon-transactions';
+import BuyTransaction from './buy-transactions';
 
-type tabTypes = 'carbon' | 'burn';
+type tabTypes = 'buy' | 'burn';
 
 const Transactions = () => {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [selectedTab, setSelectedTab] = useState<tabTypes>(
-    (searchParams.get('type') as tabTypes) || 'carbon',
+    (searchParams.get('type') as tabTypes) || 'buy',
   );
   useEffect(() => {
     setSelectedTab((prev) => {
       if (prev !== searchParams.get('type')) {
-        return (searchParams.get('type') as tabTypes) || 'carbon';
+        return (searchParams.get('type') as tabTypes) || 'buy';
       }
       return prev;
     });
@@ -50,10 +50,10 @@ const Transactions = () => {
       selectedKey={selectedTab}
       onSelectionChange={(tab) => handleChangeTab(tab as tabTypes)}
     >
-      <Tab key="carbon" title="Carbon Transaction">
-        <CarbonTransaction />
+      <Tab key="buy" title="Buy Transaction">
+        <BuyTransaction />
       </Tab>
-      <Tab key="burn" title="Transaction Burn">
+      <Tab key="burn" title="Burn Transaction">
         <BurnTransactions />
       </Tab>
     </Tabs>

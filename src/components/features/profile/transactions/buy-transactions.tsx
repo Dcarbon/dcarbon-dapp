@@ -5,6 +5,7 @@ import { doGetListTx } from '@/adapters/user';
 import DCarbonLoading from '@/components/common/loading/base-loading';
 import { QUERY_KEYS } from '@/utils/constants';
 import {
+  Button,
   Image,
   Link,
   Pagination,
@@ -21,6 +22,11 @@ import logo from 'public/images/common/logo.svg';
 import solScanIcon from 'public/images/common/sol-scan.png';
 import solanaExplorerIcon from 'public/images/common/solana-explorer.png';
 import useSWR from 'swr';
+import { useCopyToClipboard } from 'usehooks-ts';
+import { ShowAlert } from '@components/common/toast';
+import { shortAddress } from '@utils/helpers/common';
+
+import copyIcon from '../../../../../public/images/common/copy.svg';
 
 const rowsPerPage = 10;
 const txColumns = [
@@ -49,6 +55,7 @@ const txColumns = [
 const CarbonTransaction = () => {
   const [listTxPage, setListTxPage] = useState<number>(1);
   const { publicKey } = useWallet();
+  const [, copy] = useCopyToClipboard();
   const searchParams = useSearchParams();
 
   const { data: listTx, isLoading: listTxLoading } = useSWR(
@@ -56,7 +63,7 @@ const CarbonTransaction = () => {
       publicKey &&
       listTxPage &&
       searchParams.get('tab') === 'transaction' &&
-      searchParams.get('type') === 'carbon'
+      searchParams.get('type') === 'buy'
         ? [QUERY_KEYS.USER.GET_LIST_TX.CARBON, publicKey, listTxPage]
         : null,
     ([, wallet, page]) => {
@@ -64,7 +71,7 @@ const CarbonTransaction = () => {
         !wallet ||
         !page ||
         (searchParams.get('tab') !== 'transaction' &&
-          searchParams.get('type') !== 'carbon')
+          searchParams.get('type') !== 'buy')
       ) {
         return null;
       }
@@ -91,6 +98,36 @@ const CarbonTransaction = () => {
       const cellValue = user[columnKey as keyof any];
 
       switch (columnKey) {
+        case 'mint': {
+          return (
+            <div className="text-sm font-light flex gap-[5px] items-center">
+              <span className="text-[#4F4F4F]">
+                {shortAddress('text', cellValue)}
+              </span>
+              <Button
+                onClick={async () => {
+                  await copy(cellValue || '');
+                  ShowAlert.success({ message: 'Copied to clipboard' });
+                }}
+                variant="light"
+                isIconOnly
+                className="h-[24px] min-w-[24px] w-[24px] data-[hover=true]:bg-transparent"
+                radius="none"
+                disableRipple
+                disableAnimation
+              >
+                <Image
+                  src={copyIcon.src}
+                  alt="Copy"
+                  width={20}
+                  height={20}
+                  as={NextImage}
+                  draggable={false}
+                />
+              </Button>
+            </div>
+          );
+        }
         case 'metadata': {
           return (
             <span className="text-base">
@@ -203,9 +240,20 @@ const CarbonTransaction = () => {
         }
         case 'quality': {
           return (
-            <span className="text-base">
-              {(+user?.quality || 0)?.toLocaleString('en-US')}
-            </span>
+            <div className="relative flex gap-2 items-center text-base">
+              <Image
+                src={logo.src}
+                alt="DCarbon"
+                as={NextImage}
+                width={24}
+                height={24}
+                draggable={false}
+                className="min-w-[24px]"
+              />
+              <span className="text-base">
+                {(+user?.quality || 0)?.toLocaleString('en-US')}
+              </span>
+            </div>
           );
         }
         default:

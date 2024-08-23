@@ -18,6 +18,7 @@ const API_ROUTES = {
     GET_WALLET_INFO: '/v1/user/wallet-info',
     GET_LIST_CARBON: '/v1/user/list-carbon',
     GET_LIST_TX: '/v1/user/tx-list',
+    GET_LIST_BURN_TX: '/v1/user/burn-tx-list',
     GET_PROFILE_INFO: '/v1/user/profile-info',
     GENERATE_CERTIFICATE: '/v1/user/generate-certificate',
     GENERATE_NFT_METADATA: '/v1/user/generate-nft-metadata',

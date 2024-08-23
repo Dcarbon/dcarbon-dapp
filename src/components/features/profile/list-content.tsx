@@ -44,6 +44,7 @@ import viewIcon from 'public/images/common/view-icon.svg';
 import useSWR, { useSWRConfig } from 'swr';
 import { useCopyToClipboard } from 'usehooks-ts';
 
+import SwapButton from '../swap-button';
 import BurnModal from './burn-modal';
 
 const rowsPerPage = 10;
@@ -648,7 +649,7 @@ function CertificateListContent() {
         </Tab>
 
         <Tab key="list-carbon" title="List Carbon">
-          <div className="mb-2">
+          <div className="mb-2 flex gap-4">
             <DCarbonButton
               color="primary"
               className="min-w-[150px] h-[34px]"
@@ -656,6 +657,16 @@ function CertificateListContent() {
             >
               Burn
             </DCarbonButton>
+            <SwapButton
+              allMints={
+                selectedKeys === 'all'
+                  ? data?.common?.all_data?.map((item) => ({
+                      mint: item?.mint || '',
+                      amount: item?.amount || 0,
+                    })) || []
+                  : listMints
+              }
+            />
           </div>
           <div>
             <Table

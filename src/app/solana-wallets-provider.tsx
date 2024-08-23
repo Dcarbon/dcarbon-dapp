@@ -6,6 +6,7 @@ import {
   WalletProvider,
 } from '@solana/wallet-adapter-react';
 import {
+  BitgetWalletAdapter,
   PhantomWalletAdapter,
   SolflareWalletAdapter,
 } from '@solana/wallet-adapter-wallets';
@@ -13,7 +14,11 @@ import { env } from 'env.mjs';
 
 function SolanaWalletProvider({ children }: { children: React.ReactNode }) {
   const wallets = useMemo(
-    () => [new PhantomWalletAdapter(), new SolflareWalletAdapter()],
+    () => [
+      new PhantomWalletAdapter(),
+      new SolflareWalletAdapter(),
+      new BitgetWalletAdapter(),
+    ],
     [],
   );
 

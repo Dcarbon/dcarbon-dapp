@@ -221,7 +221,9 @@ function NotConnectButton() {
               <ModalBody>
                 <div className="flex flex-col gap-5">
                   {wallets
-                    .filter((wl) => ['Phantom'].includes(wl.adapter.name))
+                    .filter((wl) =>
+                      ['Phantom', 'Bitget'].includes(wl.adapter.name),
+                    )
                     .map((wl) => {
                       return (
                         <WalletButton

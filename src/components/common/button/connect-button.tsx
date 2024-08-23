@@ -24,6 +24,9 @@ function ConnectButton() {
       case 'Backpack':
         provider = anyWindow?.backpack;
         break;
+      case 'Bitget':
+        provider = anyWindow?.bitget;
+        break;
       default:
         break;
     }
@@ -57,6 +60,13 @@ function ConnectButton() {
                     'connect',
                     new PublicKey((newPublicKey as any)?.publicKey),
                   );
+                }
+              }
+              break;
+            case 'Bitget':
+              {
+                if (!newPublicKey.equals(publicKey)) {
+                  wallet?.adapter.emit('connect', newPublicKey);
                 }
               }
               break;

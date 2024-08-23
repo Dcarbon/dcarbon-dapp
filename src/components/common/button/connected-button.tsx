@@ -194,7 +194,7 @@ function ConnectedButton() {
                   {Number(
                     Big(walletInfo?.data?.carbon_amount ?? 0).toFixed(4),
                   ).toLocaleString('en-US')}{' '}
-                  Carbon
+                  DCO2
                 </span>
               )}
             </div>
@@ -228,7 +228,7 @@ function ConnectedButton() {
         </DropdownItem>
         {isShowCarbonList ? (
           <DropdownItem isReadOnly className="py-0 mt-2 h-fit cursor-auto">
-            Amount of Carbon coins available
+            Amount of DCO2 coins available
           </DropdownItem>
         ) : (
           <DropdownItem className="!hidden" />

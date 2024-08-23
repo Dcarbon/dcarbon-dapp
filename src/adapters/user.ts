@@ -1,4 +1,5 @@
 import { API_ROUTES } from '@/utils/constants';
+import { EMintingStatus } from '@enums/burn.enum';
 
 import { request } from './xhr';
 
@@ -73,6 +74,25 @@ interface IGetListTxResponse extends Response {
         name: string;
       };
     };
+  }[];
+  message?: string | string[];
+}
+
+interface IGetListBurnTxResponse extends Response {
+  request_id: string;
+  statusCode: number;
+  paging?: {
+    total: number;
+    page: number;
+    limit: number;
+  };
+  data?: {
+    group_tx: string;
+    amount: number;
+    txs: string[];
+    metadata_uri?: string;
+    status: EMintingStatus;
+    tx_time?: string;
   }[];
   message?: string | string[];
 }
@@ -198,6 +218,28 @@ const doGetListTx = async ({
       ...(wallet ? { 'x-user-wallet': wallet } : {}),
     },
   }) as Promise<IGetListTxResponse>;
+};
+
+const doGetListBurnTx = async ({
+  page,
+  limit,
+  sort_field,
+  sort_type,
+  wallet,
+}: IGetListTxParams): Promise<IGetListBurnTxResponse> => {
+  const params = {
+    ...(page ? { page } : {}),
+    ...(limit ? { limit } : {}),
+    ...(sort_field ? { sort_field } : {}),
+    ...(sort_type ? { sort_type } : {}),
+  };
+
+  return request('GET', API_ROUTES.USER.GET_LIST_BURN_TX, params, {
+    cache: 'no-store',
+    headers: {
+      ...(wallet ? { 'x-user-wallet': wallet } : {}),
+    },
+  }) as Promise<IGetListBurnTxResponse>;
 };
 
 const doGetListCertificate = async ({
@@ -390,6 +432,7 @@ export {
   doGetListCertificate,
   doGetCertificateDetail,
   doModifyBurnHistoryStatus,
+  doGetListBurnTx,
 };
 export type {
   WalletInfoResponseTypes,
@@ -398,4 +441,5 @@ export type {
   TFeeling,
   IGetListCarbonResponse,
   IGetCertificateDetailResponse,
+  IGetListBurnTxResponse,
 };

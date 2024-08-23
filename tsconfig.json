@@ -4,6 +4,7 @@
     "paths": {
       "@/*": ["src/*"],
       "@adapters/*": ["src/adapters/*"],
+      "@enums/*": ["src/enums/*"],
       "@components/*": ["src/components/*"],
       "@services/*": ["src/services/*"],
       "@styles/*": ["src/styles/*"],

@@ -9,11 +9,7 @@ import React, {
 } from 'react';
 import NextImage from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import {
-  doGetListCarbon,
-  doGetListCertificate,
-  doGetListTx,
-} from '@/adapters/user';
+import { doGetListCarbon, doGetListCertificate } from '@/adapters/user';
 import DCarbonButton from '@/components/common/button';
 import DCarbonLoading from '@/components/common/loading/base-loading';
 import { ShowAlert } from '@/components/common/toast';
@@ -45,6 +41,7 @@ import useSWR, { useSWRConfig } from 'swr';
 import { useCopyToClipboard } from 'usehooks-ts';
 
 import BurnModal from './burn-modal';
+import Transactions from './transactions';
 
 const rowsPerPage = 10;
 
@@ -58,7 +55,6 @@ function CertificateListContent() {
   const { isOpen, onClose, onOpen } = useDisclosure();
   const { publicKey } = useWallet();
   const [listCarbonPage, setListCarbonPage] = useState<number>(1);
-  const [listTxPage, setListTxPage] = useState<number>(1);
   const [listCertificatePage, setListCertificatePage] = useState<number>(1);
   const { cache } = useSWRConfig();
   const listCarbonCacheData = getAllCacheDataByKey(
@@ -116,26 +112,6 @@ function CertificateListContent() {
       revalidateOnMount: true,
     },
   );
-  const { data: listTx, isLoading: listTxLoading } = useSWR(
-    () =>
-      publicKey && listTxPage && selectedTab === 'transaction'
-        ? [QUERY_KEYS.USER.GET_LIST_TX, publicKey, listTxPage]
-        : null,
-    ([, wallet, page]) => {
-      if (!wallet || !page || selectedTab !== 'transaction') {
-        return null;
-      }
-      return doGetListTx({
-        wallet: wallet?.toBase58(),
-        page,
-        limit: rowsPerPage,
-      });
-    },
-    {
-      keepPreviousData: true,
-      revalidateOnMount: true,
-    },
-  );
 
   const { data: listCertificate, isLoading: listCertificateLoading } = useSWR(
     () =>
@@ -161,6 +137,7 @@ function CertificateListContent() {
   const handleChangeTab = useCallback(
     (tab: tabTypes) => {
       const params = new URLSearchParams(searchParams.toString());
+      params.delete('type');
       params.set('tab', tab);
 
       const newParams = params.toString();
@@ -175,12 +152,6 @@ function CertificateListContent() {
       : 0;
   }, [data?.paging?.total]);
 
-  const listTxPages = useMemo(() => {
-    return listTx?.paging?.total
-      ? Math.ceil(listTx?.paging?.total / rowsPerPage)
-      : 0;
-  }, [listTx?.paging?.total]);
-
   const listCertificatePages = useMemo(() => {
     return listCertificate?.paging?.total
       ? Math.ceil(listCertificate?.paging?.total / rowsPerPage)
@@ -188,7 +159,6 @@ function CertificateListContent() {
   }, [listCertificate?.paging?.total]);
 
   const listCarbonLoadingState = isLoading ? 'loading' : 'idle';
-  const listTxLoadingState = listTxLoading ? 'loading' : 'idle';
   const listCertificateLoadingState = listCertificateLoading
     ? 'loading'
     : 'idle';
@@ -201,29 +171,6 @@ function CertificateListContent() {
     {
       key: 'metadata',
       label: 'Name',
-    },
-    {
-      key: 'amount',
-      label: 'Amount',
-    },
-    {
-      key: 'action',
-      label: 'Action',
-    },
-  ];
-
-  const txColumns = [
-    {
-      key: 'tx_time',
-      label: 'Date',
-    },
-    {
-      key: 'mint',
-      label: 'Token address',
-    },
-    {
-      key: 'quality',
-      label: 'Quality',
     },
     {
       key: 'amount',
@@ -614,54 +561,7 @@ function CertificateListContent() {
           </Table>
         </Tab>
         <Tab key="transaction" title="Transaction">
-          <Table
-            aria-label="Transaction Table"
-            shadow="none"
-            radius="none"
-            classNames={{
-              th: 'bg-white h-[56px] border-b-1 border-[#DDE1E6] text-sm text-[#4F4F4F] font-medium',
-              td: 'h-[48px] rounded-[4px]',
-              tbody: '[&>*:nth-child(odd)]:bg-[#F6F6F6]',
-              wrapper: 'p-0',
-            }}
-            bottomContent={
-              listTxPages > 1 ? (
-                <div className="flex w-full justify-center z-[11]">
-                  <Pagination
-                    isCompact
-                    showControls
-                    showShadow
-                    color="success"
-                    page={listTxPage}
-                    total={listTxPages}
-                    onChange={(page) => setListTxPage(page)}
-                  />
-                </div>
-              ) : null
-            }
-          >
-            <TableHeader columns={txColumns}>
-              {(column) => (
-                <TableColumn key={column.key}>{column.label}</TableColumn>
-              )}
-            </TableHeader>
-            <TableBody
-              items={listTx?.data || []}
-              loadingContent={<DCarbonLoading />}
-              loadingState={listTxLoadingState}
-              emptyContent={'No transaction found!'}
-            >
-              {(item) => (
-                <TableRow key={item.tx}>
-                  {(columnKey) => (
-                    <TableCell>
-                      {renderCell(item, columnKey, 'transaction')}
-                    </TableCell>
-                  )}
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+          <Transactions />
         </Tab>
 
         <Tab key="list-carbon" title="List Carbon">

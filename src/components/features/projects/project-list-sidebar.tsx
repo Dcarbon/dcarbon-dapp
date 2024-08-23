@@ -306,7 +306,7 @@ function ProjectListSidebar() {
       <div className="mb-6">
         {['G', 'E'].includes(model || '') && (
           <CheckboxGroup
-            label={model === 'G' ? 'Scale' : 'Power'}
+            label={model === 'E' ? 'Scale' : 'Power'}
             color="default"
             value={interm}
             onValueChange={(value) => {
@@ -350,7 +350,7 @@ function ProjectListSidebar() {
                 );
               }}
             >
-              Small: ({model === 'G' ? '40 - 90 KvA' : '1 - 20 Ton'})
+              Small: ({model === 'E' ? '40 - 90 KvA' : '1 - 20 Ton'})
             </Checkbox>
             <Checkbox
               value="medium"
@@ -384,7 +384,7 @@ function ProjectListSidebar() {
                 );
               }}
             >
-              Medium ({model === 'G' ? '90 - 200 KvA' : '20 - 100 Ton'})
+              Medium ({model === 'E' ? '90 - 200 KvA' : '20 - 100 Ton'})
             </Checkbox>
             <Checkbox
               value="large"
@@ -418,7 +418,7 @@ function ProjectListSidebar() {
                 );
               }}
             >
-              Large ({model === 'G' ? '>200 KvA' : '>100 Ton'})
+              Large ({model === 'E' ? '>200 KvA' : '>100 Ton'})
             </Checkbox>
           </CheckboxGroup>
         )}

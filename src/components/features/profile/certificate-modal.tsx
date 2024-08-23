@@ -172,14 +172,14 @@ function CertificateModal({
                 return;
               }
 
+              if (!country) {
+                setIsCountryInvalid(true);
+                return;
+              }
+
               if (selectedTab === 'corporate') {
                 if (!address) {
                   setIsAddressInvalid(true);
-                  return;
-                }
-
-                if (!country) {
-                  setIsCountryInvalid(true);
                   return;
                 }
               }
@@ -442,14 +442,11 @@ function CertificateModal({
                               },
                             ]
                           : []),
-                        ...(selectedTab === 'corporate' && country
-                          ? [
-                              {
-                                trait_type: 'country',
-                                value: country,
-                              },
-                            ]
-                          : []),
+
+                        {
+                          trait_type: 'country',
+                          value: country,
+                        },
                       ],
                     },
                   );
@@ -726,10 +723,14 @@ function CertificateModal({
                 setIsProjectLocationInvalid={setIsProjectLocationInvalid}
                 reason={reason}
                 setReason={setReason}
+                country={country}
+                setCountry={setCountry}
+                isCountryInvalid={isCountryInvalid}
+                setIsCountryInvalid={setIsCountryInvalid}
                 loading={loading}
               />
             </Tab>
-            <Tab key="corporate" title="Corporate">
+            <Tab key="corporate" title="Corporation">
               <CertificateCorporate
                 amount={amount}
                 name={name}

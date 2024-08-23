@@ -19,6 +19,10 @@ function CertificateIndividual({
   reason,
   setReason,
   loading,
+  isCountryInvalid,
+  setCountry,
+  setIsCountryInvalid,
+  country,
 }: {
   amount: number;
   name: string;
@@ -36,6 +40,10 @@ function CertificateIndividual({
   reason?: string;
   setReason?: (value: string) => void;
   loading?: boolean;
+  country: string;
+  setCountry: (value: string) => void;
+  isCountryInvalid: boolean;
+  setIsCountryInvalid: (value: boolean) => void;
 }) {
   return (
     <div>
@@ -90,6 +98,42 @@ function CertificateIndividual({
             value={amount || 0}
           />
         </div>
+      </div>
+
+      <div className="mt-12">
+        <Input
+          key="country"
+          type="text"
+          labelPlacement="outside"
+          label="Country"
+          placeholder="Country"
+          radius="none"
+          classNames={{
+            inputWrapper: cn(
+              'rounded-[4px] bg-[#F6F6F6] group-data-[focus=true]:ring-1 group-data-[focus=true]:bg-white group-data-[focus=true]:ring-primary-color',
+              isCountryInvalid
+                ? 'group-data-[focus=true]:ring-0 border-small'
+                : '',
+            ),
+            label: '!text-[#21272A]',
+            helperWrapper: 'px-0',
+          }}
+          autoComplete="off"
+          isInvalid={isCountryInvalid}
+          errorMessage="Please enter your country!"
+          variant={isCountryInvalid ? 'bordered' : 'flat'}
+          value={country}
+          onValueChange={(value) => {
+            if (!value) {
+              setIsCountryInvalid(true);
+            } else {
+              setIsCountryInvalid(false);
+            }
+            setCountry(value);
+          }}
+          isDisabled={loading}
+          isRequired
+        />
       </div>
 
       <div className="mt-12">

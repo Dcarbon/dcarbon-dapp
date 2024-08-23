@@ -8,12 +8,22 @@ import locationActiveIcon from 'public/images/common/location-active-icon.svg';
 
 async function ProjectDetail({ params }: { params: { slug: string } }) {
   const data = (await doGetProjectDetail(params.slug)) as any;
+  let dataCarousel: string[] = [];
+
+  if (data?.data?.images?.length > 2 && data?.data?.images?.length < 5) {
+    dataCarousel = [
+      ...(data?.data?.images || []),
+      ...(data?.data?.images || []),
+    ];
+  } else {
+    dataCarousel = data?.data?.images;
+  }
 
   const location = `${data?.data?.location?.name || ''}${data?.data?.country_name ? `, ${data?.data?.country_name}` : ''}`;
 
   return (
     <main className="px-4 lg:px-[64px] pb-[32px] mt-[90px] lg:mt-[60px] min-h-screen max-w-[1528px] mx-auto">
-      <Carousel data={data?.data?.images || []} />
+      <Carousel data={dataCarousel || []} />
       <div className="flex gap-[24px]">
         <article className="w-full relative">
           <h1 className="text-[23px] font-medium mb-3">

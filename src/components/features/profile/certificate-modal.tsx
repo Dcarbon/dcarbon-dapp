@@ -764,8 +764,7 @@ function CertificateModal({
       {nftSuccessData?.name &&
         nftSuccessData?.burn_tx &&
         nftSuccessData?.burn_tx?.length > 0 &&
-        nftSuccessData?.amount &&
-        nftSuccessData?.project_name && (
+        nftSuccessData?.amount && (
           <NftModal
             visible={visibleNftSuccess}
             setVisible={setVisibleNftSuccess}

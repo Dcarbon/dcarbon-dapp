@@ -40,3 +40,6 @@ yarn-error.log*
 .vercel
 .parcel-cache
 .env.*
+
+# lock
+yarn.lock

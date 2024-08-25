@@ -27,7 +27,6 @@ const generateBurningList = (
       result,
     };
   }
-  list.sort((a, b) => (b?.amount || 0) - (a?.amount || 0));
   for (let i = 0; i < list.length; i++) {
     if (currentAmount.toNumber() <= 0) break;
     if (list[i].amount > 0) {

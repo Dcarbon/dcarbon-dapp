@@ -22,8 +22,8 @@ import certificateIcon from 'public/images/projects/cerfiticate-icon.png';
 
 import DCarbonButton from '../../common/button';
 import DCarbonModal from '../../common/modal';
-import CertificateCorporate from './certificate-corporate';
-import CertificateIndividual from './certificate-individual';
+import CertificateCorporate from './list-carbon/certificate-corporate';
+import CertificateIndividual from './list-carbon/certificate-individual';
 
 dayjs.extend(utc);
 

@@ -51,20 +51,22 @@ const doSendFeedback = async ({
   });
 };
 
+interface Metadata {
+  mint?: string;
+  name: string;
+  uri?: string;
+  symbol: string;
+  image: string;
+  attributes: {
+    trait_type: string;
+    value: string;
+  }[];
+}
+
 interface IGetMintMetadataResponse extends Response {
   request_id: string;
   statusCode: number;
-  data?: {
-    mint: string;
-    name: string;
-    uri: string;
-    symbol: string;
-    image: string;
-    attributes: {
-      trait_type: string;
-      value: string;
-    }[];
-  };
+  data?: Metadata;
 }
 
 const doGetMintMetada = async (
@@ -87,4 +89,4 @@ const doGetMintMetada = async (
 };
 
 export { doSendFeedback, doSendContact, doGetMintMetada };
-export type { ISendFeedbackBody, TFeeling, ISendContactBody };
+export type { ISendFeedbackBody, TFeeling, ISendContactBody, Metadata };

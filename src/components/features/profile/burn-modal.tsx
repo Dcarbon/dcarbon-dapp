@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import NextImage from 'next/image';
 import { IGetListCarbonResponse } from '@/adapters/user';
 import DCarbonButton from '@/components/common/button';
@@ -14,6 +15,7 @@ import { KeyedMutator } from 'swr';
 import CertificateModal from './certificate-modal';
 
 function BurnModal({
+  router,
   isOpen,
   onClose,
   amount,
@@ -24,6 +26,7 @@ function BurnModal({
   mutate,
   reset,
 }: {
+  router: AppRouterInstance;
   isOpen: boolean;
   onClose: () => void;
   amount?: number;
@@ -132,6 +135,7 @@ function BurnModal({
         </div>
       </DCarbonModal>
       <CertificateModal
+        router={router}
         isOpen={certificateModalState.isOpen}
         onClose={certificateModalState.onClose}
         onBack={() => {

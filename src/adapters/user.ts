@@ -1,9 +1,12 @@
 import { API_ROUTES } from '@/utils/constants';
+import { Metadata } from '@adapters/common';
 import { EMintingStatus } from '@enums/burn.enum';
 
 import { request } from './xhr';
 
 type TFeeling = 'Terrible' | 'Bad' | 'Okey' | 'Good' | 'Amazing';
+
+type TBurnStatus = 'finished' | 'rejected' | 'error' | 'minting';
 
 interface IGetListCarbonParams {
   page?: number;
@@ -91,8 +94,10 @@ interface IGetListBurnTxResponse extends Response {
     amount: number;
     txs: string[];
     metadata_uri?: string;
+    metadata?: Metadata;
     status: EMintingStatus;
     tx_time?: string;
+    mint_tx?: string;
   }[];
   message?: string | string[];
 }
@@ -111,16 +116,7 @@ interface IGetListCertificateResponse extends Response {
     address: string;
     name: string;
     symbol: string;
-    metadata: {
-      name: string;
-      symbol: string;
-      image: string;
-      description: string;
-      attributes: {
-        trait_type: string;
-        value: string;
-      }[];
-    };
+    metadata: Metadata;
   }[];
 
   error?: string;
@@ -305,6 +301,7 @@ interface IGenerateCertificateResponse extends Response {
   };
   message?: string | string[];
 }
+
 const doGenerateBurnMetadata = async (
   wallet: string,
   {
@@ -334,6 +331,7 @@ type TGenerateNftMetadataAtributes = {
   trait_type: string;
   value: string;
 };
+
 interface IGenerateNftMetadataBody {
   name: string;
   symbol: string;
@@ -408,14 +406,23 @@ const doGetCertificateDetail = async (
 
 const doModifyBurnHistoryStatus = async ({
   info,
+  status,
+  group_tx,
+  mint_tx,
 }: {
-  info: {
+  info?: {
     tx: string;
-    status: 'finished' | 'rejected' | 'error';
+    status: TBurnStatus;
   }[];
+  group_tx?: string;
+  status?: TBurnStatus;
+  mint_tx?: string;
 }) => {
   const body = {
     info,
+    status,
+    group_tx,
+    mint_tx,
   };
   return request('POST', API_ROUTES.USER.MODIFY_BURN_HISTORY_STATUS, body, {
     cache: 'no-store',
@@ -442,4 +449,5 @@ export type {
   IGetListCarbonResponse,
   IGetCertificateDetailResponse,
   IGetListBurnTxResponse,
+  TBurnStatus,
 };

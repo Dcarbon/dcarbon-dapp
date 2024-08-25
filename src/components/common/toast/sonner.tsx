@@ -37,6 +37,7 @@ const SonnerToaster = ({ ...props }: ToasterProps) => {
 interface IShowAlert {
   title?: string;
   message?: string | ReactNode;
+  body?: ReactNode;
 }
 
 const ShowAlert = {
@@ -62,6 +63,11 @@ const ShowAlert = {
                 className="font-light text-[#4F4F4F] text-sm"
                 dangerouslySetInnerHTML={{ __html: props.message }}
               />
+            )}
+            {props?.body && (
+              <div className="font-light text-[#4F4F4F] text-sm">
+                {props?.body}
+              </div>
             )}
           </div>
         </div>
@@ -107,6 +113,11 @@ const ShowAlert = {
                 className="font-light text-[#4F4F4F] text-sm"
                 dangerouslySetInnerHTML={{ __html: props.message }}
               />
+            )}
+            {props?.body && (
+              <div className="font-light text-[#4F4F4F] text-sm">
+                props?.body
+              </div>
             )}
           </div>
         </div>

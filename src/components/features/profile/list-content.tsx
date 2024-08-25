@@ -653,6 +653,7 @@ function CertificateListContent() {
         onClose={onClose}
         amount={totalAmountWillBurn}
         onOpen={onOpen}
+        router={router}
         mints={
           selectedKeys === 'all'
             ? data?.common?.all_data?.map((item) => ({

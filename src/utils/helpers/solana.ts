@@ -24,6 +24,7 @@ interface ISendTxOption {
   wallet: Wallet;
   transactions: TTransaction | TTransaction[];
   transactions2?: TTransaction[];
+  beforeSendTxFn?: () => Promise<void>;
 }
 
 const createTransactionV0 = async (
@@ -34,6 +35,7 @@ const createTransactionV0 = async (
 ): Promise<{
   tx: VersionedTransaction;
   blockhash: RpcResponseAndContext<BlockhashWithExpiryBlockHeight>;
+  error?: any;
 } | null> => {
   if (!txInstructions) {
     throw new Error('txInstructions is required');
@@ -157,6 +159,7 @@ const sendTx = async ({
   wallet,
   transactions,
   transactions2 = [] as any,
+  beforeSendTxFn,
 }: ISendTxOption): Promise<
   | {
       value?: {
@@ -191,7 +194,9 @@ const sendTx = async ({
           ...[...transactions, ...transactions2].map((tx) => tx.tx),
         ])
       : await (wallet?.adapter as any)?.signTransaction(transactions.tx);
-
+    if (beforeSendTxFn) {
+      await beforeSendTxFn();
+    }
     if (isMultipleTx) {
       let index1 = 0;
       let index2 = 0;

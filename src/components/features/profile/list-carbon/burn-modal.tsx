@@ -5,7 +5,7 @@ import { IGetListCarbonResponse } from '@/adapters/user';
 import DCarbonButton from '@/components/common/button';
 import DCarbonModal from '@/components/common/modal';
 import { generateBurningList } from '@/utils/helpers/profile';
-import { Image, useDisclosure } from '@nextui-org/react';
+import { cn, Image, useDisclosure } from '@nextui-org/react';
 import Big from 'big.js';
 import logoIcon from 'public/images/common/logo.svg';
 import burnIcon from 'public/images/profile/burn-icon.png';
@@ -101,7 +101,12 @@ function BurnModal({
                     thousandSeparator
                     allowNegative={false}
                     id="you_send"
-                    className="text-sm w-full bg-[#E7E7E7] focus:bg-white focus:ring-1 focus:ring-primary-color p-3 rounded h-[40px] outline-none hover:bg-default-200 transition-all placeholder:text-[#888] placeholder:text-sm placeholder:font-normal"
+                    className={cn(
+                      'text-sm w-full bg-[#E7E7E7] focus:bg-white p-3 rounded h-[40px] outline-none hover:bg-default-200 transition-all placeholder:text-[#888] placeholder:text-sm placeholder:font-normal',
+                      amountError
+                        ? 'ring-1 ring-danger'
+                        : 'focus:ring-1 focus:ring-primary-color',
+                    )}
                     placeholder="0.1"
                     decimalScale={1}
                     onValueChange={(q) => {

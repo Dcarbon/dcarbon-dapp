@@ -44,9 +44,9 @@ import certificateIcon from 'public/images/projects/cerfiticate-icon.png';
 import { KeyedMutator, useSWRConfig } from 'swr';
 import { mintNft } from '@utils/contract/contract.util';
 
-import DCarbonButton from '../../common/button';
-import DCarbonModal from '../../common/modal';
-import NftModal from '../certificate/nftModal';
+import DCarbonButton from '../../../common/button';
+import DCarbonModal from '../../../common/modal';
+import NftModal from '../../certificate/nftModal';
 import CertificateCorporate from './certificate-corporate';
 import CertificateIndividual from './certificate-individual';
 

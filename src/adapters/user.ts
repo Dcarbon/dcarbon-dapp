@@ -40,6 +40,7 @@ interface IGetListCarbonResponse extends Response {
     mint: string;
     token_account: string;
     amount: number;
+    image?: string;
   }[];
   common?: {
     total: number;

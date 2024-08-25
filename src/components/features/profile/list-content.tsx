@@ -40,8 +40,8 @@ import viewIcon from 'public/images/common/view-icon.svg';
 import useSWR, { useSWRConfig } from 'swr';
 import { useCopyToClipboard } from 'usehooks-ts';
 
-import SwapButton from '../swap-button';
-import BurnModal from './burn-modal';
+import BurnModal from './list-carbon/burn-modal';
+import SwapButton from './list-carbon/swap-button';
 import Transactions from './transactions';
 
 const rowsPerPage = 10;
@@ -429,7 +429,7 @@ function CertificateListContent() {
           return (
             <div className="relative flex gap-2 items-center text-base">
               <Image
-                src={logo.src}
+                src={user?.image || logo.src}
                 alt="DCarbon"
                 as={NextImage}
                 width={24}
@@ -575,7 +575,7 @@ function CertificateListContent() {
               Burn
             </DCarbonButton>
             <SwapButton
-              allMints={
+              mints={
                 selectedKeys === 'all'
                   ? data?.common?.all_data?.map((item) => ({
                       mint: item?.mint || '',
@@ -583,6 +583,9 @@ function CertificateListContent() {
                     })) || []
                   : listMints
               }
+              allMints={data?.common?.all_data || []}
+              reset={reset}
+              mutate={mutate}
             />
           </div>
           <div>

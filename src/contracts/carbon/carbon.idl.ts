@@ -245,38 +245,6 @@ export const CARBON_IDL = {
       args: [],
     },
     {
-      name: 'claim_minting_fee',
-      discriminator: [11, 171, 197, 227, 232, 242, 222, 102],
-      accounts: [
-        {
-          name: 'signer',
-          writable: true,
-          signer: true,
-        },
-        {
-          name: 'claim',
-          writable: true,
-          pda: {
-            seeds: [
-              {
-                kind: 'const',
-                value: [99, 108, 97, 105, 109],
-              },
-              {
-                kind: 'account',
-                path: 'mint',
-              },
-            ],
-          },
-        },
-        {
-          name: 'mint',
-          writable: true,
-        },
-      ],
-      args: [],
-    },
-    {
       name: 'create_collection',
       discriminator: [156, 251, 92, 54, 233, 2, 16, 82],
       accounts: [
@@ -768,6 +736,7 @@ export const CARBON_IDL = {
         },
         {
           name: 'governance',
+          writable: true,
           pda: {
             seeds: [
               {
@@ -812,6 +781,13 @@ export const CARBON_IDL = {
           writable: true,
         },
         {
+          name: 'vault',
+        },
+        {
+          name: 'vault_ata',
+          writable: true,
+        },
+        {
           name: 'device_status',
           writable: true,
           pda: {
@@ -851,6 +827,7 @@ export const CARBON_IDL = {
         },
         {
           name: 'token_program',
+          address: 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA',
         },
         {
           name: 'system_program',
@@ -858,13 +835,14 @@ export const CARBON_IDL = {
         },
         {
           name: 'sysvar_program',
-          address: 'Sysvar1nstructions1111111111111111111111111',
         },
         {
-          name: 'token_metadata_program',
+          name: 'token_metadassociated_token_program',
+          address: 'metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s',
         },
         {
-          name: 'ata_program',
+          name: 'associated_token_program',
+          address: 'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL',
         },
       ],
       args: [
@@ -1258,6 +1236,20 @@ export const CARBON_IDL = {
           signer: true,
         },
         {
+          name: 'contract_config',
+          pda: {
+            seeds: [
+              {
+                kind: 'const',
+                value: [
+                  99, 111, 110, 116, 114, 97, 99, 116, 95, 99, 111, 110, 102,
+                  105, 103,
+                ],
+              },
+            ],
+          },
+        },
+        {
           name: 'burn_ata',
           writable: true,
         },
@@ -1295,6 +1287,7 @@ export const CARBON_IDL = {
         },
         {
           name: 'token_program',
+          address: 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA',
         },
         {
           name: 'system_program',
@@ -1305,19 +1298,17 @@ export const CARBON_IDL = {
         },
         {
           name: 'token_metadata_program',
+          address: 'metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s',
         },
         {
           name: 'ata_program',
+          address: 'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL',
         },
       ],
       args: [
         {
-          name: 'burn_data_vec',
-          type: 'bytes',
-        },
-        {
-          name: 'mint_data_vec',
-          type: 'bytes',
+          name: 'burn_amount',
+          type: 'f64',
         },
       ],
     },
@@ -1563,6 +1554,10 @@ export const CARBON_IDL = {
             name: 'governance_amount',
             type: 'f64',
           },
+          {
+            name: 'vault',
+            type: 'pubkey',
+          },
         ],
       },
     },
@@ -1596,6 +1591,10 @@ export const CARBON_IDL = {
           {
             name: 'governance_amount',
             type: 'f64',
+          },
+          {
+            name: 'vault',
+            type: 'pubkey',
           },
         ],
       },

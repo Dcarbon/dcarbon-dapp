@@ -120,9 +120,9 @@ const Home = async () => {
             <div className="max-w-[704px] flex flex-col gap-4 items-center">
               <h2 className="text-[44px] font-medium">Model S</h2>
               <p className="text-center font-light">
-                Lorem ipsum dolor sit amet consectetur. Vestibulum vitae morbi
-                magna urna mollis sit malesuada. Praesent nunc consequat
-                convallis.
+                Model S transforms organic waste into biochar, a stable form of
+                carbon that not only sequesters carbon dioxide but also enhances
+                soil fertility and agricultural productivity.
               </p>
             </div>
 

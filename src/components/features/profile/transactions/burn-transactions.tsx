@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useMemo, useState } from 'react';
 import NextImage from 'next/image';
 import { useSearchParams } from 'next/navigation';
@@ -90,20 +92,16 @@ const BurnTransaction = () => {
     data: listTx,
     isLoading: listTxLoading,
     mutate,
+    isValidating,
   } = useSWR(
     () =>
       publicKey &&
       listTxPage &&
       searchParams.get('tab') === 'transaction' &&
       searchParams.get('type') === 'burn'
-        ? [
-            QUERY_KEYS.USER.GET_LIST_TX.BURN,
-            searchParams.get('type'),
-            publicKey,
-            listTxPage,
-          ]
+        ? [QUERY_KEYS.USER.GET_LIST_TX.BURN, publicKey, listTxPage]
         : null,
-    ([, , wallet, page]) => {
+    ([, wallet, page]) => {
       if (
         !wallet ||
         !page ||
@@ -120,10 +118,11 @@ const BurnTransaction = () => {
     },
     {
       revalidateOnMount: true,
+      revalidateOnReconnect: true,
       keepPreviousData: true,
     },
   );
-  const listTxLoadingState = listTxLoading ? 'loading' : 'idle';
+  const listTxLoadingState = listTxLoading || isValidating ? 'loading' : 'idle';
 
   const openExplorer = async (type: 'sol_ex' | 'sol_io', tx: string) => {
     const urlSolScan = `https://explorer.solana.com/tx/${tx || ''}${env.NEXT_PUBLIC_MODE === 'prod' ? '' : '?cluster=devnet'}`;
@@ -408,7 +407,7 @@ const BurnTransaction = () => {
   return (
     <>
       <Table
-        aria-label="Transaction Table"
+        aria-label="BurnTransaction Table"
         shadow="none"
         radius="none"
         classNames={{
@@ -442,7 +441,6 @@ const BurnTransaction = () => {
           // items={listTx?.data || []}
           loadingContent={<DCarbonLoading />}
           loadingState={listTxLoadingState}
-          isLoading={listTxLoading}
           emptyContent={'No transaction found!'}
         >
           {(listTx?.data || []).map((item, idx) => (

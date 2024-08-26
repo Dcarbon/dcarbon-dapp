@@ -1,34 +1,37 @@
 'use client';
 
-import { useEffect } from 'react';
-import * as Sentry from '@sentry/nextjs';
+import NextImage from 'next/image';
+import { Image } from '@nextui-org/react';
+import serverErr from 'public/images/common/dcarbon-500.svg';
+import logo from 'public/images/common/full-logo-dark.svg';
 
-const GlobalError = ({
-  error,
-  reset,
-}: {
-  error: Error & { message?: string };
-  reset: () => void;
-}) => {
-  useEffect(() => {
-    Sentry.captureException(error);
-  }, [error]);
+const GlobalError = () => {
   return (
     <html>
       <body>
-        <section className="bg-white dark:bg-gray-900">
-          <div className="py-8 px-4 mx-auto max-w-screen-xl lg:py-16 lg:px-6">
-            <div className="mx-auto max-w-screen-sm text-center">
-              <h1 className="mb-4 text-7xl tracking-tight font-extrabold lg:text-9xl text-primary-600 dark:text-primary-500">
-                500
-              </h1>
-              <p className="mb-4 text-3xl tracking-tight font-bold text-gray-900 md:text-4xl dark:text-white">
-                Internal Server Error.
-              </p>
-              <p className="mb-4 text-lg font-light text-gray-500 dark:text-gray-400">
-                We are already working to solve the problem.
-              </p>
-            </div>
+        <section className="bg-white dark:bg-gray-900 p-4 w-[100dvw] h-[100dvh]">
+          <div className="w-full flex justify-center items-center">
+            <Image
+              src={logo.src}
+              as={NextImage}
+              alt="logo"
+              width={164}
+              height={32}
+              draggable={false}
+            />
+          </div>
+          <div className="flex h-[calc(100dvh-32px)] items-center justify-center">
+            <Image
+              src={serverErr.src}
+              alt="error 500"
+              width={680}
+              height={454}
+              className="max-w-[680px] !max-h-[454px] !h-fit w-full]"
+              as={NextImage}
+              draggable={false}
+              loading="eager"
+              radius="none"
+            />
           </div>
         </section>
       </body>

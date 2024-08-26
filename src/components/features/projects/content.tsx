@@ -236,7 +236,7 @@ function ProjectContent({
 
                           <div className="text-sm text-[#4F4F4F]">
                             {model === 'E' ? 'Power' : 'Production'}:{' '}
-                            {item?.power || ''}
+                            {item?.power || ''} {model === 'E' ? 'kVA' : 'Ton'}
                           </div>
 
                           <p className="text-sm text-[#21272A] my-4">

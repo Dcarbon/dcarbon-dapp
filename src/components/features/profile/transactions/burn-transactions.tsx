@@ -96,9 +96,14 @@ const BurnTransaction = () => {
       listTxPage &&
       searchParams.get('tab') === 'transaction' &&
       searchParams.get('type') === 'burn'
-        ? [QUERY_KEYS.USER.GET_LIST_TX.BURN, publicKey, listTxPage]
+        ? [
+            QUERY_KEYS.USER.GET_LIST_TX.BURN,
+            searchParams.get('type'),
+            publicKey,
+            listTxPage,
+          ]
         : null,
-    ([, wallet, page]) => {
+    ([, , wallet, page]) => {
       if (
         !wallet ||
         !page ||
@@ -115,6 +120,7 @@ const BurnTransaction = () => {
     },
     {
       revalidateOnMount: true,
+      keepPreviousData: true,
     },
   );
   const listTxLoadingState = listTxLoading ? 'loading' : 'idle';
@@ -436,6 +442,7 @@ const BurnTransaction = () => {
           // items={listTx?.data || []}
           loadingContent={<DCarbonLoading />}
           loadingState={listTxLoadingState}
+          isLoading={listTxLoading}
           emptyContent={'No transaction found!'}
         >
           {(listTx?.data || []).map((item, idx) => (

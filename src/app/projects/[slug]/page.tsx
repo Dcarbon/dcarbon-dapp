@@ -1,5 +1,6 @@
 import React from 'react';
 import NextImage from 'next/image';
+import { notFound } from 'next/navigation';
 import { doGetProjectDetail } from '@/adapters/project';
 import Carousel from '@/components/features/projects/carousel';
 import DetailSidebar from '@/components/features/projects/detail-sidebar';
@@ -8,6 +9,9 @@ import locationActiveIcon from 'public/images/common/location-active-icon.svg';
 
 async function ProjectDetail({ params }: { params: { slug: string } }) {
   const data = (await doGetProjectDetail(params.slug)) as any;
+  if (data.statusCode !== 200) {
+    return notFound();
+  }
   let dataCarousel: string[] = [];
 
   if (data?.data?.images?.length > 2 && data?.data?.images?.length < 5) {
@@ -18,7 +22,6 @@ async function ProjectDetail({ params }: { params: { slug: string } }) {
   } else {
     dataCarousel = data?.data?.images;
   }
-
   const location = `${data?.data?.location?.name || ''}${data?.data?.country_name ? `, ${data?.data?.country_name}` : ''}`;
 
   return (

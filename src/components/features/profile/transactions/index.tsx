@@ -37,6 +37,7 @@ const Transactions = () => {
     <Tabs
       key="mode"
       variant="underlined"
+      destroyInactiveTabPanel
       aria-label="transaction"
       classNames={{
         base: 'flex',

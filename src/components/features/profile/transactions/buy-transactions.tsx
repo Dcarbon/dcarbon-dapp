@@ -64,9 +64,14 @@ const CarbonTransaction = () => {
       listTxPage &&
       searchParams.get('tab') === 'transaction' &&
       searchParams.get('type') === 'buy'
-        ? [QUERY_KEYS.USER.GET_LIST_TX.CARBON, publicKey, listTxPage]
+        ? [
+            QUERY_KEYS.USER.GET_LIST_TX.CARBON,
+            searchParams.get('type'),
+            publicKey,
+            listTxPage,
+          ]
         : null,
-    ([, wallet, page]) => {
+    ([, , wallet, page]) => {
       if (
         !wallet ||
         !page ||
@@ -83,6 +88,7 @@ const CarbonTransaction = () => {
     },
     {
       revalidateOnMount: true,
+      keepPreviousData: true,
     },
   );
   const listTxLoadingState = listTxLoading ? 'loading' : 'idle';
@@ -297,6 +303,7 @@ const CarbonTransaction = () => {
         items={listTx?.data || []}
         loadingContent={<DCarbonLoading />}
         loadingState={listTxLoadingState}
+        isLoading={listTxLoading}
         emptyContent={'No transaction found!'}
       >
         {(item) => (

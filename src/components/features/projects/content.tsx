@@ -31,6 +31,10 @@ type ProjectResponse = {
   location: { name: string };
   power: number;
   thumbnail: string;
+  type?: {
+    id: number;
+    name: string;
+  };
 };
 
 function ProjectContent({
@@ -240,7 +244,7 @@ function ProjectContent({
                           </div>
 
                           <p className="text-sm text-[#21272A] my-4">
-                            Dự án Miền Nam
+                            {item.type?.name || ''}
                           </p>
                         </Link>
 

@@ -82,7 +82,7 @@ const mintNft = async (
     TOKEN_METADATA_PROGRAM_ID,
   );
   const mintNftIns = await program.methods
-    .mintNft(uri, 'DCO2 Certificate', 'DCO2C', amount)
+    .mintNft(uri, 'DCO2 Certificate', 'DCC', amount)
     .accounts({
       signer,
       collectionMetadataAccount: collectionMetadataPDA,

@@ -200,7 +200,7 @@ function CertificateRetryModal({
                   });
                   const metadataInput: Metadata = {
                     name: 'DCO2 Certificate',
-                    symbol: 'DCO2C',
+                    symbol: 'DCC',
                     image: 'image',
                     attributes: [
                       {

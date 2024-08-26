@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useMemo, useState } from 'react';
 import NextImage from 'next/image';
 import { useSearchParams } from 'next/navigation';
@@ -58,20 +60,19 @@ const CarbonTransaction = () => {
   const [, copy] = useCopyToClipboard();
   const searchParams = useSearchParams();
 
-  const { data: listTx, isLoading: listTxLoading } = useSWR(
+  const {
+    data: listTx,
+    isLoading: listTxLoading,
+    isValidating,
+  } = useSWR(
     () =>
       publicKey &&
       listTxPage &&
       searchParams.get('tab') === 'transaction' &&
       searchParams.get('type') === 'buy'
-        ? [
-            QUERY_KEYS.USER.GET_LIST_TX.CARBON,
-            searchParams.get('type'),
-            publicKey,
-            listTxPage,
-          ]
+        ? [QUERY_KEYS.USER.GET_LIST_TX.CARBON, publicKey, listTxPage]
         : null,
-    ([, , wallet, page]) => {
+    ([, wallet, page]) => {
       if (
         !wallet ||
         !page ||
@@ -88,10 +89,11 @@ const CarbonTransaction = () => {
     },
     {
       revalidateOnMount: true,
+      revalidateOnReconnect: true,
       keepPreviousData: true,
     },
   );
-  const listTxLoadingState = listTxLoading ? 'loading' : 'idle';
+  const listTxLoadingState = listTxLoading || isValidating ? 'loading' : 'idle';
 
   const listTxPages = useMemo(() => {
     return listTx?.paging?.total
@@ -266,12 +268,12 @@ const CarbonTransaction = () => {
           return cellValue;
       }
     },
-    [],
+    [listTx],
   );
 
   return (
     <Table
-      aria-label="Transaction Table"
+      aria-label="Buy Transaction Table"
       shadow="none"
       radius="none"
       classNames={{
@@ -303,7 +305,6 @@ const CarbonTransaction = () => {
         items={listTx?.data || []}
         loadingContent={<DCarbonLoading />}
         loadingState={listTxLoadingState}
-        isLoading={listTxLoading}
         emptyContent={'No transaction found!'}
       >
         {(item) => (

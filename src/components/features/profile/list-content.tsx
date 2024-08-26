@@ -91,7 +91,7 @@ function CertificateListContent() {
 
       return prev;
     });
-  }, [searchParams]);
+  }, [searchParams.get('tab')]);
 
   const { data, isLoading, mutate } = useSWR(
     () =>
@@ -139,13 +139,8 @@ function CertificateListContent() {
     (tab: tabTypes) => {
       const params = new URLSearchParams(searchParams.toString());
       params.delete('type');
-      if (tab === 'transaction') {
-        params.set('type', 'carbon');
-      }
       params.set('tab', tab);
-
       const newParams = params.toString();
-      setSelectedTab(tab);
       router.push(pathname + '?' + newParams, { scroll: false });
     },
     [pathname, router, searchParams],
@@ -191,7 +186,7 @@ function CertificateListContent() {
     { key: 'attributes', label: 'Project Name' },
     {
       key: 'amount',
-      label: 'Total Carbon',
+      label: 'Total DCO2',
     },
     {
       key: 'symbol',
@@ -552,7 +547,6 @@ function CertificateListContent() {
               emptyContent={'No certificated found!'}
               loadingContent={<DCarbonLoading />}
               loadingState={listCertificateLoadingState}
-              isLoading={listCertificateLoading}
             >
               {(item) => (
                 <TableRow key={item.address}>

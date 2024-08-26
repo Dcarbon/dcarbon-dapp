@@ -349,7 +349,7 @@ function InformationDetailSidebar(props: { data: any }) {
                 {data?.data?.available_carbon ||
                 data?.data?.available_carbon === 0 ? (
                   <div className="text-sm font-light flex flex-wrap gap-3 items-baseline">
-                    <span>Available Carbon:</span>
+                    <span>Available DCO2:</span>
                     <span className="font-medium text-lg text-primary-color">
                       {Number(
                         Big(data.data.available_carbon).toFixed(4),
@@ -379,7 +379,7 @@ function InformationDetailSidebar(props: { data: any }) {
                   if (
                     Big(q?.value || 0).gt(data?.data?.available_carbon || 0)
                   ) {
-                    setQuantityError('Quantity exceeds available Carbon.');
+                    setQuantityError('Quantity exceeds available DCarbon.');
                   }
 
                   if (
@@ -546,7 +546,7 @@ function InformationDetailSidebar(props: { data: any }) {
               onPress={handleBuyCarbon}
               disabled={loading}
             >
-              {loading ? 'Processing...' : 'Buy Carbon'}
+              {loading ? 'Processing...' : 'Buy DCO2'}
             </DCarbonButton>
           </div>
         </div>

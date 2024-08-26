@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useCallback, useEffect, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Tab, Tabs } from '@nextui-org/react';
@@ -12,12 +14,15 @@ const Transactions = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [selectedTab, setSelectedTab] = useState<tabTypes>(
-    (searchParams.get('type') as tabTypes) || 'buy',
+    searchParams.get('type') as tabTypes,
   );
   useEffect(() => {
     setSelectedTab((prev) => {
-      if (prev !== searchParams.get('type')) {
-        return (searchParams.get('type') as tabTypes) || 'buy';
+      if (
+        prev !== searchParams.get('type') &&
+        searchParams.get('tab') === 'transaction'
+      ) {
+        return searchParams.get('type') as tabTypes;
       }
       return prev;
     });

@@ -235,7 +235,8 @@ function ProjectContent({
                           </h2>
 
                           <div className="text-sm text-[#4F4F4F]">
-                            Sản lượng: {item?.power || ''}
+                            {model === 'E' ? 'Power' : 'Production'}:{' '}
+                            {item?.power || ''}
                           </div>
 
                           <p className="text-sm text-[#21272A] my-4">

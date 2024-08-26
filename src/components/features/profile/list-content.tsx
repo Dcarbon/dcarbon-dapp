@@ -139,6 +139,9 @@ function CertificateListContent() {
     (tab: tabTypes) => {
       const params = new URLSearchParams(searchParams.toString());
       params.delete('type');
+      if (tab === 'transaction') {
+        params.set('type', 'carbon');
+      }
       params.set('tab', tab);
 
       const newParams = params.toString();
@@ -498,6 +501,7 @@ function CertificateListContent() {
       <Tabs
         key="mode"
         variant="light"
+        destroyInactiveTabPanel
         aria-label="Certificate List"
         classNames={{
           base: 'flex',
@@ -548,6 +552,7 @@ function CertificateListContent() {
               emptyContent={'No certificated found!'}
               loadingContent={<DCarbonLoading />}
               loadingState={listCertificateLoadingState}
+              isLoading={listCertificateLoading}
             >
               {(item) => (
                 <TableRow key={item.address}>

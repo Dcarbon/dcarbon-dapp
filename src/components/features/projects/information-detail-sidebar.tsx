@@ -405,7 +405,7 @@ function InformationDetailSidebar(props: { data: any }) {
               />
 
               <div className="text-sm text-[#4F4F4F] absolute right-3 top-1/2 -translate-y-1/2 cursor-default">
-                CARBON
+                DCO2
               </div>
             </div>
             {quantityError && (

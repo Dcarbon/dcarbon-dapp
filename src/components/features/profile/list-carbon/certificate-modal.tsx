@@ -106,6 +106,7 @@ function CertificateModal({
     burn_tx: string[];
     amount: string;
     project_name: string;
+    asset_type: 'sFT' | 'FT';
   }>();
   const RetryLink = useCallback(() => {
     return (
@@ -310,6 +311,7 @@ function CertificateModal({
                 burnResult = resultBurnTx;
 
                 let projectName: string = '';
+                let isNotFt;
 
                 if (
                   (Array.isArray(resultBurnTx) &&
@@ -380,6 +382,17 @@ function CertificateModal({
                     message: 'Generating NFT certificate metadata...',
                   });
 
+                  const [configContract] = PublicKey.findProgramAddressSync(
+                    [Buffer.from('contract_config')],
+                    program.programId,
+                  );
+                  const configData =
+                    await program.account.contractConfig.fetch(configContract);
+
+                  const mintFt = configData.mint;
+
+                  isNotFt = mints?.find((m) => m.mint !== mintFt.toString());
+
                   const metadata = await doGenerateNftMetadata(
                     publicKey.toBase58(),
                     {
@@ -407,6 +420,10 @@ function CertificateModal({
                         {
                           trait_type: 'burned_at',
                           value: dayjs.utc().format('DD.MM.YYYY'),
+                        },
+                        {
+                          trait_type: 'asset_type',
+                          value: isNotFt ? 'sFT' : 'FT',
                         },
                         ...(projectName
                           ? [{ trait_type: 'project_name', value: projectName }]
@@ -618,6 +635,7 @@ function CertificateModal({
                         ? burnResult.map((res) => res?.value?.tx || '')
                         : [burnResult?.tx || ''],
                       project_name: projectName,
+                      asset_type: isNotFt ? 'sFT' : 'FT',
                     });
                     setVisibleNftSuccess(true);
                   }
@@ -750,6 +768,7 @@ function CertificateModal({
             burn_tx={nftSuccessData?.burn_tx}
             amount={nftSuccessData?.amount.toString()}
             project_name={nftSuccessData?.project_name}
+            asset_type={nftSuccessData?.asset_type}
           />
         )}
     </>

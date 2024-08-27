@@ -19,6 +19,7 @@ interface INftModalSuccessProps {
   burn_tx: string[];
   amount: string;
   project_name: string;
+  asset_type?: 'sFT' | 'FT';
 }
 
 const NftModalSuccess = (props: INftModalSuccessProps) => {
@@ -90,6 +91,7 @@ const NftModalSuccess = (props: INftModalSuccessProps) => {
                       burn_tx: props?.burn_tx,
                       amount: props?.amount,
                       project_name: props?.project_name,
+                      asset_type: props?.asset_type,
                     },
                   } as any
                 }

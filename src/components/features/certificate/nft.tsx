@@ -286,8 +286,8 @@ function NftCertificate({
       const yCarbon = drawDynamicText(
         ctx,
         'Has retired',
-        ` ${Number(Big(data?.data?.amount || 0).toFixed(1)).toLocaleString('en-US')} CARBON `,
-        'token from the',
+        ` ${Number(Big(data?.data?.amount || 0).toFixed(1)).toLocaleString('en-US')} DCO2 `,
+        `${data?.data?.asset_type === 'sFT' ? 'token from the' : 'token'}`,
         64,
         yOwner + 50,
         220,
@@ -296,7 +296,9 @@ function NftCertificate({
       ctx.font = '16px LexendDeca400';
       const yProjectName = drawText(
         ctx,
-        `${data?.data?.project_name || 'multiple projects'}`,
+        data?.data?.asset_type === 'sFT'
+          ? `${data?.data?.project_name || 'multiple projects'}`
+          : ' ',
         64,
         yCarbon + 20,
         220,
@@ -335,6 +337,7 @@ function NftCertificate({
   }, [
     canvasHeight,
     data?.data?.amount,
+    data?.data?.asset_type,
     data?.data?.burn_tx,
     data?.data?.burned_at,
     data?.data?.name,

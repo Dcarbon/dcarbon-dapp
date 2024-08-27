@@ -388,6 +388,7 @@ interface IGetCertificateDetailResponse extends Response {
     burn_tx?: string[];
     amount?: string;
     project_name?: string;
+    asset_type?: 'sFT' | 'FT';
   };
   message?: string | string[];
 }

@@ -347,6 +347,17 @@ function CertificateModal({
                         ? [{ tx: burnResult.tx, status }]
                         : [];
 
+                  const [configContract] = PublicKey.findProgramAddressSync(
+                    [Buffer.from('contract_config')],
+                    program.programId,
+                  );
+                  const configData =
+                    await program.account.contractConfig.fetch(configContract);
+
+                  const mintFt = configData.mint;
+
+                  isNotFt = mints?.find((m) => m.mint !== mintFt.toString());
+
                   const pdfResponse = await doGenerateBurnMetadata(
                     publicKey.toBase58(),
                     {
@@ -357,6 +368,7 @@ function CertificateModal({
                       date: dayjs().utc().unix(),
                       owner: name,
                       project_name: projectName,
+                      asset_type: isNotFt ? 'sFT' : 'FT',
                     },
                   );
                   if (!pdfResponse?.data?.url) {
@@ -381,17 +393,6 @@ function CertificateModal({
                   ShowAlert.loading({
                     message: 'Generating NFT certificate metadata...',
                   });
-
-                  const [configContract] = PublicKey.findProgramAddressSync(
-                    [Buffer.from('contract_config')],
-                    program.programId,
-                  );
-                  const configData =
-                    await program.account.contractConfig.fetch(configContract);
-
-                  const mintFt = configData.mint;
-
-                  isNotFt = mints?.find((m) => m.mint !== mintFt.toString());
 
                   const metadata = await doGenerateNftMetadata(
                     publicKey.toBase58(),

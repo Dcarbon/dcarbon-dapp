@@ -87,6 +87,7 @@ const BurnTransaction = () => {
     burn_tx: string[];
     amount: string;
     project_name: string;
+    asset_type: 'sFT' | 'FT';
   }>();
   const {
     data: listTx,
@@ -246,6 +247,9 @@ const BurnTransaction = () => {
         const burnTxs = metadata?.attributes?.filter(
           (attr) => attr.trait_type === 'burn_tx',
         );
+        const assetType = metadata?.attributes.find(
+          (attr) => attr.trait_type === 'asset_type',
+        );
         const burnResult = (burnTxs || []).map((attr) => attr.value);
         setNftSuccessData({
           name: certName ? certName.value : 'DCO2 Certificate',
@@ -253,6 +257,7 @@ const BurnTransaction = () => {
           burned_at: dayjs.utc().format('DD.MM.YYYY'),
           burn_tx: burnResult,
           project_name: projectName ? projectName.value : 'multiple projects',
+          asset_type: assetType?.value as 'sFT' | 'FT',
         });
         setVisibleNftSuccess(true);
         await mutate();
@@ -474,6 +479,7 @@ const BurnTransaction = () => {
             burn_tx={nftSuccessData?.burn_tx}
             amount={nftSuccessData?.amount.toString()}
             project_name={nftSuccessData?.project_name}
+            asset_type={nftSuccessData.asset_type}
           />
         )}
     </>

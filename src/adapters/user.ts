@@ -287,6 +287,7 @@ interface IGenerateCertificatetaBody {
   date: number;
   amount: number;
   project_name: string;
+  asset_type: 'sFT' | 'FT';
 }
 
 interface IGenerateCertificateResponse extends Response {
@@ -311,6 +312,7 @@ const doGenerateBurnMetadata = async (
     date,
     amount,
     project_name,
+    asset_type,
   }: IGenerateCertificatetaBody,
 ): Promise<IGenerateCertificateResponse> => {
   const body = {
@@ -318,6 +320,7 @@ const doGenerateBurnMetadata = async (
     owner,
     date,
     amount,
+    asset_type,
     ...(project_name ? { project_name } : {}),
   };
   return request('POST', API_ROUTES.USER.GENERATE_CERTIFICATE, body, {

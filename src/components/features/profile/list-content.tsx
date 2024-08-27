@@ -33,6 +33,7 @@ import {
 import { useWallet } from '@solana/wallet-adapter-react';
 import { env } from 'env.mjs';
 import copyIcon from 'public/images/common/copy.svg';
+import downloadIcon from 'public/images/common/download.svg';
 import logo from 'public/images/common/logo.svg';
 import solScanIcon from 'public/images/common/sol-scan.png';
 import solanaExplorerIcon from 'public/images/common/solana-explorer.png';
@@ -336,7 +337,7 @@ function CertificateListContent() {
           }
 
           return (
-            <div className="relative flex">
+            <div className="relative flex gap-[24px]">
               <Link
                 href={WEB_ROUTES.CERTIFICATE_DETAIL.replace(
                   '[id]',
@@ -353,6 +354,48 @@ function CertificateListContent() {
                   draggable={false}
                 />
               </Link>
+              <Button
+                isIconOnly
+                radius="none"
+                disableRipple
+                variant="light"
+                className="data-[hover=true]:bg-transparent min-w-[24px] w-[24px]"
+                onClick={async () => {
+                  const fileUrl = user?.metadata?.attributes?.find(
+                    (att: any) => att?.trait_type === 'file',
+                  )?.value;
+
+                  const fileResponse = await fetch(fileUrl, {
+                    cache: 'no-store',
+                  });
+                  const blob = await fileResponse?.blob();
+
+                  const url = window.URL.createObjectURL(new Blob([blob]));
+
+                  if (url) {
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.setAttribute(
+                      'download',
+                      `${fileUrl?.replace('https://arweave.net/', '')?.replace('https://arweave.dev/', '')}.pdf`,
+                    );
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    ShowAlert.success({ message: 'Downloaded successfully!' });
+                  }
+                }}
+              >
+                <Image
+                  src={downloadIcon.src}
+                  alt="Download"
+                  as={NextImage}
+                  width={24}
+                  height={24}
+                  draggable={false}
+                  radius="none"
+                />
+              </Button>
             </div>
           );
         }

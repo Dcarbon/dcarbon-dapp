@@ -8,14 +8,18 @@ import {
   doModifyBurnHistoryStatus,
 } from '@/adapters/user';
 import { ShowAlert } from '@/components/common/toast';
+import { CARBON_IDL } from '@/contracts/carbon/carbon.idl';
+import { ICarbonContract } from '@/contracts/carbon/carbon.interface';
 import { THROW_EXCEPTION } from '@/utils/constants';
 import { logger } from '@/utils/helpers/common';
+import { AnchorProvider, Program } from '@coral-xyz/anchor';
 import { Tab, Tabs } from '@nextui-org/react';
 import {
   useAnchorWallet,
   useConnection,
   useWallet,
 } from '@solana/wallet-adapter-react';
+import { PublicKey } from '@solana/web3.js';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import certificateIcon from 'public/images/projects/cerfiticate-icon.png';
@@ -154,6 +158,7 @@ function CertificateRetryModal({
               });
               try {
                 let projectName: string = '';
+                let isNotFt;
                 if (retryOption?.burnTxs && retryOption?.burnTxs.length > 0) {
                   ShowAlert.loading({ message: 'Generating certificate...' });
 
@@ -170,6 +175,26 @@ function CertificateRetryModal({
                   if (newProjectName) {
                     projectName = newProjectName;
                   }
+
+                  const provider = new AnchorProvider(connection, anchorWallet);
+                  const program = new Program<ICarbonContract>(
+                    CARBON_IDL as ICarbonContract,
+                    provider,
+                  );
+
+                  const [configContract] = PublicKey.findProgramAddressSync(
+                    [Buffer.from('contract_config')],
+                    program.programId,
+                  );
+                  const configData =
+                    await program.account.contractConfig.fetch(configContract);
+
+                  const mintFt = configData.mint;
+
+                  isNotFt = retryOption?.mints?.find(
+                    (m) => m !== mintFt.toString(),
+                  );
+
                   const pdfResponse = await doGenerateBurnMetadata(
                     publicKey.toBase58(),
                     {
@@ -178,6 +203,7 @@ function CertificateRetryModal({
                       date: dayjs().utc().unix(),
                       owner: name,
                       project_name: projectName,
+                      asset_type: isNotFt ? 'sFT' : 'FT',
                     },
                   );
                   if (!pdfResponse?.data?.url) {
@@ -223,6 +249,10 @@ function CertificateRetryModal({
                       {
                         trait_type: 'burned_at',
                         value: dayjs.utc().format('DD.MM.YYYY'),
+                      },
+                      {
+                        trait_type: 'asset_type',
+                        value: isNotFt ? 'sFT' : 'FT',
                       },
                       ...(projectName
                         ? [{ trait_type: 'project_name', value: projectName }]

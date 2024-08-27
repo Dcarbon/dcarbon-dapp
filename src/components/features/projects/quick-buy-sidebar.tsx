@@ -7,7 +7,14 @@ import { CARBON_IDL } from '@contracts/carbon/carbon.idl';
 import { ICarbonContract } from '@contracts/carbon/carbon.interface';
 import { AnchorProvider, Program } from '@coral-xyz/anchor';
 import { TOKEN_PROGRAM_ID } from '@coral-xyz/anchor/dist/cjs/utils/token';
-import { cn, Image, Select, Selection, SelectItem } from '@nextui-org/react';
+import {
+  cn,
+  Image,
+  Select,
+  Selection,
+  SelectItem,
+  useDisclosure,
+} from '@nextui-org/react';
 import {
   createAssociatedTokenAccountInstruction,
   getAssociatedTokenAddressSync,
@@ -35,6 +42,8 @@ import { logger } from '@utils/helpers/common';
 import { generateListingList } from '@utils/helpers/project';
 import { createTransactionV0, sendTx } from '@utils/helpers/solana';
 
+import QuickBuyModal from './quickbuy-modal';
+
 function QuickBuySidebar() {
   const searchParams = useSearchParams();
   const model = searchParams.get('model');
@@ -47,7 +56,9 @@ function QuickBuySidebar() {
   const { publicKey, wallet } = useWallet();
   const [touched, setTouched] = useState<boolean>(false);
   const [creditsError, setCreditsError] = useState<string | null>(null);
-
+  const { isOpen, onClose, onOpenChange } = useDisclosure({
+    id: 'quick-buy-modal',
+  });
   let iot_model;
 
   switch (model) {
@@ -147,7 +158,6 @@ function QuickBuySidebar() {
       ShowAlert.error({ message: 'Please select asset!' });
       return;
     }
-
     setLoading(true);
     const isSol = Array.from(asset)?.[0]?.toString().toLowerCase() === 'sol';
 
@@ -191,7 +201,6 @@ function QuickBuySidebar() {
           carbonOwner,
         );
         const toAta = getAssociatedTokenAddressSync(carbonMint, publicKey);
-
         const buyIns = await program.methods
           .buy(Big(item.available).toNumber())
           .accounts({
@@ -339,6 +348,12 @@ function QuickBuySidebar() {
 
   return (
     <>
+      <QuickBuyModal
+        isOpen={isOpen}
+        onClose={onClose}
+        data={[]}
+        handleBuy={handleBuyCarbon}
+      />
       <div>
         <p className="text-sm font-light text-[#454545] mb-8">
           Purchase credits from any of our farms.
@@ -486,7 +501,7 @@ function QuickBuySidebar() {
           color="primary"
           fullWidth
           className="mt-6"
-          onClick={handleBuyCarbon}
+          onClick={onOpenChange}
         >
           Buy Now
         </DCarbonButton>

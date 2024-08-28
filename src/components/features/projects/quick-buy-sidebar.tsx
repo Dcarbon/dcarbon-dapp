@@ -96,6 +96,10 @@ function QuickBuySidebar() {
       ShowAlert.warning({ message: 'Please connect to wallet first!' });
       return;
     }
+    if (!isAsset) {
+      ShowAlert.warning({ message: 'Please select asset!' });
+      return;
+    }
     onOpenChange();
   };
 
@@ -387,7 +391,7 @@ function QuickBuySidebar() {
           <NumericFormat
             key="credits"
             thousandSeparator
-            decimalScale={1}
+            decimalScale={2}
             allowNegative={false}
             id="credits"
             className="disabled:bg-default-200 text-sm mt-2 w-full bg-[#F6F6F6] p-3 rounded h-[40px] outline-none hover:bg-gray-50 transition-all focus:ring-1 focus:ring-primary-color placeholder:text-[#888] placeholder:text-sm placeholder:font-normal focus:bg-white"

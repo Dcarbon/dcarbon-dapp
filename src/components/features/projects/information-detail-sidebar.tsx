@@ -370,7 +370,7 @@ function InformationDetailSidebar(props: { data: any }) {
             <div className="relative">
               <NumericFormat
                 value={quantity}
-                decimalScale={1}
+                decimalScale={2}
                 thousandSeparator
                 allowNegative={false}
                 onValueChange={(q) => {

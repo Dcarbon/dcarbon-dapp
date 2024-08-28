@@ -108,7 +108,7 @@ const QuickBuyModal = ({
         <div
           className={cn(
             'flex flex-col gap-2 w-full mt-3 transition-height duration-1000 h-auto',
-            showMore ? 'max-h-[200px] overflow-y-auto' : '',
+            showMore ? 'max-h-[300px] overflow-y-auto' : '',
           )}
         >
           {isLoading ? (
@@ -119,7 +119,7 @@ const QuickBuyModal = ({
             <>
               {mintsData.length > 0
                 ? mintsData
-                    .slice(0, showMore ? mintsData.length : 2)
+                    .slice(0, showMore ? mintsData.length : 5)
                     .map((d: MetaMintsData, i) => (
                       <div
                         key={i}
@@ -138,7 +138,7 @@ const QuickBuyModal = ({
                             <span>{d.name}</span>
                           </div>
                         </div>
-                        <div className="flex gap-1 items-baseline  text-text-primary">
+                        <div className="flex gap-1 items-baseline justify-start  text-text-primary">
                           <span className="font-light text-[12px]">
                             Unit Price:
                           </span>
@@ -146,8 +146,7 @@ const QuickBuyModal = ({
                             {' '}
                             {Number(
                               Big(
-                                d.available *
-                                  +(d.payment_info?.exchange_rate || 1) || 0,
+                                d.payment_info?.exchange_rate || 1 || 0,
                               ).toFixed(4),
                             ).toLocaleString('en-US')}
                             {' USDT'}
@@ -167,7 +166,7 @@ const QuickBuyModal = ({
           </div>
         ) : (
           <>
-            {data.length > 2 ? (
+            {data.length > 5 ? (
               <p className="text-right select-none">
                 <span
                   className="text-text-primary font-light text-[12px] flex items-center gap-2 justify-end cursor-pointer"

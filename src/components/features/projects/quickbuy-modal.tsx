@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+'use client';
+
+import React, { memo, useCallback, useEffect, useState } from 'react';
 import NextImage from 'next/image';
 import DCarbonButton from '@/components/common/button';
 import DCarbonModal from '@/components/common/modal';
@@ -20,6 +22,15 @@ const QuickBuyModal = ({
   handleBuy,
 }: QuickBuyModalProps) => {
   const [showMore, setShowMore] = useState(false);
+
+  const getUnitPrice = useCallback((keys: string[]) => {
+    console.info('keys', keys);
+  }, []);
+
+  useEffect(() => {
+    isOpen && getUnitPrice([]);
+  }, [isOpen, getUnitPrice]);
+
   return (
     <DCarbonModal
       onClose={onClose}
@@ -106,4 +117,4 @@ const QuickBuyModal = ({
   );
 };
 
-export default QuickBuyModal;
+export default memo(QuickBuyModal);

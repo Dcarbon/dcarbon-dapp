@@ -10,12 +10,14 @@ interface ISendFeedbackBody {
   email: string;
   description?: string;
 }
+
 interface ISendContactBody {
   firstName: string;
   lastName: string;
   email: string;
   message: string;
 }
+
 const doSendContact = async ({
   firstName,
   lastName,
@@ -68,16 +70,22 @@ interface IGetMintMetadataResponse extends Response {
   statusCode: number;
   data?: Metadata;
 }
-
+interface IGetMintsMetadataResponse extends Response {
+  request_id: string;
+  statusCode: number;
+  data: Metadata[];
+}
 const doGetMintMetada = async (
   wallet: string,
   mint: string,
+  withoutAttr = false,
 ): Promise<IGetMintMetadataResponse> => {
   return request(
     'GET',
     API_ROUTES.COMMON.GET_MINT_METADATA,
     {
       mint,
+      without_attr: withoutAttr,
     },
     {
       cache: 'no-store',
@@ -87,6 +95,25 @@ const doGetMintMetada = async (
     },
   ) as Promise<IGetMintMetadataResponse>;
 };
-
-export { doSendFeedback, doSendContact, doGetMintMetada };
+const doGetMintsMetada = async (
+  wallet: string,
+  mint: string,
+  withoutAttr = false,
+): Promise<IGetMintsMetadataResponse> => {
+  return request(
+    'GET',
+    API_ROUTES.COMMON.GET_MINTS_METADATA,
+    {
+      mint,
+      without_attr: withoutAttr,
+    },
+    {
+      cache: 'no-store',
+      headers: {
+        ...(wallet ? { 'x-user-wallet': wallet } : {}),
+      },
+    },
+  ) as Promise<IGetMintsMetadataResponse>;
+};
+export { doSendFeedback, doSendContact, doGetMintMetada, doGetMintsMetada };
 export type { ISendFeedbackBody, TFeeling, ISendContactBody, Metadata };

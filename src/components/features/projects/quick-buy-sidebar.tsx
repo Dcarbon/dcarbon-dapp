@@ -34,6 +34,7 @@ import Big from 'big.js';
 import { env } from 'env.mjs';
 import arrowDownIcon from 'public/images/common/arrow-down-icon.svg';
 import { NumericFormat } from 'react-number-format';
+import { BeatLoader } from 'react-spinners';
 import useSWR from 'swr';
 import { Skeleton } from '@components/common/loading';
 import { ShowAlert } from '@components/common/toast';
@@ -89,6 +90,14 @@ function QuickBuySidebar() {
       icon: info?.icon || '',
     };
   });
+
+  const openBuyModal = () => {
+    if (!publicKey || !wallet || !anchorWallet || !connection) {
+      ShowAlert.warning({ message: 'Please connect to wallet first!' });
+      return;
+    }
+    onOpenChange();
+  };
 
   useEffect(() => {
     if ((asset as any)?.currentKey) {
@@ -151,11 +160,6 @@ function QuickBuySidebar() {
 
     if (!(wallet?.adapter as any)?.signAllTransactions) {
       ShowAlert.error({ message: 'Not support signAllTransactions!' });
-      return;
-    }
-
-    if (!Array.from(asset) || Array.from(asset).length === 0) {
-      ShowAlert.error({ message: 'Please select asset!' });
       return;
     }
     setLoading(true);
@@ -340,6 +344,7 @@ function QuickBuySidebar() {
       ShowAlert.error({ message: THROW_EXCEPTION.NETWORK_CONGESTED });
     } finally {
       setLoading(false);
+      onClose();
     }
   };
   const handleCredits = async (e: any) => {
@@ -348,12 +353,19 @@ function QuickBuySidebar() {
 
   return (
     <>
-      <QuickBuyModal
-        isOpen={isOpen}
-        onClose={onClose}
-        data={[]}
-        handleBuy={handleBuyCarbon}
-      />
+      {publicKey && credits && (
+        <QuickBuyModal
+          isOpen={isOpen}
+          onClose={onClose}
+          data={
+            generateListingList(listingInfo || [], Big(credits)?.toNumber())
+              .result || []
+          }
+          handleBuy={handleBuyCarbon}
+          publicKey={publicKey}
+          isMinting={loading}
+        />
+      )}
       <div>
         <p className="text-sm font-light text-[#454545] mb-8">
           Purchase credits from any of our farms.
@@ -362,9 +374,7 @@ function QuickBuySidebar() {
           <div className="flex gap-1 items-center justify-between flex-wrap">
             Carbon Credit{' '}
             {isLoading ? (
-              <Skeleton>
-                <div className="h-[24px] w-24" />
-              </Skeleton>
+              <BeatLoader size={10} color="#7BDA08" loading className="px-2" />
             ) : (
               <span className="flex items-center gap-1">
                 {'Available: '}
@@ -501,7 +511,7 @@ function QuickBuySidebar() {
           color="primary"
           fullWidth
           className="mt-6"
-          onClick={onOpenChange}
+          onClick={openBuyModal}
         >
           Buy Now
         </DCarbonButton>

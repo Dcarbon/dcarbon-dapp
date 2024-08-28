@@ -123,7 +123,7 @@ function CertificateProfile() {
               {Number(Big(data?.data?.offset || 0).toFixed(1)).toLocaleString(
                 'en-US',
               )}{' '}
-              Carbon
+              DCO2
             </div>
           )}
         </div>

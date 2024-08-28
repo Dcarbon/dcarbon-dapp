@@ -7,7 +7,14 @@ import { CARBON_IDL } from '@contracts/carbon/carbon.idl';
 import { ICarbonContract } from '@contracts/carbon/carbon.interface';
 import { AnchorProvider, Program } from '@coral-xyz/anchor';
 import { TOKEN_PROGRAM_ID } from '@coral-xyz/anchor/dist/cjs/utils/token';
-import { cn, Image, Select, Selection, SelectItem } from '@nextui-org/react';
+import {
+  cn,
+  Image,
+  Select,
+  Selection,
+  SelectItem,
+  useDisclosure,
+} from '@nextui-org/react';
 import {
   createAssociatedTokenAccountInstruction,
   getAssociatedTokenAddressSync,
@@ -27,6 +34,7 @@ import Big from 'big.js';
 import { env } from 'env.mjs';
 import arrowDownIcon from 'public/images/common/arrow-down-icon.svg';
 import { NumericFormat } from 'react-number-format';
+import { BeatLoader } from 'react-spinners';
 import useSWR from 'swr';
 import { Skeleton } from '@components/common/loading';
 import { ShowAlert } from '@components/common/toast';
@@ -34,6 +42,8 @@ import { QUERY_KEYS, THROW_EXCEPTION } from '@utils/constants';
 import { logger } from '@utils/helpers/common';
 import { generateListingList } from '@utils/helpers/project';
 import { createTransactionV0, sendTx } from '@utils/helpers/solana';
+
+import QuickBuyModal from './quickbuy-modal';
 
 function QuickBuySidebar() {
   const searchParams = useSearchParams();
@@ -47,7 +57,9 @@ function QuickBuySidebar() {
   const { publicKey, wallet } = useWallet();
   const [touched, setTouched] = useState<boolean>(false);
   const [creditsError, setCreditsError] = useState<string | null>(null);
-
+  const { isOpen, onClose, onOpenChange } = useDisclosure({
+    id: 'quick-buy-modal',
+  });
   let iot_model;
 
   switch (model) {
@@ -78,6 +90,14 @@ function QuickBuySidebar() {
       icon: info?.icon || '',
     };
   });
+
+  const openBuyModal = () => {
+    if (!publicKey || !wallet || !anchorWallet || !connection) {
+      ShowAlert.warning({ message: 'Please connect to wallet first!' });
+      return;
+    }
+    onOpenChange();
+  };
 
   useEffect(() => {
     if ((asset as any)?.currentKey) {
@@ -142,12 +162,6 @@ function QuickBuySidebar() {
       ShowAlert.error({ message: 'Not support signAllTransactions!' });
       return;
     }
-
-    if (!Array.from(asset) || Array.from(asset).length === 0) {
-      ShowAlert.error({ message: 'Please select asset!' });
-      return;
-    }
-
     setLoading(true);
     const isSol = Array.from(asset)?.[0]?.toString().toLowerCase() === 'sol';
 
@@ -191,7 +205,6 @@ function QuickBuySidebar() {
           carbonOwner,
         );
         const toAta = getAssociatedTokenAddressSync(carbonMint, publicKey);
-
         const buyIns = await program.methods
           .buy(Big(item.available).toNumber())
           .accounts({
@@ -331,6 +344,7 @@ function QuickBuySidebar() {
       ShowAlert.error({ message: THROW_EXCEPTION.NETWORK_CONGESTED });
     } finally {
       setLoading(false);
+      onClose();
     }
   };
   const handleCredits = async (e: any) => {
@@ -339,6 +353,19 @@ function QuickBuySidebar() {
 
   return (
     <>
+      {publicKey && credits && (
+        <QuickBuyModal
+          isOpen={isOpen}
+          onClose={onClose}
+          data={
+            generateListingList(listingInfo || [], Big(credits)?.toNumber())
+              .result || []
+          }
+          handleBuy={handleBuyCarbon}
+          publicKey={publicKey}
+          isMinting={loading}
+        />
+      )}
       <div>
         <p className="text-sm font-light text-[#454545] mb-8">
           Purchase credits from any of our farms.
@@ -347,9 +374,7 @@ function QuickBuySidebar() {
           <div className="flex gap-1 items-center justify-between flex-wrap">
             Carbon Credit{' '}
             {isLoading ? (
-              <Skeleton>
-                <div className="h-[24px] w-24" />
-              </Skeleton>
+              <BeatLoader size={10} color="#7BDA08" loading className="px-2" />
             ) : (
               <span className="flex items-center gap-1">
                 {'Available: '}
@@ -486,7 +511,7 @@ function QuickBuySidebar() {
           color="primary"
           fullWidth
           className="mt-6"
-          onClick={handleBuyCarbon}
+          onClick={openBuyModal}
         >
           Buy Now
         </DCarbonButton>

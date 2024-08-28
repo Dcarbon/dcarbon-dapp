@@ -13,12 +13,11 @@ import { doGetListCarbon, doGetListCertificate } from '@/adapters/user';
 import DCarbonButton from '@/components/common/button';
 import DCarbonLoading from '@/components/common/loading/base-loading';
 import { ShowAlert } from '@/components/common/toast';
-import { QUERY_KEYS, WEB_ROUTES } from '@/utils/constants';
+import { QUERY_KEYS } from '@/utils/constants';
 import { getAllCacheDataByKey, shortAddress } from '@/utils/helpers/common';
 import {
   Button,
   Image,
-  Link,
   Pagination,
   Tab,
   Table,
@@ -31,13 +30,9 @@ import {
   useDisclosure,
 } from '@nextui-org/react';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { env } from 'env.mjs';
 import copyIcon from 'public/images/common/copy.svg';
 import downloadIcon from 'public/images/common/download.svg';
 import logo from 'public/images/common/logo.svg';
-import solScanIcon from 'public/images/common/sol-scan.png';
-import solanaExplorerIcon from 'public/images/common/solana-explorer.png';
-import viewIcon from 'public/images/common/view-icon.svg';
 import useSWR, { useSWRConfig } from 'swr';
 import { useCopyToClipboard } from 'usehooks-ts';
 
@@ -203,7 +198,7 @@ function CertificateListContent() {
     (
       user: any,
       columnKey: React.Key,
-      type?: 'transaction' | 'list-carbon' | 'certificated',
+      type?: 'list-carbon' | 'certificated',
     ) => {
       const cellValue = user[columnKey as keyof any];
 
@@ -297,141 +292,7 @@ function CertificateListContent() {
         case 'symbol': {
           return <span className="text-base">{user?.symbol}</span>;
         }
-        case 'action': {
-          if (type === 'transaction' || type === 'list-carbon') {
-            let urlSolScan = `https://explorer.solana.com/address/${user?.token_account || ''}${env.NEXT_PUBLIC_MODE === 'prod' ? '' : '?cluster=devnet'}`;
-            let urlSolanaIo = `https://solscan.io/account/${user?.token_account || ''}${env.NEXT_PUBLIC_MODE === 'prod' ? '' : '?cluster=devnet'}`;
-            if (type === 'transaction') {
-              urlSolScan = `https://explorer.solana.com/tx/${user?.tx || ''}${env.NEXT_PUBLIC_MODE === 'prod' ? '' : '?cluster=devnet'}`;
-              urlSolanaIo = `https://solscan.io/tx/${user?.tx || ''}${env.NEXT_PUBLIC_MODE === 'prod' ? '' : '?cluster=devnet'}`;
-            }
-            return (
-              <div className="relative flex gap-4">
-                <Link href={urlSolScan} isExternal>
-                  <Image
-                    src={solanaExplorerIcon.src}
-                    alt="Solana Explorer"
-                    as={NextImage}
-                    width={24}
-                    height={24}
-                    draggable={false}
-                    radius="none"
-                    className="min-w-[24px]"
-                  />
-                </Link>
-
-                <Link href={urlSolanaIo} isExternal>
-                  <Image
-                    src={solScanIcon.src}
-                    alt="Solscan"
-                    as={NextImage}
-                    width={24}
-                    height={24}
-                    draggable={false}
-                    radius="none"
-                    className="min-w-[24px]"
-                  />
-                </Link>
-              </div>
-            );
-          }
-
-          return (
-            <div className="relative flex gap-[24px]">
-              <Link
-                href={WEB_ROUTES.CERTIFICATE_DETAIL.replace(
-                  '[id]',
-                  user?.address || '',
-                )}
-                target="_blank"
-              >
-                <Image
-                  src={viewIcon.src}
-                  alt="View"
-                  as={NextImage}
-                  width={24}
-                  height={24}
-                  draggable={false}
-                />
-              </Link>
-              <Button
-                isIconOnly
-                radius="none"
-                disableRipple
-                variant="light"
-                className="data-[hover=true]:bg-transparent min-w-[24px] w-[24px]"
-                onClick={async () => {
-                  const fileUrl = user?.metadata?.attributes?.find(
-                    (att: any) => att?.trait_type === 'file',
-                  )?.value;
-
-                  const fileResponse = await fetch(fileUrl, {
-                    cache: 'no-store',
-                  });
-                  const blob = await fileResponse?.blob();
-
-                  const url = window.URL.createObjectURL(new Blob([blob]));
-
-                  if (url) {
-                    const link = document.createElement('a');
-                    link.href = url;
-                    link.setAttribute(
-                      'download',
-                      `${fileUrl?.replace('https://arweave.net/', '')?.replace('https://arweave.dev/', '')}.pdf`,
-                    );
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    ShowAlert.success({ message: 'Downloaded successfully!' });
-                  }
-                }}
-              >
-                <Image
-                  src={downloadIcon.src}
-                  alt="Download"
-                  as={NextImage}
-                  width={24}
-                  height={24}
-                  draggable={false}
-                  radius="none"
-                />
-              </Button>
-            </div>
-          );
-        }
         case 'amount': {
-          if (type === 'transaction') {
-            return (
-              <div className="relative flex gap-2 items-center text-base">
-                <Image
-                  src={user?.payment_info?.currency?.icon}
-                  alt={user?.payment_info?.currency?.symbol}
-                  as={NextImage}
-                  width={24}
-                  height={24}
-                  draggable={false}
-                  className="min-w-[24px]"
-                />
-                <div className={'flex flex-col'}>
-                  <span className={'text-sm'}>
-                    {(+user?.amount || 0)?.toLocaleString('en-US')}{' '}
-                    {user?.payment_info?.currency?.symbol}
-                  </span>
-                  <span className={'text-xs text-[#697077]'}>
-                    {'≈ '}
-                    {Number(
-                      (
-                        (+user?.amount || 0) *
-                        (user?.payment_info?.exchange_rate || 1)
-                      ).toFixed(1),
-                    )?.toLocaleString('en-US')}
-                    {'$'}
-                  </span>
-                </div>
-              </div>
-            );
-          }
-
           if (type === 'certificated') {
             return (
               <div className="relative flex gap-2 items-center text-base">
@@ -451,6 +312,7 @@ function CertificateListContent() {
                     as={NextImage}
                     width={24}
                     height={24}
+                    fallbackSrc={logo.src}
                     draggable={false}
                     className="min-w-[24px]"
                   />

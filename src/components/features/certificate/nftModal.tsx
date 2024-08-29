@@ -3,6 +3,7 @@
 import React, { memo, useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
+import { cn } from '@nextui-org/react';
 import { motion } from 'framer-motion';
 import lightEffect from 'public/images/certificates/light-effect.png';
 import { useOnClickOutside, useScrollLock, useWindowSize } from 'usehooks-ts';
@@ -36,20 +37,20 @@ const NftModalSuccess = (props: INftModalSuccessProps) => {
   useOnClickOutside(ref, handleClickOutside);
 
   useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  useEffect(() => {
     if (props?.visible) {
       lock();
     }
   }, [props?.visible]);
 
   return (
-    props?.visible &&
-    isMounted && (
+    props?.visible && (
       <>
-        <motion.div className="w-screen h-screen flex justify-center items-center bg-black bg-opacity-50 fixed top-0 left-0 z-50 overflow-hidden">
+        <motion.div
+          className={cn(
+            'w-screen h-screen flex justify-center items-center bg-black bg-opacity-50 fixed top-0 left-0 z-50 overflow-hidden',
+            isMounted ? '' : 'hidden',
+          )}
+        >
           <Confetti width={width} height={height} />
           <motion.div
             animate={{
@@ -83,6 +84,8 @@ const NftModalSuccess = (props: INftModalSuccessProps) => {
           >
             <div className="overflow-hidden">
               <NftCertificate
+                setMounted={setIsMounted}
+                mounted={isMounted}
                 data={
                   {
                     data: {

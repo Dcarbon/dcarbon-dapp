@@ -14,14 +14,17 @@ import QRCode from 'qrcode';
 function NftCertificate({
   data,
   className,
+  setMounted,
+  mounted,
 }: {
   data?: IGetCertificateDetailResponse;
   className?: string;
+  setMounted?: (value: boolean) => void;
+  mounted?: boolean;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const [canvasHeight, setCanvasHeight] = useState(842);
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     const perTransactionPerPage = 2.5;
@@ -330,7 +333,7 @@ function NftCertificate({
       );
 
       setCanvasHeight(yProjectName + 74);
-      setMounted(true);
+      setMounted && setMounted(true);
     };
 
     initCanvas();
@@ -342,6 +345,7 @@ function NftCertificate({
     data?.data?.burned_at,
     data?.data?.name,
     data?.data?.project_name,
+    setMounted,
   ]);
 
   return (

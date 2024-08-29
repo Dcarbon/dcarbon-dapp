@@ -1,10 +1,18 @@
 import React from 'react';
+import { Metadata } from 'next';
 import { doGetProjetList } from '@/adapters/project';
 import ProjectContent from '@/components/features/projects/content';
 import Sidebar from '@/components/features/projects/sidebar';
 
 import { ProjectStoreProvider } from '../project-store-provider';
 
+function generateMetadata(): Metadata {
+  return {
+    description:
+      "Use Dcarbon's Quick Buy mode to instantly purchase carbon credits.Enjoy fast, easy transactions on our sustainable marketplace.Start supporting the environment today.",
+    title: 'Dcarbon - Quick Buy Carbon Credits | Fast & Easy Transactions',
+  };
+}
 async function Projects({ searchParams }: any) {
   const model = searchParams?.model;
   let iot_model;
@@ -22,7 +30,6 @@ async function Projects({ searchParams }: any) {
   }
 
   const projectsData = (await doGetProjetList({ iot_model })) as any;
-
   return (
     <ProjectStoreProvider>
       <main className="px-4 lg:px-[64px] pb-[32px] mt-[90px] lg:mt-[60px] min-h-screen flex gap-[48px]">
@@ -35,7 +42,7 @@ async function Projects({ searchParams }: any) {
 
 const dynamic = 'force-dynamic';
 
-export { dynamic };
+export { dynamic, generateMetadata };
 
 // eslint-disable-next-line import/no-unused-modules
 export default Projects;

@@ -1,7 +1,37 @@
 import React from 'react';
+import { Metadata } from 'next';
 import CertificateListContent from '@/components/features/profile/list-content';
 import CertificateProfile from '@/components/features/profile/profile';
 
+function generateMetadata({
+  searchParams,
+}: {
+  searchParams: { tab: string };
+}): Metadata {
+  switch (searchParams?.tab) {
+    case 'transaction':
+      return {
+        description:
+          'Access and review your transaction history on Dcarbon. Track your carbon credit purchases, sales, and activities with ease. Manage your account and stay informed about your sustainability contributions.',
+        title:
+          'Dcarbon - View Your Transaction History | Track Carbon Credit Activity',
+      };
+    case 'list-carbon':
+      return {
+        description:
+          'View a detailed list of the carbon credits you’ve purchased on Dcarbon. Manage your credits and track your environmental contributions easily.',
+        title:
+          'Dcarbon - View Your Purchased Carbon Credits | Track Your Credits',
+      };
+    default:
+      return {
+        description:
+          'View a complete list of NFTs you’ve minted on Dcarbon. Manage and track your carbon credit NFTs, and explore details about each of your minted assets.',
+        title:
+          'Dcarbon - List of Your Minted NFTs | View Your Carbon Credit NFTs',
+      };
+  }
+}
 async function CertificatesPage() {
   return (
     <>
@@ -18,3 +48,4 @@ async function CertificatesPage() {
 }
 
 export default CertificatesPage;
+export { generateMetadata };

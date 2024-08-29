@@ -2,24 +2,30 @@ import { Metadata } from 'next';
 import { env } from 'env.mjs';
 
 const META_DATA_DEFAULT: Metadata = {
-  applicationName: 'NextJS Boilerplate',
+  applicationName: 'Dcarbon',
   authors: {
-    name: 'Noah Duong',
-    url: 'https://duongnamtruong.com',
+    name: 'Dcarbon',
+    url: env.NEXT_PUBLIC_BASE_URL,
   },
-  creator: 'Noah Duong',
+  creator: 'Dcarbon',
   description:
-    'A super powerful NextJS boilerplate developed following the Feature driven pattern',
+    'Dcarbon is your go-to platform to buy and sell carbon credits. Join our sustainable marketplace to trade verified carbon offsets and support environmental responsibility.',
   keywords: [
-    'nextjs',
-    'boilerplate',
-    'typescript',
-    'feature driven',
-    'noah duong',
+    'Nextjs',
+    'DCO2',
+    'Certificate',
+    'Carbon creadits',
+    'Dcarbon',
+    'NFT',
+    'Crypto',
+    'Blockchain',
   ],
   title: {
-    default: 'Home',
-    template: '%s | NextJS Boilerplate',
+    default: 'Dcarbon',
+    absolute:
+      'Dcarbon - Buy Dcarbon and Sell Carbon Credits | Sustainable Marketplace',
+    template:
+      '%s Buy Dcarbon and Sell Carbon Credits | Sustainable Marketplace',
   },
   metadataBase: new URL(env.NEXT_PUBLIC_BASE_URL),
 };

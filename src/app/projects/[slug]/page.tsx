@@ -1,4 +1,5 @@
 import React from 'react';
+import { Metadata } from 'next';
 import NextImage from 'next/image';
 import { notFound } from 'next/navigation';
 import { doGetProjectDetail } from '@/adapters/project';
@@ -7,6 +8,15 @@ import DetailSidebar from '@/components/features/projects/detail-sidebar';
 import { Image } from '@nextui-org/react';
 import locationActiveIcon from 'public/images/common/location-active-icon.svg';
 
+import '@/styles/quill.css';
+
+function generateMetadata(): Metadata {
+  return {
+    description:
+      "View detailed information about carbon credit projects on Dcarbon. Learn about project impacts, available credits, and sustainability benefits. Dive into each project's specifics today.",
+    title: 'Dcarbon - Project Details for Carbon Credits | In-Depth Insights',
+  };
+}
 async function ProjectDetail({ params }: { params: { slug: string } }) {
   const data = (await doGetProjectDetail(params.slug)) as any;
   if (data.statusCode !== 200) {
@@ -49,7 +59,7 @@ async function ProjectDetail({ params }: { params: { slug: string } }) {
             dangerouslySetInnerHTML={{
               __html: data?.data?.description || '',
             }}
-            className="mt-6 text-sm font-light"
+            className="mt-6 text-sm font-light ql-content"
           />
         </article>
         <DetailSidebar data={data} />
@@ -59,3 +69,4 @@ async function ProjectDetail({ params }: { params: { slug: string } }) {
 }
 
 export default ProjectDetail;
+export { generateMetadata };

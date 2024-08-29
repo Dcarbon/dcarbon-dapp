@@ -6,12 +6,26 @@ import Sidebar from '@/components/features/projects/sidebar';
 
 import { ProjectStoreProvider } from '../project-store-provider';
 
-function generateMetadata(): Metadata {
-  return {
-    description:
-      "Use Dcarbon's Quick Buy mode to instantly purchase carbon credits.Enjoy fast, easy transactions on our sustainable marketplace.Start supporting the environment today.",
-    title: 'Dcarbon - Quick Buy Carbon Credits | Fast & Easy Transactions',
-  };
+function generateMetadata({
+  searchParams,
+}: {
+  searchParams: { mode: string };
+}): Metadata {
+  switch (searchParams?.mode) {
+    case 'quick-buy':
+      return {
+        title: 'Dcarbon - Quick Buy Carbon Credits | Fast & Easy Transactions',
+        description:
+          "Use Dcarbon's Quick Buy mode to instantly purchase carbon credits. Enjoy fast, easy transactions on our sustainable marketplace. Start supporting the environment today.",
+      };
+    default:
+      return {
+        description:
+          'Explore and list carbon credit projects on Dcarbon. Discover verified projects with available credits and contribute to sustainable initiatives. Start your journey today.',
+        title:
+          'Dcarbon - Browse and List Carbon Credit Projects | Explore Verified Credits',
+      };
+  }
 }
 async function Projects({ searchParams }: any) {
   const model = searchParams?.model;

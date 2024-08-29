@@ -10,10 +10,8 @@ function generateMetadata(): Metadata {
   return {
     description:
       'View detailed information about the NFTs you’ve minted on Dcarbon. Explore the specifics, attributes, and impact of your carbon credit NFTs. Manage your minted assets with ease.',
-    title: {
-      absolute:
-        'Dcarbon - View Details of Your Minted NFTs | Carbon Credit Insights',
-    },
+    title:
+      'Dcarbon - View Details of Your Minted NFTs | Carbon Credit Insights',
   };
 }
 async function Certificate({ params }: any) {

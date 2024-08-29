@@ -21,11 +21,10 @@ const META_DATA_DEFAULT: Metadata = {
     'Blockchain',
   ],
   title: {
-    default: 'Dcarbon',
+    default:
+      'Dcarbon - Buy Dcarbon and Sell Carbon Credits | Sustainable Marketplace',
     absolute:
       'Dcarbon - Buy Dcarbon and Sell Carbon Credits | Sustainable Marketplace',
-    template:
-      '%s Buy Dcarbon and Sell Carbon Credits | Sustainable Marketplace',
   },
   metadataBase: new URL(env.NEXT_PUBLIC_BASE_URL),
 };

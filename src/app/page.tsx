@@ -1,5 +1,6 @@
 import React from 'react';
 import NextImage from 'next/image';
+import { doGetTopPage, IGetTopPageResponse } from '@/adapters/common';
 import DCarbonButton from '@/components/common/button';
 import Hero from '@/components/features/home/hero';
 import Slogan from '@/components/features/home/slogan';
@@ -11,6 +12,7 @@ import section3Image from 'public/images/home/section-3.avif';
 import section4Image from 'public/images/home/section-4.avif';
 
 const Home = async () => {
+  const { data } = (await doGetTopPage()) as IGetTopPageResponse;
   return (
     <>
       <main>
@@ -19,8 +21,12 @@ const Home = async () => {
 
           <div className="text-white absolute bottom-[8%] left-0 w-full h-full z-10 flex justify-between max-h-[62vh] items-center flex-col gap-4 p-4 overflow-hidden">
             <Slogan />
-
-            <Statistics />
+            {data ? (
+              <Statistics
+                deployed_nodes_total={data.deployed_nodes_total || 0}
+                tco2e_mitigated_total={data.tco2e_mitigated_total || 0}
+              />
+            ) : null}
           </div>
         </section>
 

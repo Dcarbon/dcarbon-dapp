@@ -14,6 +14,7 @@ const API_ROUTES = {
     SEND_CONTACT: '/v1/common/send-contact',
     GET_MINT_METADATA: '/v1/common/mint-metadata',
     GET_MINTS_METADATA: '/v1/common/mints-metadata',
+    GET_TOP_PAGE: '/v1/common/top-page-information',
   },
   USER: {
     GET_WALLET_INFO: '/v1/user/wallet-info',

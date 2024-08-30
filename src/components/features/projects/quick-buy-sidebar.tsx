@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import NextImage from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import DCarbonButton from '@/components/common/button';
@@ -75,23 +75,28 @@ function QuickBuySidebar() {
   }
   const isAsset = Object.prototype.hasOwnProperty.call(asset, 'anchorKey');
   const { data, isLoading, mutate } = useSWR(
-    [QUERY_KEYS.PROJECTS.GET_QUICK_BUY_LISTING_INFO],
+    [QUERY_KEYS.PROJECTS.GET_QUICK_BUY_LISTING_INFO, iot_model],
     () => {
       return doGetQuickBuyListingInfo(iot_model);
     },
     {
       revalidateOnMount: true,
+      revalidateOnFocus: true,
     },
   );
-  const assetSelectOptions = data?.data?.spl_tokens?.map((info) => {
-    return {
-      label: info?.symbol || '',
-      value: info?.mint || '',
-      icon: info?.icon || '',
-    };
-  });
+  const assetSelectOptions = useMemo(
+    () =>
+      data?.data?.spl_tokens?.map((info) => {
+        return {
+          label: info?.symbol || '',
+          value: info?.mint || '',
+          icon: info?.icon || '',
+        };
+      }),
+    [data?.data],
+  );
 
-  const openBuyModal = () => {
+  const openBuyModal = useCallback(() => {
     if (!publicKey || !wallet || !anchorWallet || !connection) {
       ShowAlert.warning({ message: 'Please connect to wallet first!' });
       return;
@@ -100,8 +105,19 @@ function QuickBuySidebar() {
       ShowAlert.warning({ message: 'Please select asset!' });
       return;
     }
+    if (creditsError) {
+      return;
+    }
     onOpenChange();
-  };
+  }, [
+    anchorWallet,
+    connection,
+    creditsError,
+    isAsset,
+    onOpenChange,
+    publicKey,
+    wallet,
+  ]);
 
   useEffect(() => {
     if ((asset as any)?.currentKey) {
@@ -128,7 +144,7 @@ function QuickBuySidebar() {
     ? availableCarbon
     : data?.data?.available_carbon;
 
-  const handleBuyCarbon = async () => {
+  const handleBuyCarbon = useCallback(async () => {
     if (credits && Big(maxCredits || 0).eq(0)) {
       setCreditsError('No credits available, please try another asset');
     }
@@ -350,11 +366,49 @@ function QuickBuySidebar() {
       setLoading(false);
       onClose();
     }
-  };
-  const handleCredits = async (e: any) => {
-    setCredits(e);
-  };
+  }, [
+    anchorWallet,
+    asset,
+    connection,
+    credits,
+    isAsset,
+    listingInfo,
+    maxCredits,
+    mutate,
+    onClose,
+    publicKey,
+    wallet,
+  ]);
+  useEffect(() => {
+    if (credits && asset) {
+      CreditValidator(credits);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [credits, asset, maxCredits]);
 
+  const CreditValidator = useCallback(
+    (value: string | undefined) => {
+      if (!maxCredits) {
+        setCreditsError('No credits available, please try another asset');
+      }
+
+      if (value && maxCredits && Big(value).gt(Big(maxCredits))) {
+        setCreditsError('Max credits is ' + maxCredits);
+      }
+
+      if (value && Big(value).lte(Big(maxCredits || 0))) {
+        setCreditsError(null);
+      }
+
+      if (Big(value || 0).lte(0)) {
+        setCreditsError('Credits must be greater than 0');
+      }
+    },
+    [maxCredits],
+  );
+  const handleChangeValue = (q: { value: string } | undefined) => {
+    setCredits(q?.value || '');
+  };
   return (
     <>
       {publicKey && credits && (
@@ -394,29 +448,13 @@ function QuickBuySidebar() {
             decimalScale={2}
             allowNegative={false}
             id="credits"
+            disabled={isLoading}
             className="disabled:bg-default-200 text-sm mt-2 w-full bg-[#F6F6F6] p-3 rounded h-[40px] outline-none hover:bg-gray-50 transition-all focus:ring-1 focus:ring-primary-color placeholder:text-[#888] placeholder:text-sm placeholder:font-normal focus:bg-white"
             placeholder="Enter credit"
             autoComplete="off"
             value={credits}
             onValueChange={(q) => {
-              if (q?.value && Big(maxCredits || 0).eq(0)) {
-                setCreditsError(
-                  'No credits available, please try another asset',
-                );
-              }
-              if (q?.value && maxCredits && Big(q.value).gt(Big(maxCredits))) {
-                setCreditsError('Max credits is ' + maxCredits);
-              }
-
-              if (q?.value && Big(q?.value).lte(Big(maxCredits || 0))) {
-                setCreditsError(null);
-              }
-
-              if (Big(q?.value || 0).lte(0)) {
-                setCreditsError('Credits must be greater than 0');
-              }
-
-              handleCredits(q?.value || '');
+              handleChangeValue(q);
             }}
             min={0}
           />

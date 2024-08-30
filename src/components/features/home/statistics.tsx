@@ -8,59 +8,67 @@ type StatisticsProps = {
   deployed_nodes_total: number;
   tco2e_mitigated_total: number;
 };
+const tranferToK = (value: number) => {
+  return (value < 1000 ? value : value / 1000).toLocaleString('en-US', {
+    maximumFractionDigits: 1,
+    minimumFractionDigits: 0,
+  });
+};
 function Statistics(data: StatisticsProps) {
-  const projectCount = useMotionValue(0);
-  const organizationCount = useMotionValue(0);
-  const userCount = useMotionValue(0);
+  const tco2eMintigated = useMotionValue(0);
+  const deployedNode = useMotionValue(0);
 
-  const organizationRound = useTransform(organizationCount, (value) =>
-    Math.round(value).toLocaleString('en-US'),
+  const tco2eMintigatedRound = useTransform(tco2eMintigated, (value) =>
+    tranferToK(value),
   );
-  const userRound = useTransform(userCount, (value) =>
-    Math.round(value).toLocaleString('en-US'),
+  const deployedNodeRound = useTransform(deployedNode, (value) =>
+    tranferToK(value),
   );
 
   useEffect(() => {
-    const organizationAnimation = animate(
-      organizationCount,
-      data.deployed_nodes_total,
+    const tco2eAnimation = animate(
+      tco2eMintigated,
+      +tranferToK(data.tco2e_mitigated_total),
       {
         duration: 3,
       },
     );
 
-    const userAnimation = animate(userCount, data.tco2e_mitigated_total, {
-      duration: 3,
-    });
+    const deployedNodeAnimation = animate(
+      deployedNode,
+      +tranferToK(data.deployed_nodes_total),
+      {
+        duration: 3,
+      },
+    );
 
     return () => {
-      organizationAnimation.stop();
-      userAnimation.stop();
+      tco2eAnimation.stop();
+      deployedNodeAnimation.stop();
     };
   }, [
     data.deployed_nodes_total,
     data.tco2e_mitigated_total,
-    organizationCount,
-    projectCount,
-    userCount,
+    tco2eMintigated,
+    deployedNode,
   ]);
 
   return (
     <div className="p-6 backdrop-blur-sm rounded-[16px] flex items-center space-x-[25.75px]">
       <div className="flex flex-col gap-2 items-center">
         <span className="text-primary-color text-xl sm:text-5xl font-bold">
-          <motion.span>{organizationRound}</motion.span>
-          <span>K</span>
+          <motion.span>{deployedNodeRound}</motion.span>
+          <span>{data.deployed_nodes_total < 1000 ? '' : 'k'}</span>
         </span>
-        <span>tCO2e Mitigated</span>
+        <span>Deployed Nodes</span>
       </div>
       <Divider orientation="vertical" className="w-[1.5px] bg-white/40" />
       <div className="flex flex-col gap-2 items-center">
         <span className="text-primary-color text-xl sm:text-5xl font-bold">
-          <motion.span>{userRound}</motion.span>
-          <span>K</span>
+          <motion.span>{tco2eMintigatedRound}</motion.span>
+          <span>{data.tco2e_mitigated_total < 1000 ? '' : 'K'}</span>
         </span>
-        <span>Deployed Nodes</span>
+        <span>tCO2e Mitigated</span>
       </div>
     </div>
   );

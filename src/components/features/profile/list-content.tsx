@@ -94,7 +94,7 @@ function CertificateListContent() {
     });
   }, [searchParams.get('tab')]);
 
-  const { data, isLoading, mutate } = useSWR(
+  const { data, isLoading, mutate, isValidating } = useSWR(
     () =>
       publicKey && listCarbonPage && selectedTab === 'list-carbon'
         ? [QUERY_KEYS.USER.GET_LIST_CARBON, publicKey, listCarbonPage]
@@ -112,6 +112,8 @@ function CertificateListContent() {
     {
       keepPreviousData: true,
       revalidateOnMount: true,
+      revalidateOnReconnect: true,
+      revalidateOnFocus: true,
     },
   );
 
@@ -158,7 +160,7 @@ function CertificateListContent() {
       : 0;
   }, [listCertificate?.paging?.total]);
 
-  const listCarbonLoadingState = isLoading ? 'loading' : 'idle';
+  const listCarbonLoadingState = isLoading || isValidating ? 'loading' : 'idle';
   const listCertificateLoadingState = listCertificateLoading
     ? 'loading'
     : 'idle';

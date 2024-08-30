@@ -75,6 +75,14 @@ interface IGetMintsMetadataResponse extends Response {
   statusCode: number;
   data: Metadata[];
 }
+interface IGetTopPageResponse extends Response {
+  request_id: string;
+  statusCode: number;
+  data: {
+    deployed_nodes_total: number;
+    tco2e_mitigated_total: number;
+  };
+}
 const doGetMintMetada = async (
   wallet: string,
   mint: string,
@@ -115,5 +123,25 @@ const doGetMintsMetada = async (
     },
   ) as Promise<IGetMintsMetadataResponse>;
 };
-export { doSendFeedback, doSendContact, doGetMintMetada, doGetMintsMetada };
-export type { ISendFeedbackBody, TFeeling, ISendContactBody, Metadata };
+const doGetTopPage = async (): Promise<IGetTopPageResponse> => {
+  return request(
+    'GET',
+    API_ROUTES.COMMON.GET_TOP_PAGE,
+    {},
+    { cache: 'no-store' },
+  ) as Promise<IGetTopPageResponse>;
+};
+export {
+  doSendFeedback,
+  doSendContact,
+  doGetMintMetada,
+  doGetMintsMetada,
+  doGetTopPage,
+};
+export type {
+  ISendFeedbackBody,
+  TFeeling,
+  ISendContactBody,
+  Metadata,
+  IGetTopPageResponse,
+};

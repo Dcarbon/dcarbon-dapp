@@ -58,7 +58,7 @@ function Statistics(data: StatisticsProps) {
       <div className="flex flex-col gap-2 items-center">
         <span className="text-primary-color text-xl sm:text-5xl font-bold">
           <motion.span>{deployedNodeRound}</motion.span>
-          <span>{data.deployed_nodes_total < 1000 ? '' : 'k'}</span>
+          {data.deployed_nodes_total < 1000 ? null : <span>k</span>}
         </span>
         <span>Deployed Nodes</span>
       </div>
@@ -66,7 +66,7 @@ function Statistics(data: StatisticsProps) {
       <div className="flex flex-col gap-2 items-center">
         <span className="text-primary-color text-xl sm:text-5xl font-bold">
           <motion.span>{tco2eMintigatedRound}</motion.span>
-          <span>{data.tco2e_mitigated_total < 1000 ? '' : 'K'}</span>
+          {data.tco2e_mitigated_total < 1000 ? null : <span>K</span>}
         </span>
         <span>tCO2e Mitigated</span>
       </div>

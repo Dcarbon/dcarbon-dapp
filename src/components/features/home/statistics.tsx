@@ -9,8 +9,8 @@ type StatisticsProps = {
   tco2e_mitigated_total: number;
 };
 const tranferToK = (value: number) => {
-  return (value < 1000 ? value : value / 1000).toLocaleString('en-US', {
-    maximumFractionDigits: 1,
+  return +(value < 1000 ? value : value / 1000).toLocaleString('en-US', {
+    maximumFractionDigits: 3,
     minimumFractionDigits: 0,
   });
 };
@@ -28,7 +28,7 @@ function Statistics(data: StatisticsProps) {
   useEffect(() => {
     const tco2eAnimation = animate(
       tco2eMintigated,
-      +tranferToK(data.tco2e_mitigated_total),
+      tranferToK(data.tco2e_mitigated_total),
       {
         duration: 3,
       },
@@ -36,7 +36,7 @@ function Statistics(data: StatisticsProps) {
 
     const deployedNodeAnimation = animate(
       deployedNode,
-      +tranferToK(data.deployed_nodes_total),
+      tranferToK(data.deployed_nodes_total),
       {
         duration: 3,
       },

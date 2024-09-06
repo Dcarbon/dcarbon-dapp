@@ -49,11 +49,6 @@ interface IListingInfo {
 interface IGetQuickBuyListingInfoResponse extends Response {
   request_id: string;
   statusCode: number;
-  paging?: {
-    total: number;
-    page: number;
-    limit: number;
-  };
   data?: {
     available_carbon: number;
     listing_carbon?: IListingInfo[];
@@ -68,7 +63,36 @@ interface IGetQuickBuyListingInfoResponse extends Response {
   };
   message?: string | string[];
 }
-
+interface IGetChartResponse extends Response {
+  request_id: string;
+  statusCode: number;
+  data: {
+    device_info?: {
+      paging: {
+        page: number;
+        limit: number;
+        total: number;
+      };
+      devices?: {
+        device_name: string;
+        device_id: string;
+        is_active: boolean;
+        is_selected: boolean;
+        last_mint: string;
+      }[];
+    };
+    carbon_minted?: {
+      data: number[];
+      labels: string[];
+    };
+  };
+}
+type GetCarbonMintedRequest = {
+  type: 'all_data' | 'device_data' | 'minted_data';
+  device_id?: string;
+  devices_page?: number;
+  devices_limit?: number;
+};
 const doGetProjetList = async ({
   keyword,
   page,
@@ -134,12 +158,29 @@ const doGetQuickBuyListingInfo = async (
     },
   ) as Promise<IGetQuickBuyListingInfoResponse>;
 };
-
+const doGetCarbonMinted = async (
+  slug: string,
+  data: GetCarbonMintedRequest,
+): Promise<IGetChartResponse> => {
+  return request(
+    'GET',
+    API_ROUTES.PROJECT.CARBON_MINTED_DASHBOARD.replace('[slug]', slug),
+    data,
+    {
+      cache: 'no-store',
+    },
+  ) as Promise<IGetChartResponse>;
+};
 export {
   doGetProjetList,
   doGetProjectDetail,
   doGetProjectListingInfo,
   doGetQuickBuyListingInfo,
+  doGetCarbonMinted,
 };
 
-export type { IGetProjectListingInfoResponse, IListingInfo };
+export type {
+  IGetProjectListingInfoResponse,
+  IListingInfo,
+  GetCarbonMintedRequest,
+};

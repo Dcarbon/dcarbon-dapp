@@ -79,4 +79,20 @@
   ol li {
     margin-bottom: 8px;
   }
+
+  scrollbar-width: thin;
+}
+
+
+.scroll-w-none {
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+}
+
+.custom-tooltip {
+  background-color: #7bda08;
+  padding: 5px 10px;
+  border-radius: 99px !important;
+  color: #1b1b1b;
+  font-size: 16px;
 }

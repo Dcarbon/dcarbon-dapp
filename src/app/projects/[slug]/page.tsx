@@ -9,6 +9,8 @@ import { Image } from '@nextui-org/react';
 import locationActiveIcon from 'public/images/common/location-active-icon.svg';
 
 import '@/styles/quill.css';
+import ProjectDetailTabs from '@/components/features/projects/project-detail-tabs';
+import ProjectDocument from '@/components/features/projects/project-document';
 
 function generateMetadata(): Metadata {
   return {
@@ -59,11 +61,13 @@ async function ProjectDetail({ params }: { params: { slug: string } }) {
             dangerouslySetInnerHTML={{
               __html: data?.data?.description || '',
             }}
-            className="mt-6 text-sm font-light ql-content"
+            className="mt-6 text-sm font-light ql-content max-h-[855px]"
           />
         </article>
         <DetailSidebar data={data} />
       </div>
+      <ProjectDetailTabs />
+      <ProjectDocument />
     </main>
   );
 }

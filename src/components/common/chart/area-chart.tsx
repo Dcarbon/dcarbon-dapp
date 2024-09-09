@@ -10,32 +10,27 @@ const AreaChart = ({ data }: { data: number[] }) => {
         enabled: true,
         dynamicAnimation: {
           enabled: true,
-          speed: 350,
+          speed: 300,
         },
-        animateGradually: {
-          enabled: false,
-          delay: 150,
-        },
-        easing: "easeinout",
-        speed: 800,
+        easing: 'easeinout',
+        speed: 300,
       },
       dropShadow: {
         left: 9,
         blur: 0,
       },
-      fontFamily: "Lexend",
-      id: "CGkfn",
+
+      id: 'CGkfn',
       stackOnlyBar: true,
       toolbar: {
         show: false,
       },
-      type: "area",
-      width: '100%',
+      type: 'area',
+      zoom: {
+        enabled: false,
+      },
     },
-    colors: [
-      "#A7F442",
-      "#7BDA08",
-    ],
+    colors: ['#A7F442', '#7BDA08'],
     dataLabels: {
       enabled: false,
       style: {
@@ -50,9 +45,12 @@ const AreaChart = ({ data }: { data: number[] }) => {
     },
     grid: {
       borderColor: '#F6F6F6',
+      padding: {
+        left: 32,
+      },
     },
     legend: {
-      fontSize: "12px",
+      fontSize: '12px',
       offsetY: 0,
       markers: {
         size: 7,
@@ -62,9 +60,7 @@ const AreaChart = ({ data }: { data: number[] }) => {
       },
     },
     markers: {
-      colors: [
-        "#74D10C",
-      ],
+      colors: ['#74D10C'],
       strokeOpacity: 1,
       hover: {
         size: 5,
@@ -72,13 +68,11 @@ const AreaChart = ({ data }: { data: number[] }) => {
       },
     },
     stroke: {
-      lineCap: "round",
+      lineCap: 'round',
       width: 3,
-      colors: [
-        "#A7F541",
-      ],
+      colors: ['#A7F541'],
       fill: {
-        type: "solid",
+        type: 'solid',
       },
     },
     xaxis: {
@@ -97,18 +91,18 @@ const AreaChart = ({ data }: { data: number[] }) => {
         show: false,
       },
       tooltip: {
-        enabled: false
+        enabled: false,
       },
       group: {
         groups: [],
         style: {
           colors: [],
-          fontSize: "12px",
+          fontSize: '12px',
           fontWeight: 400,
-          cssClass: "",
+          cssClass: '',
         },
       },
-      tickAmount: "dataPoints",
+      tickAmount: 'dataPoints',
       title: {
         style: {
           fontWeight: 700,
@@ -128,7 +122,7 @@ const AreaChart = ({ data }: { data: number[] }) => {
       },
     },
     theme: {
-      palette: "palette4",
+      palette: 'palette4',
     },
     tooltip: {
       fillSeriesColor: false,
@@ -159,7 +153,6 @@ const AreaChart = ({ data }: { data: number[] }) => {
           return `${value} DCO2`;
         },
       },
-
     },
   };
 
@@ -171,14 +164,14 @@ const AreaChart = ({ data }: { data: number[] }) => {
           {
             name: 'DCO2',
             data: isEmpty(data) ? [0, 0] : data,
-            group: "apexcharts-axis-0",
+            group: 'apexcharts-axis-0',
           },
         ]}
         type="area"
         width="100%"
         height={430}
       />
-    </div >
+    </div>
   );
 };
 

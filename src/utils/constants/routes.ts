@@ -9,7 +9,7 @@ const API_ROUTES = {
     LISTING_INFO: '/v1/projects/[slug]/listing-info',
     QUICK_BUY_LISTING_INFO: '/v1/projects/quick-buy-listing-info',
     CARBON_MINTED_DASHBOARD: '/v1/projects/[slug]/carbon-minted-dashboard',
-
+    WOOD_BURNED_DASHBOARD: '/v1/projects/[slug]/wood-burned-dashboard',
   },
   COMMON: {
     SEND_FEEDBACK: '/v1/common/send-feedback',

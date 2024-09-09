@@ -83,14 +83,13 @@
   scrollbar-width: thin;
 }
 
-
 .scroll-w-none {
   scroll-behavior: smooth;
   scrollbar-width: none;
 }
 
 .custom-tooltip {
-  background-color: #7bda08;
+  background-color: #7bda08 !important;
   padding: 5px 10px;
   border-radius: 99px !important;
   color: #1b1b1b;

@@ -1,61 +1,75 @@
 'use client';
-import DCarbonButton from '@/components/common/button';
-import AreaChart from '@/components/common/chart/area-chart';
-import { Image } from '@nextui-org/react';
-import active from 'public/images/projects/active.svg';
-import inactive from 'public/images/projects/inactive.svg';
-import NextImage from 'next/image'; import React from 'react';
+
+import React, { useCallback, useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
+import { doGetWoodBurned, GetWoodBurnedRequest } from '@/adapters/project';
+import { QUERY_KEYS } from '@/utils/constants';
+import useSWRMutation from 'swr/mutation';
+
+import TabContent from './tab-content';
 
 const WoodBurned = () => {
+  const params = useParams<{ slug: string }>();
+  const [selectedDevice, setSelectedDevice] = useState<string | null>(null);
+  const [devices, setDevices] = useState<{}[]>([]);
+  const [paging, setPaging] = useState<{
+    limit: number;
+    page: number;
+    total: number;
+  } | null>(null);
+  const [chartData, setChartData] = useState<number[]>([]);
+  const { trigger, isMutating } = useSWRMutation(
+    [QUERY_KEYS.PROJECTS.GET_CARBON_MINTED_DASHBOARD, params.slug],
+    (_, { arg }: { arg: GetWoodBurnedRequest }) => {
+      return doGetWoodBurned(params.slug, arg);
+    },
+    {
+      onSuccess: ({ data }) => {
+        if (data?.device_info?.devices) {
+          setDevices([...devices, ...data.device_info.devices]);
+          data.device_info.devices.forEach((device: any) => {
+            if (device.is_selected) {
+              setSelectedDevice(device.device_id);
+            }
+          });
+          setPaging(data.device_info.paging);
+        }
+        if (data.carbon_minted) {
+          setChartData(data.carbon_minted.data);
+        }
+      },
+      onError: (error) => {
+        console.error(error);
+      },
+    },
+  );
+  useEffect(() => {
+    trigger({
+      type: 'all_data',
+      devices_limit: 5,
+      devices_page: 1,
+    });
+  }, [trigger]);
+  const handleSelectDevice = useCallback(
+    (device_id: string) => {
+      setSelectedDevice(device_id);
+      trigger({
+        type: 'wood_burned_data',
+        device_id,
+      });
+    },
+    [trigger],
+  );
   return (
-    <div className='flex flex-col xl:flex-row xl:flex-nowrap gap-8 w-full'>
-      <div className='flex gap-2 py-2 *:min-w-32 flex-row max-w-[100vw] overflow-x-auto xl:flex-col flex-auto xl:max-w-[326px] xl:max-h-[430px] xl:overflow-y-auto'>
-        <DCarbonButton
-          variant="bordered"
-          color='primary'
-          className='p-4 rounded-lg bg-[#F6F6F6] flex h-[80px] max-w-[326px] w-full justify-start'
-        >
-          <div className='flex gap-4 items-center justify-start'>
-            <div className='w-12 h-12 bg-[#F6F6F6] flex justify-center items-center rounded-md'>
-              <Image src={inactive.src} alt='active' as={NextImage} draggable={false} width={24} height={24} radius='none' />
-            </div>
-            <div className='flex flex-col items-start justify-between gap-2'>
-              <span className='text-[23px] font-medium text-text-primary leading-6'>
-                Inactivated
-              </span>
-              <span className='text-sm text-[#697077] leading-4'>
-                Device IOT 404
-              </span>
-            </div>
-          </div>
-        </DCarbonButton>
-        <DCarbonButton
-          variant="bordered"
-          className='p-4 rounded-lg flex h-[80px] max-w-[326px] w-full justify-start'
-        >
-          <div className='flex gap-4 items-center justify-start'>
-            <div className='w-12 h-12 bg-[#F6F6F6] flex justify-center items-center rounded-md'>
-              <Image src={active.src} alt='active' as={NextImage} draggable={false} width={24} height={24} radius='none' />
-            </div>
-            <div className='flex flex-col items-start justify-between gap-2'>
-              <span className='text-[23px] font-medium text-text-primary leading-6'>
-                Activated
-              </span>
-              <span className='text-sm text-[#697077] leading-4'>
-                Device IOT 405
-              </span>
-            </div>
-          </div>
-        </DCarbonButton>
-      </div>
-      <div className='flex-auto'>
-        <AreaChart
-          data={[
-            13, 1.435, 23.435, 90, 45.435, 87.435, 67.435, 140.435, 5.435, 60,
-          ]}
-        />
-      </div>
-    </div>
+    <TabContent
+      chartData={chartData}
+      devices={devices}
+      selectedDevice={selectedDevice}
+      isMutating={isMutating}
+      paging={paging}
+      handleSelectDevice={handleSelectDevice}
+      trigger={trigger}
+    />
   );
 };
 

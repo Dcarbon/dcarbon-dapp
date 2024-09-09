@@ -93,6 +93,12 @@ type GetCarbonMintedRequest = {
   devices_page?: number;
   devices_limit?: number;
 };
+type GetWoodBurnedRequest = {
+  type: 'all_data' | 'device_data' | 'wood_burned_data';
+  device_id?: string;
+  devices_page?: number;
+  devices_limit?: number;
+};
 const doGetProjetList = async ({
   keyword,
   page,
@@ -171,16 +177,31 @@ const doGetCarbonMinted = async (
     },
   ) as Promise<IGetChartResponse>;
 };
+const doGetWoodBurned = async (
+  slug: string,
+  data: GetWoodBurnedRequest,
+): Promise<IGetChartResponse> => {
+  return request(
+    'GET',
+    API_ROUTES.PROJECT.WOOD_BURNED_DASHBOARD.replace('[slug]', slug),
+    data,
+    {
+      cache: 'no-store',
+    },
+  ) as Promise<IGetChartResponse>;
+};
 export {
   doGetProjetList,
   doGetProjectDetail,
   doGetProjectListingInfo,
   doGetQuickBuyListingInfo,
   doGetCarbonMinted,
+  doGetWoodBurned,
 };
 
 export type {
   IGetProjectListingInfoResponse,
   IListingInfo,
   GetCarbonMintedRequest,
+  GetWoodBurnedRequest,
 };

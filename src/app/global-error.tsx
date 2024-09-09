@@ -9,7 +9,7 @@ const GlobalError = () => {
   return (
     <html>
       <body>
-        <section className="bg-white dark:bg-gray-900 p-4 w-[100dvw] h-[100dvh]">
+        <section className="bg-white dark:bg-gray-900 p-4 w-[100dvw] h-[100dvh] overflow-hidden">
           <div className="w-full flex justify-center items-center">
             <Image
               src={logo.src}

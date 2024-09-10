@@ -99,6 +99,22 @@ type GetWoodBurnedRequest = {
   devices_page?: number;
   devices_limit?: number;
 };
+interface IGetProjectDocumentResponse extends Response {
+  request_id: string;
+  statusCode: number;
+  paging: {
+    total: number;
+    page: number;
+    limit: number;
+  };
+  data: {
+    document_id: string;
+    document_name: string;
+    document_type: string;
+    document_path: string;
+    created_at: string;
+  }[];
+}
 const doGetProjetList = async ({
   keyword,
   page,
@@ -190,6 +206,19 @@ const doGetWoodBurned = async (
     },
   ) as Promise<IGetChartResponse>;
 };
+const doGetProjectDocuments = async (
+  slug: string,
+  page?: number,
+): Promise<IGetProjectDocumentResponse> => {
+  return request(
+    'GET',
+    API_ROUTES.PROJECT.DOCUMENTS.replace('[slug]', slug),
+    { page: page },
+    {
+      cache: 'no-store',
+    },
+  ) as Promise<IGetProjectDocumentResponse>;
+};
 export {
   doGetProjetList,
   doGetProjectDetail,
@@ -197,6 +226,7 @@ export {
   doGetQuickBuyListingInfo,
   doGetCarbonMinted,
   doGetWoodBurned,
+  doGetProjectDocuments,
 };
 
 export type {

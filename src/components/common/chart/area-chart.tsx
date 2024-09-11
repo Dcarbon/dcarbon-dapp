@@ -2,7 +2,7 @@ import { memo } from 'react';
 import { isEmpty } from '@/utils/helpers/common';
 import ApexCharts, { Props } from 'react-apexcharts';
 
-const AreaChart = ({ data }: { data: number[] }) => {
+const AreaChart = ({ data, slug }: { data: number[]; slug: string }) => {
   const options: Props['options'] = {
     annotations: {},
     chart: {
@@ -28,6 +28,14 @@ const AreaChart = ({ data }: { data: number[] }) => {
       type: 'area',
       zoom: {
         enabled: false,
+      },
+      events: {
+        markerClick() {
+          return window.open(
+            `https://dcarbon.org/dashboard?iot=${slug}`,
+            '_blank',
+          );
+        },
       },
     },
     colors: ['#A7F442', '#7BDA08'],

@@ -18,7 +18,7 @@ const WoodBurned = () => {
     total: number;
   } | null>(null);
   const [chartData, setChartData] = useState<number[]>([]);
-  const { trigger, isMutating } = useSWRMutation(
+  const { trigger, isMutating, data } = useSWRMutation(
     [QUERY_KEYS.PROJECTS.GET_CARBON_MINTED_DASHBOARD, params.slug],
     (_, { arg }: { arg: GetWoodBurnedRequest }) => {
       return doGetWoodBurned(params.slug, arg);
@@ -69,6 +69,7 @@ const WoodBurned = () => {
       paging={paging}
       handleSelectDevice={handleSelectDevice}
       trigger={trigger}
+      model={data?.data?.project_model}
     />
   );
 };

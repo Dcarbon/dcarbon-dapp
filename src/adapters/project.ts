@@ -67,6 +67,7 @@ interface IGetChartResponse extends Response {
   request_id: string;
   statusCode: number;
   data: {
+    project_model?: string;
     device_info?: {
       paging: {
         page: number;

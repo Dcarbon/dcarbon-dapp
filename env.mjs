@@ -24,6 +24,7 @@ const env = createEnv({
     NEXT_PUBLIC_SKIP_PREFLIGHT: z
       .union([z.literal('1'), z.literal('0')])
       .nullish(),
+    NEXT_PUBLIC_BUCKET_ENPOINT: z.string().min(1).includes('http').nullish(),
   },
   runtimeEnv: {
     NEXT_PUBLIC_API_ENDPOINT: process.env.NEXT_PUBLIC_API_ENDPOINT,
@@ -43,6 +44,7 @@ const env = createEnv({
       process.env.NEXT_PUBLIC_CONTRACT_CARBON_PROGRAM_ID,
     NEXT_PUBLIC_ENDPOINT_RPC: process.env.NEXT_PUBLIC_ENDPOINT_RPC,
     NEXT_PUBLIC_SKIP_PREFLIGHT: process.env.NEXT_PUBLIC_SKIP_PREFLIGHT,
+    NEXT_PUBLIC_BUCKET_ENPOINT: process.env.NEXT_PUBLIC_BUCKET_ENPOINT,
   },
 });
 

@@ -130,7 +130,7 @@ async function ProjectDetail({ params }: { params: { slug: string } }) {
             dangerouslySetInnerHTML={{
               __html: data?.data?.description || '',
             }}
-            className="mt-6 text-sm font-light ql-content max-h-[855px]"
+            className="mt-6 text-sm font-light ql-content xl:max-h-[855px]"
           />
         </article>
         <DetailSidebar data={data} />

@@ -48,10 +48,10 @@ const TabContent = ({
   }
   return (
     <div className="flex flex-col xl:flex-row xl:flex-nowrap gap-8 w-full">
-      <div className="flex gap-y-6 py-2 flex-row max-w-[100vw] overflow-x-auto xl:flex-col flex-auto xl:max-w-[326px] xl:max-h-[430px] xl:h-full xl:overflow-y-auto scroll-w-none">
+      <div className="flex gap-y-6 py-2 flex-row max-w-[100vw] gap-x-4 xl:gap-x-0 overflow-x-auto xl:flex-col flex-auto xl:max-w-[326px] xl:max-h-[430px] xl:h-full xl:overflow-y-auto scroll-w-none">
         {isMutating && !selectedDevice
           ? Array.from({ length: 5 }).map((_, index) => (
-              <Skeleton key={index} className="min-h-[80px]">
+              <Skeleton key={index} className="min-h-[80px] min-w-[15rem]">
                 <div className="p-4 rounded-lg bg-white flex h-[80px] max-w-[326px] min-w-[15rem] w-full" />
               </Skeleton>
             ))

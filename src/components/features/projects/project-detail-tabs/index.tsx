@@ -13,12 +13,9 @@ const ProjectDetailTabs = () => {
     'carbon' as tabTypes,
   );
 
-  const handleChangeTab = useCallback(
-    (tab: tabTypes) => {
-      setSelectedTab(tab);
-    },
-    [selectedTab],
-  );
+  const handleChangeTab = useCallback((tab: tabTypes) => {
+    setSelectedTab(tab);
+  }, []);
   return (
     <Tabs
       key="mode"

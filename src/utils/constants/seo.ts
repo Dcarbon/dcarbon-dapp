@@ -42,7 +42,7 @@ const META_DATA_DEFAULT: Metadata = {
     locale: 'en_US',
     images: [
       {
-        url: `${env.NEXT_PUBLIC_AWS_S3_BUCKET_URL}/public/og.png'`,
+        url: `${env.NEXT_PUBLIC_BUCKET_ENPOINT}/public/common/dcarbon-banner.jpeg'`,
         width: 1200,
         height: 630,
         alt: 'DCarbon',

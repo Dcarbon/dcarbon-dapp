@@ -25,6 +25,7 @@ type TabContentProps = {
     devices_limit: number;
     devices_page: number;
   }) => void;
+  model?: string;
 };
 
 const TabContent = ({
@@ -35,6 +36,7 @@ const TabContent = ({
   paging,
   selectedDevice,
   trigger,
+  model,
 }: TabContentProps) => {
   const { slug } = useParams<{ slug: string }>();
   if (isEmpty(devices) && !isMutating) {
@@ -118,7 +120,7 @@ const TabContent = ({
             />
           </div>
         ) : null}
-        <AreaChart data={chartData} slug={slug} />
+        <AreaChart data={chartData} slug={slug} model={model} />
       </div>
     </div>
   );

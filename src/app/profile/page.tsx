@@ -12,23 +12,23 @@ function generateMetadata({
     case 'transaction':
       return {
         description:
-          'Access and review your transaction history on Dcarbon. Track your carbon credit purchases, sales, and activities with ease. Manage your account and stay informed about your sustainability contributions.',
+          'Access and review your transaction history on DCarbon. Track your carbon credit purchases, sales, and activities with ease. Manage your account and stay informed about your sustainability contributions.',
         title:
-          'Dcarbon - View Your Transaction History | Track Carbon Credit Activity',
+          'DCarbon - View Your Transaction History | Track Carbon Credit Activity',
       };
     case 'list-carbon':
       return {
         description:
-          'View a detailed list of the carbon credits you’ve purchased on Dcarbon. Manage your credits and track your environmental contributions easily.',
+          'View a detailed list of the carbon credits you’ve purchased on DCarbon. Manage your credits and track your environmental contributions easily.',
         title:
-          'Dcarbon - View Your Purchased Carbon Credits | Track Your Credits',
+          'DCarbon - View Your Purchased Carbon Credits | Track Your Credits',
       };
     default:
       return {
         description:
-          'View a complete list of NFTs you’ve minted on Dcarbon. Manage and track your carbon credit NFTs, and explore details about each of your minted assets.',
+          'View a complete list of NFTs you’ve minted on DCarbon. Manage and track your carbon credit NFTs, and explore details about each of your minted assets.',
         title:
-          'Dcarbon - List of Your Minted NFTs | View Your Carbon Credit NFTs',
+          'DCarbon - List of Your Minted NFTs | View Your Carbon Credit NFTs',
       };
   }
 }

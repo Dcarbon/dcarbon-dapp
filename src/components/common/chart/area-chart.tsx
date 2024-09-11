@@ -2,7 +2,15 @@ import { memo } from 'react';
 import { isEmpty } from '@/utils/helpers/common';
 import ApexCharts, { Props } from 'react-apexcharts';
 
-const AreaChart = ({ data, slug }: { data: number[]; slug: string }) => {
+const AreaChart = ({
+  data,
+  slug,
+  model,
+}: {
+  data: number[];
+  slug: string;
+  model?: string;
+}) => {
   const options: Props['options'] = {
     annotations: {},
     chart: {
@@ -158,7 +166,7 @@ const AreaChart = ({ data, slug }: { data: number[]; slug: string }) => {
           },
         },
         formatter: (value: number) => {
-          return `${value} DCO2`;
+          return `${value} ${model === 'PrjT_none' || !model ? 'DCO2' : model === 'PrjT_G' ? 'Ton' : 'kVA'}`;
         },
       },
     },

@@ -9,9 +9,9 @@ import NftCertificate from '@components/features/certificate/nft';
 function generateMetadata(): Metadata {
   return {
     description:
-      'View detailed information about the NFTs you’ve minted on Dcarbon. Explore the specifics, attributes, and impact of your carbon credit NFTs. Manage your minted assets with ease.',
+      'View detailed information about the NFTs you’ve minted on DCarbon. Explore the specifics, attributes, and impact of your carbon credit NFTs. Manage your minted assets with ease.',
     title:
-      'Dcarbon - View Details of Your Minted NFTs | Carbon Credit Insights',
+      'DCarbon - View Details of Your Minted NFTs | Carbon Credit Insights',
   };
 }
 async function Certificate({ params }: any) {

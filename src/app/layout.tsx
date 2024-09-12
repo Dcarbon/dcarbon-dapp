@@ -1,4 +1,3 @@
-import WebVitals from '@/components/features/web-vitals';
 import { META_DATA_DEFAULT } from '@/utils/constants/seo';
 import { cn } from '@/utils/helpers/common';
 
@@ -7,21 +6,40 @@ import '@styles/globals.css';
 import { Viewport } from 'next';
 import dynamic from 'next/dynamic';
 import { Lexend as FontSans } from 'next/font/google';
-import Footer from '@/components/common/footer';
-import Header from '@/components/common/header';
-import Ribbon from '@/components/features/ribbon';
-import NextTopLoader from 'nextjs-toploader';
 
-import GlobalStoreProvider from './global-store-provider';
-import NextuiProviders from './nextui-provider';
-import SolanaWalletProvider from './solana-wallets-provider';
-import SWRProvider from './swr-provider';
+const WebVitals = dynamic(() => import('@/components/features/web-vitals'), {
+  ssr: false,
+});
 
-const SonnerToaster = dynamic(() => import('@/components/common/toast/sonner'));
+const Footer = dynamic(() => import('@/components/common/footer'));
+const Header = dynamic(() => import('@/components/common/header'), {
+  ssr: false,
+});
+const Ribbon = dynamic(() => import('@/components/features/ribbon'), {
+  ssr: false,
+});
+
+const GlobalStoreProvider = dynamic(() => import('./global-store-provider'), {
+  ssr: false,
+});
+const NextuiProviders = dynamic(() => import('./nextui-provider'), {
+  ssr: false,
+});
+const SolanaWalletProvider = dynamic(
+  () => import('./solana-wallets-provider'),
+  { ssr: false },
+);
+const SWRProvider = dynamic(() => import('./swr-provider'), { ssr: false });
+
+const SonnerToaster = dynamic(
+  () => import('@/components/common/toast/sonner'),
+  { ssr: false },
+);
 
 const fontSans = FontSans({
   subsets: ['latin'],
   variable: '--font-sans',
+  display: 'swap',
 });
 
 const metadata = META_DATA_DEFAULT;
@@ -43,7 +61,9 @@ const RootLayout = (props: { children: React.ReactNode }) => {
         )}
       >
         <WebVitals />
-        <NextTopLoader color="#7BDA08" />
+        {import('nextjs-toploader').then((NextTopLoader) => {
+          return <NextTopLoader.default color="#7BDA08" />;
+        })}
         <NextuiProviders>
           <SWRProvider>
             <SolanaWalletProvider>

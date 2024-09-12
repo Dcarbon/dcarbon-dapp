@@ -29,6 +29,7 @@ function Hero() {
         transform: `scale(${scale > 1.35 ? 1.35 : scale})`,
       }}
       priority
+      sizes="(max-width: 768px) 768px, (max-width: 960px) 960px, 100vw"
     />
   );
 }

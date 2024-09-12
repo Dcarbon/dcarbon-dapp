@@ -4,9 +4,9 @@ import { createContext, ReactNode, useContext, useEffect, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { createGlobalStore, GlobalStore } from '@/stores/global.store';
 import { WEB_ROUTES } from '@/utils/constants';
-import * as Sentry from '@sentry/nextjs';
+// import * as Sentry from '@sentry/nextjs';
 import { useLocalStorage, useWallet } from '@solana/wallet-adapter-react';
-import { env } from 'env.mjs';
+// import { env } from 'env.mjs';
 import { useStore } from 'zustand';
 
 type GlobalStoreApi = ReturnType<typeof createGlobalStore>;
@@ -43,37 +43,37 @@ const GlobalStoreProvider = ({ children }: GlobalStoreProviderProps) => {
     wallet?.adapter.once('disconnect', autoRedirect);
   }, [connected, pathName, router, wallet?.adapter, walletName]);
 
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'production') {
-      Sentry.init({
-        dsn: env.NEXT_PUBLIC_SENTRY_DSN,
+  // useEffect(() => {
+  //   if (process.env.NODE_ENV === 'production') {
+  //     Sentry.init({
+  //       dsn: env.NEXT_PUBLIC_SENTRY_DSN,
 
-        // Adjust this value in production, or use tracesSampler for greater control
-        tracesSampleRate: 1,
+  //       // Adjust this value in production, or use tracesSampler for greater control
+  //       tracesSampleRate: 1,
 
-        // Setting this option to true will print useful information to the console while you're setting up Sentry.
-        debug: false,
+  //       // Setting this option to true will print useful information to the console while you're setting up Sentry.
+  //       debug: false,
 
-        replaysOnErrorSampleRate: 1.0,
+  //       replaysOnErrorSampleRate: 1.0,
 
-        // This sets the sample rate to be 10%. You may want this to be 100% while
-        // in development and sample at a lower rate in production
-        replaysSessionSampleRate: 0.1,
+  //       // This sets the sample rate to be 10%. You may want this to be 100% while
+  //       // in development and sample at a lower rate in production
+  //       replaysSessionSampleRate: 0.1,
 
-        // You can remove this option if you're not planning to use the Sentry Session Replay feature:
-        integrations: [
-          Sentry.replayIntegration({
-            // Additional Replay configuration goes in here, for example:
-            maskAllText: true,
-            blockAllMedia: true,
-          }),
-          Sentry.captureConsoleIntegration({
-            levels: ['error', 'debug'],
-          }),
-        ],
-      });
-    }
-  }, []);
+  //       // You can remove this option if you're not planning to use the Sentry Session Replay feature:
+  //       integrations: [
+  //         Sentry.replayIntegration({
+  //           // Additional Replay configuration goes in here, for example:
+  //           maskAllText: true,
+  //           blockAllMedia: true,
+  //         }),
+  //         Sentry.captureConsoleIntegration({
+  //           levels: ['error', 'debug'],
+  //         }),
+  //       ],
+  //     });
+  //   }
+  // }, []);
 
   function matchMode(e: MediaQueryListEvent) {
     if (!storeRef.current) return;

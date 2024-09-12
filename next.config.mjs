@@ -3,8 +3,11 @@ import './env.mjs';
 /** @type {import('next').NextConfig} */
 
 import withBundleAnalyzer from '@next/bundle-analyzer';
-import { withSentryConfig } from '@sentry/nextjs';
-import { sentryWebpackPlugin } from '@sentry/webpack-plugin';
+import TerserPlugin from 'terser-webpack-plugin';
+
+// import { withSentryConfig } from '@sentry/nextjs';
+
+// import { sentryWebpackPlugin } from '@sentry/webpack-plugin';
 
 const runWithBundleAnalyzer = withBundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
@@ -42,6 +45,15 @@ const nextConfig = runWithBundleAnalyzer({
       allowedOrigins: process.env.ALLOWED_ORIGINS?.split(','),
     },
     serverComponentsExternalPackages: ['pino-pretty'],
+    optimizePackageImports: [
+      '@metaplex-foundation',
+      '@nextui-org',
+      'bn.js',
+      '@internationalized',
+      '@react-aria',
+      'zod',
+      'framer-motion',
+    ],
   },
   compiler: {
     removeConsole:
@@ -52,22 +64,30 @@ const nextConfig = runWithBundleAnalyzer({
         : false,
   },
   swcMinify: true,
-  webpack: (config, { webpack }) => {
+  webpack: (config, { webpack, dev, isServer }) => {
     config.plugins.push(
       new webpack.DefinePlugin({
         'globalThis.__DEV__': false,
       }),
     );
 
+    if (!dev && !isServer) {
+      config.optimization.minimizer = [
+        new TerserPlugin({
+          parallel: true,
+        }),
+      ];
+    }
+
     if (process.env.NODE_ENV === 'production') {
       config.devtool = 'source-map';
-      config.plugins.push(
-        sentryWebpackPlugin({
-          org: 'example',
-          project: process.env.SENTRY_PROJECT,
-          authToken: process.env.SENTRY_AUTH_TOKEN,
-        }),
-      );
+      // config.plugins.push(
+      //   sentryWebpackPlugin({
+      //     org: 'example',
+      //     project: process.env.SENTRY_PROJECT,
+      //     authToken: process.env.SENTRY_AUTH_TOKEN,
+      //   }),
+      // );
     }
 
     return config;
@@ -97,47 +117,48 @@ const nextConfig = runWithBundleAnalyzer({
   },
 });
 
-const sentryNextConfig = withSentryConfig(
-  nextConfig,
-  {
-    // For all available options, see:
-    // https://github.com/getsentry/sentry-webpack-plugin#options
+// const sentryNextConfig = withSentryConfig(
+//   nextConfig,
+//   {
+//     // For all available options, see:
+//     // https://github.com/getsentry/sentry-webpack-plugin#options
 
-    // Suppresses source map uploading logs during build
-    silent: true,
-    org: 'example',
-    project: process.env.SENTRY_PROJECT,
-  },
-  {
-    // For all available options, see:
-    // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
+//     // Suppresses source map uploading logs during build
+//     silent: true,
+//     org: 'example',
+//     project: process.env.SENTRY_PROJECT,
+//   },
+//   {
+//     // For all available options, see:
+//     // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
 
-    // Upload a larger set of source maps for prettier stack traces (increases build time)
-    widenClientFileUpload: true,
+//     // Upload a larger set of source maps for prettier stack traces (increases build time)
+//     widenClientFileUpload: true,
 
-    // Transpiles SDK to be compatible with IE11 (increases bundle size)
-    transpileClientSDK: true,
+//     // Transpiles SDK to be compatible with IE11 (increases bundle size)
+//     transpileClientSDK: true,
 
-    // Uncomment to route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
-    // This can increase your server load as well as your hosting bill.
-    // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
-    // side errors will fail.
-    // tunnelRoute: "/monitoring",
+//     // Uncomment to route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
+//     // This can increase your server load as well as your hosting bill.
+//     // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
+//     // side errors will fail.
+//     // tunnelRoute: "/monitoring",
 
-    // Hides source maps from generated client bundles
-    hideSourceMaps: true,
+//     // Hides source maps from generated client bundles
+//     hideSourceMaps: true,
 
-    // Automatically tree-shake Sentry logger statements to reduce bundle size
-    disableLogger: true,
+//     // Automatically tree-shake Sentry logger statements to reduce bundle size
+//     disableLogger: true,
 
-    // Enables automatic instrumentation of Vercel Cron Monitors.
-    // See the following for more information:
-    // https://docs.sentry.io/product/crons/
-    // https://vercel.com/docs/cron-jobs
-    automaticVercelMonitors: true,
-  },
-);
+//     // Enables automatic instrumentation of Vercel Cron Monitors.
+//     // See the following for more information:
+//     // https://docs.sentry.io/product/crons/
+//     // https://vercel.com/docs/cron-jobs
+//     automaticVercelMonitors: true,
+//   },
+// );
 
-export default process.env.NODE_ENV === 'production'
-  ? nextConfig
-  : sentryNextConfig;
+// export default process.env.NODE_ENV === 'production'
+//   ? nextConfig
+//   : sentryNextConfig;
+export default nextConfig;

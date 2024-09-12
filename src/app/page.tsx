@@ -1,15 +1,19 @@
 import React from 'react';
-import NextImage from 'next/image';
+import lazy from 'next/dynamic';
 import { doGetTopPage, IGetTopPageResponse } from '@/adapters/common';
-import DCarbonButton from '@/components/common/button';
-import Hero from '@/components/features/home/hero';
-import Slogan from '@/components/features/home/slogan';
-import Statistics from '@/components/features/home/statistics';
-import { WEB_ROUTES } from '@/utils/constants';
-import { Image, Link } from '@nextui-org/react';
-import section2Image from 'public/images/home/section-2.avif';
-import section3Image from 'public/images/home/section-3.avif';
-import section4Image from 'public/images/home/section-4.avif';
+
+const Hero = lazy(() => import('@/components/features/home/hero'), {
+  ssr: false,
+});
+const Slogan = lazy(() => import('@/components/features/home/slogan'), {
+  ssr: false,
+});
+const Statistics = lazy(() => import('@/components/features/home/statistics'), {
+  ssr: false,
+});
+const ModelS = lazy(() => import('@/components/features/home/model-s'));
+const ModelE = lazy(() => import('@/components/features/home/model-e'));
+const ModelG = lazy(() => import('@/components/features/home/model-g'));
 
 const Home = async () => {
   const { data } = (await doGetTopPage()) as IGetTopPageResponse;
@@ -30,133 +34,11 @@ const Home = async () => {
           </div>
         </section>
 
-        <section className="relative h-screen w-full">
-          <Image
-            removeWrapper
-            src={section2Image.src}
-            alt="Section 2"
-            as={NextImage}
-            draggable={false}
-            radius="none"
-            fill
-            style={{
-              objectFit: 'cover',
-            }}
-          />
-          <div className="absolute top-0 left-0 w-full h-full z-10 flex justify-between items-center flex-col py-[70px]">
-            <div className="max-w-[704px] flex flex-col gap-4 items-center text-white">
-              <h2 className="text-[44px] font-medium">Model E</h2>
-              <p className="text-center text-lg">
-                Biogas to electricity converts organic waste into clean,
-                renewable energy, reducing greenhouse gas emissions and
-                promoting sustainability.
-              </p>
-            </div>
+        <ModelE />
 
-            <div className="flex flex-wrap gap-8 justify-center items-center">
-              <DCarbonButton className="min-w-[200px]">
-                <Link
-                  className="absolute top-0 left-0 w-full h-full flex justify-center text-sm text-text-primary"
-                  href={WEB_ROUTES.PROJECTS + '?mode=quick-buy&model=E'}
-                >
-                  Order now
-                </Link>
-              </DCarbonButton>
-              <DCarbonButton color="primary" className="min-w-[200px]">
-                Learn more
-              </DCarbonButton>
-            </div>
-          </div>
-        </section>
+        <ModelG />
 
-        <section className="relative h-screen w-full">
-          <Image
-            removeWrapper
-            src={section3Image.src}
-            alt="Section 3"
-            as={NextImage}
-            draggable={false}
-            radius="none"
-            fill
-            style={{
-              objectFit: 'cover',
-            }}
-          />
-          <div className="absolute top-0 left-0 w-full h-full z-10 flex justify-between items-center flex-col py-[70px]">
-            <div className="max-w-[704px] flex flex-col gap-4 items-center text-white">
-              <h2 className="text-[44px] font-medium">Model G</h2>
-              <p className="text-center text-lg">
-                Biomass gasification technology converts organic waste into
-                syngas for clean energy, featuring continuous feeding, high
-                efficiency, and low emissions, reducing fuel costs and
-                environmental impact.
-              </p>
-            </div>
-
-            <div className="flex flex-wrap gap-8 justify-center items-center">
-              <DCarbonButton className="min-w-[200px]">
-                <Link
-                  className="absolute top-0 left-0 w-full h-full flex justify-center text-sm text-text-primary"
-                  href={WEB_ROUTES.PROJECTS + '?mode=quick-buy&model=G'}
-                >
-                  Order now
-                </Link>
-              </DCarbonButton>
-              <DCarbonButton color="primary" className="min-w-[200px]">
-                Learn more
-              </DCarbonButton>
-            </div>
-          </div>
-        </section>
-
-        <section className="relative h-screen w-full">
-          <Image
-            removeWrapper
-            src={section4Image.src}
-            alt="Section 4"
-            as={NextImage}
-            draggable={false}
-            radius="none"
-            fill
-            style={{
-              objectFit: 'cover',
-            }}
-          />
-          <div className="absolute top-0 left-0 w-full h-full z-10 flex justify-between items-center flex-col py-[70px]">
-            <div className="max-w-[704px] flex flex-col gap-4 items-center text-white">
-              <h2 className="text-[44px] font-medium">Model S</h2>
-              <p className="text-center text-lg">
-                Transforms organic waste into biochar, a stable form of carbon
-                that not only sequesters carbon dioxide but also enhances soil
-                fertility and agricultural productivity.
-              </p>
-            </div>
-
-            <div>
-              <div className="text-white text-[28px] font-light mb-6 text-center">
-                Coming soon
-              </div>
-
-              <div className="flex flex-wrap gap-8 justify-center items-center">
-                <DCarbonButton className="min-w-[200px]" isDisabled>
-                  {/* <Link
-                    className="absolute top-0 left-0 w-full h-full flex justify-center text-sm text-text-primary"
-                    href={WEB_ROUTES.PROJECTS}
-                  > */}
-                  Order now
-                  {/* </Link> */}
-                </DCarbonButton>
-                <DCarbonButton
-                  color="primary"
-                  className="min-w-[200px]"
-                  isDisabled
-                >
-                  Learn more
-                </DCarbonButton>
-              </div>
-            </div>
-          </div>
-        </section>
+        <ModelS />
       </main>
     </>
   );

@@ -135,7 +135,7 @@ async function ProjectDetail({ params }: { params: { slug: string } }) {
         </article>
         <DetailSidebar data={data} />
       </div>
-      <ProjectDetailTabs />
+      <ProjectDetailTabs type={data?.data?.iot_models[0]?.id || ''} />
       <ProjectDocument />
     </main>
   );

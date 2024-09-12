@@ -32,7 +32,7 @@
   word-wrap: break-word;
 }
 
-.ql-content>* {
+.ql-content > * {
   cursor: text;
 }
 
@@ -57,12 +57,12 @@
   padding-left: 1.5em;
 }
 
-.ql-content ol>li,
-.ql-content ul>li {
+.ql-content ol > li,
+.ql-content ul > li {
   list-style-type: none;
 }
 
-.ql-content ul>li::before {
+.ql-content ul > li::before {
   content: '\2022';
 }
 
@@ -71,23 +71,23 @@
   pointer-events: none;
 }
 
-.ql-content ul[data-checked='true']>li *,
-.ql-content ul[data-checked='false']>li * {
+.ql-content ul[data-checked='true'] > li *,
+.ql-content ul[data-checked='false'] > li * {
   pointer-events: all;
 }
 
-.ql-content ul[data-checked='true']>li::before,
-.ql-content ul[data-checked='false']>li::before {
+.ql-content ul[data-checked='true'] > li::before,
+.ql-content ul[data-checked='false'] > li::before {
   color: #777;
   cursor: pointer;
   pointer-events: all;
 }
 
-.ql-content ul[data-checked='true']>li::before {
+.ql-content ul[data-checked='true'] > li::before {
   content: '\2611';
 }
 
-.ql-content ul[data-checked='false']>li::before {
+.ql-content ul[data-checked='false'] > li::before {
   content: '\2610';
 }
 

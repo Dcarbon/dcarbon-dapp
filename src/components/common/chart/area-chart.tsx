@@ -166,7 +166,10 @@ const AreaChart = ({
           },
         },
         formatter: (value: number) => {
-          return `${value} ${model === 'PrjT_none' || !model ? 'DCO2' : model === 'PrjT_G' ? 'Ton' : 'kVA'}`;
+          return `${value.toLocaleString('en-US', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 3,
+          })} ${model === 'PrjT_none' || !model ? 'DCO2' : model === 'PrjT_G' ? 'Ton' : 'kVA'}`;
         },
       },
     },

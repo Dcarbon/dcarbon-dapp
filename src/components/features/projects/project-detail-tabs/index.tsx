@@ -8,7 +8,7 @@ import WoodBurned from './wood-burned';
 
 type tabTypes = 'carbon' | 'wood';
 
-const ProjectDetailTabs = () => {
+const ProjectDetailTabs = ({ type }: { type: string }) => {
   const [selectedTab, setSelectedTab] = useState<tabTypes>(
     'carbon' as tabTypes,
   );
@@ -37,7 +37,10 @@ const ProjectDetailTabs = () => {
       <Tab key="carbon" title="Carbon minted">
         <CarbonMinted />
       </Tab>
-      <Tab key="burn" title="Wood burned">
+      <Tab
+        key="burn"
+        title={type === 'PrjT_E' ? 'Electric produced' : 'Wood burned'}
+      >
         <WoodBurned />
       </Tab>
     </Tabs>

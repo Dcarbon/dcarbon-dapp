@@ -86,6 +86,10 @@ interface IGetChartResponse extends Response {
       data: number[];
       labels: string[];
     };
+    wood_burned?: {
+      data: number[];
+      labels: string[];
+    };
   };
 }
 type GetCarbonMintedRequest = {

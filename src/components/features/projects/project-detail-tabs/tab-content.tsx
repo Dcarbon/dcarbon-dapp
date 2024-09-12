@@ -1,6 +1,5 @@
 import React from 'react';
 import NextImage from 'next/image';
-import { useParams } from 'next/navigation';
 import DCarbonButton from '@/components/common/button';
 import AreaChart from '@/components/common/chart/area-chart';
 import { Skeleton } from '@/components/common/loading';
@@ -38,11 +37,10 @@ const TabContent = ({
   trigger,
   model,
 }: TabContentProps) => {
-  const { slug } = useParams<{ slug: string }>();
   if (isEmpty(devices) && !isMutating) {
     return (
-      <div className="flex flex-col xl:flex-row xl:flex-nowrap h-[390px] gap-8 w-full justify-center items-center text-[#888888]">
-        No data
+      <div className="flex flex-col xl:flex-row xl:flex-nowrap h-[390px] gap-8 w-full justify-center items-center text-foreground-400 bg-[#f6f6f6]">
+        No Data
       </div>
     );
   }
@@ -120,7 +118,7 @@ const TabContent = ({
             />
           </div>
         ) : null}
-        <AreaChart data={chartData} slug={slug} model={model} />
+        <AreaChart data={chartData} slug={selectedDevice || ''} model={model} />
       </div>
     </div>
   );

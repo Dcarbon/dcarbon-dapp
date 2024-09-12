@@ -16,7 +16,8 @@ import {
   Spinner,
 } from '@nextui-org/react';
 import { useInView } from 'framer-motion';
-import quickBuyImage from 'public/images/projects/quick-buy-cover.avif';
+import quickBuyModelE from 'public/images/projects/quick-buy-model-e.avif';
+import quickBuyModelG from 'public/images/projects/quick-buy-model-g.avif';
 import ReactCountryFlag from 'react-country-flag';
 import useSWRInfinite from 'swr/infinite';
 import { useDebounceValue } from 'usehooks-ts';
@@ -164,22 +165,41 @@ function ProjectContent({
       <div className="w-full relative">
         {mode === 'quick-buy' ? (
           <div className="relative w-full min-h-[807px]">
-            <Image
-              src={quickBuyImage.src}
-              alt="quick buy"
-              draggable={false}
-              as={NextImage}
-              width={1336}
-              height={807}
-              sizes="100vw"
-              style={{
-                width: '100%',
-                height: 'auto',
-              }}
-              radius="none"
-              className="rounded-[16px]"
-              removeWrapper
-            />
+            {model === 'G' ? (
+              <Image
+                src={quickBuyModelG.src}
+                alt="quick buy"
+                draggable={false}
+                as={NextImage}
+                width={2672}
+                height={1614}
+                sizes="100vw"
+                style={{
+                  width: '100%',
+                  height: 'auto',
+                }}
+                radius="none"
+                className="rounded-[16px]"
+                removeWrapper
+              />
+            ) : (
+              <Image
+                src={quickBuyModelE.src}
+                alt="quick buy"
+                draggable={false}
+                as={NextImage}
+                width={2672}
+                height={1614}
+                sizes="100vw"
+                style={{
+                  width: '100%',
+                  height: 'auto',
+                }}
+                radius="none"
+                className="rounded-[16px]"
+                removeWrapper
+              />
+            )}
           </div>
         ) : dataMerged?.length !== 0 ? (
           <>

@@ -478,7 +478,7 @@ function QuickBuySidebar() {
                 variant={isAsset || !touched ? undefined : 'bordered'}
                 aria-label="Asset"
                 label=""
-                items={assetSelectOptions}
+                items={assetSelectOptions || []}
                 classNames={{
                   trigger: cn(
                     'bg-[#F6F6F6] shadow-none rounded-[4px] data-[hover=true]:bg-default-200',

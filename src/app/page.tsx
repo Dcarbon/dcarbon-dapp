@@ -20,7 +20,7 @@ const Home = async () => {
   return (
     <>
       <main>
-        <section className="relative h-screen w-full">
+        <section className="relative h-screen w-screen overflow-x-hidden">
           <Hero />
 
           <div className="text-white absolute bottom-[8%] lg:bottom-[4%] 2xl:bottom-[8%] left-0 w-full h-full z-10 flex justify-between max-h-[62vh] lg:max-h-[72vh] 2xl:max-h-[62vh] items-center flex-col gap-4 p-4 overflow-hidden">

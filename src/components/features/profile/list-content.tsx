@@ -113,7 +113,6 @@ function CertificateListContent() {
       keepPreviousData: true,
       revalidateOnMount: true,
       revalidateOnReconnect: true,
-      revalidateOnFocus: true,
     },
   );
 

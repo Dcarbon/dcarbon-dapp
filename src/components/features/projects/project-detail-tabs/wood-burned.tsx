@@ -34,7 +34,7 @@ const WoodBurned = () => {
           });
           setPaging(data.device_info.paging);
         }
-        if (data.wood_burned) {
+        if (data?.wood_burned) {
           setChartData(data.wood_burned.data || []);
         }
       },

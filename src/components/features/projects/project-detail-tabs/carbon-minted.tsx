@@ -34,7 +34,7 @@ const CarbonMinted = () => {
           });
           setPaging(data.device_info.paging);
         }
-        if (data.carbon_minted) {
+        if (data?.carbon_minted) {
           setChartData(data.carbon_minted.data || []);
         }
       },

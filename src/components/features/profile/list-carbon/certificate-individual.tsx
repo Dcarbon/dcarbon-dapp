@@ -103,6 +103,12 @@ function CertificateIndividual({
             value={amount || 0}
           />
         </div>
+        {projects && projects.projectFt?.amount ? (
+          <p className="text-xs text-[#697077]">
+            *This is the tokens of{' '}
+            {!projects.projectsFt.length ? 'unknown' : 'mix'} origin{' '}
+          </p>
+        ) : null}
       </div>
 
       <div className="mt-12">

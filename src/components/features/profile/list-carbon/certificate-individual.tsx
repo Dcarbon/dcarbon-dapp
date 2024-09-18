@@ -2,20 +2,31 @@ import React from 'react';
 import { cn, Input } from '@nextui-org/react';
 import { NumericFormat } from 'react-number-format';
 
+type ProjectsType = {
+  projectsFt:
+    | {
+        id: string;
+        location_name: string;
+        amount: number;
+        type: {
+          name: string;
+        };
+      }[]
+    | any[];
+  projectFt?: {
+    amount: number;
+    type: {
+      name: string;
+    };
+  };
+};
 function CertificateIndividual({
   amount,
   name,
   setName,
   isNameInvalid,
   setIsNameInvalid,
-  projectType,
-  setProjectType,
-  isProjectTypeInvalid,
-  setIsProjectTypeInvalid,
-  projectLocation,
-  setProjectLocation,
-  isProjectLocationInvalid,
-  setIsProjectLocationInvalid,
+
   reason,
   setReason,
   loading,
@@ -23,20 +34,13 @@ function CertificateIndividual({
   setCountry,
   setIsCountryInvalid,
   country,
+  projects,
 }: {
   amount: number;
   name: string;
   setName: (value: string) => void;
   isNameInvalid: boolean;
   setIsNameInvalid: (value: boolean) => void;
-  projectType: string;
-  setProjectType: (value: string) => void;
-  isProjectTypeInvalid: boolean;
-  setIsProjectTypeInvalid: (value: boolean) => void;
-  projectLocation: string;
-  setProjectLocation: (value: string) => void;
-  isProjectLocationInvalid: boolean;
-  setIsProjectLocationInvalid: (value: boolean) => void;
   reason?: string;
   setReason?: (value: string) => void;
   loading?: boolean;
@@ -44,6 +48,7 @@ function CertificateIndividual({
   setCountry: (value: string) => void;
   isCountryInvalid: boolean;
   setIsCountryInvalid: (value: boolean) => void;
+  projects?: ProjectsType;
 }) {
   return (
     <div>
@@ -135,78 +140,6 @@ function CertificateIndividual({
           isRequired
         />
       </div>
-
-      <div className="mt-12">
-        <Input
-          key="project-type"
-          type="text"
-          labelPlacement="outside"
-          label="Project type"
-          placeholder="Project type"
-          radius="none"
-          classNames={{
-            inputWrapper: cn(
-              'rounded-[4px] bg-[#F6F6F6] group-data-[focus=true]:ring-1 group-data-[focus=true]:bg-white group-data-[focus=true]:ring-primary-color',
-              isProjectTypeInvalid
-                ? 'group-data-[focus=true]:ring-0 border-small'
-                : '',
-            ),
-            label: '!text-[#21272A]',
-            helperWrapper: 'px-0',
-          }}
-          autoComplete="off"
-          isInvalid={isProjectTypeInvalid}
-          errorMessage="Please enter your project type!"
-          variant={isProjectTypeInvalid ? 'bordered' : 'flat'}
-          value={projectType}
-          onValueChange={(value) => {
-            if (!value) {
-              setIsProjectTypeInvalid(true);
-            } else {
-              setIsProjectTypeInvalid(false);
-            }
-            setProjectType(value);
-          }}
-          isDisabled={loading}
-          isRequired
-        />
-      </div>
-      <div className="mt-12">
-        <Input
-          key="project-location"
-          type="text"
-          labelPlacement="outside"
-          label="Project location"
-          placeholder="Project location"
-          radius="none"
-          classNames={{
-            inputWrapper: cn(
-              'rounded-[4px] bg-[#F6F6F6] group-data-[focus=true]:ring-1 group-data-[focus=true]:bg-white group-data-[focus=true]:ring-primary-color',
-              isProjectLocationInvalid
-                ? 'group-data-[focus=true]:ring-0 border-small'
-                : '',
-            ),
-            label: '!text-[#21272A]',
-            helperWrapper: 'px-0',
-          }}
-          autoComplete="off"
-          isInvalid={isProjectLocationInvalid}
-          errorMessage="Please enter your project location!"
-          variant={isProjectLocationInvalid ? 'bordered' : 'flat'}
-          value={projectLocation}
-          onValueChange={(value) => {
-            if (!value) {
-              setIsProjectLocationInvalid(true);
-            } else {
-              setIsProjectLocationInvalid(false);
-            }
-            setProjectLocation(value);
-          }}
-          isDisabled={loading}
-          isRequired
-        />
-      </div>
-
       <div className="mt-12">
         <Input
           key="reason"
@@ -227,6 +160,68 @@ function CertificateIndividual({
           onValueChange={setReason}
           isDisabled={loading}
         />
+      </div>
+      <span className="text-[#21272A] text-sm mt-5 mb-2 block">
+        Project information
+      </span>
+      <div className="flex flex-col gap-y-2 max-h-[282px] h-full overflow-y-auto scroll-w-none">
+        {projects && projects.projectsFt?.length > 0
+          ? projects.projectsFt.map((item) => (
+              <div
+                key={item.id}
+                className="flex flex-col border-1 border-[#d1d1d1] border-dashed p-3 rounded *:flex *:gap-4 *:text-sm *:justify-start *:text-left gap-y-4"
+              >
+                <span>
+                  <span className="w-[35%] text-nowrap text-[#888888] font-light">
+                    Project type:
+                  </span>
+                  <span className="w-[65%] text-text-primary">
+                    {item.type.name}
+                  </span>
+                </span>
+                <span className="">
+                  <span className="w-[35%] text-nowrap text-[#888888] font-light">
+                    Project Location:
+                  </span>
+                  <span className="w-[65%] text-text-primary overflow-hidden text-ellipsis whitespace-pre-wrap break-words">
+                    {item.location_name}
+                  </span>
+                </span>
+                <span className="">
+                  <span className="w-[35%] text-nowrap text-[#888888] font-light">
+                    Amount:
+                  </span>
+                  <span className="w-[65%] text-text-primary">
+                    {item.amount}
+                  </span>
+                </span>
+              </div>
+            ))
+          : null}
+
+        {projects?.projectFt ? (
+          <div
+            key={'fcfs'}
+            className="flex flex-col border-1 border-[#d1d1d1] border-dashed p-3 rounded *:flex *:gap-4 *:text-sm *:justify-start *:text-left gap-y-4"
+          >
+            <span>
+              <span className="w-[35%] text-nowrap text-[#888888] font-light">
+                Project type:
+              </span>
+              <span className="w-[65%] text-text-primary">
+                {projects.projectFt.type.name}
+              </span>
+            </span>
+            <span className="">
+              <span className="w-[35%] text-nowrap text-[#888888] font-light">
+                Amount:
+              </span>
+              <span className="w-[65%] text-text-primary">
+                {projects.projectFt.amount}
+              </span>
+            </span>
+          </div>
+        ) : null}
       </div>
     </div>
   );

@@ -49,45 +49,45 @@ const TabContent = ({
       <div className="flex gap-y-6 py-2 flex-row max-w-[100vw] gap-x-4 xl:gap-x-0 overflow-x-auto xl:flex-col flex-auto xl:max-w-[326px] xl:max-h-[430px] xl:h-full xl:overflow-y-auto scroll-w-none">
         {isMutating && !selectedDevice
           ? Array.from({ length: 5 }).map((_, index) => (
-              <Skeleton key={index} className="min-h-[80px] min-w-[15rem]">
-                <div className="p-4 rounded-lg bg-white flex h-[80px] max-w-[326px] min-w-[15rem] w-full" />
-              </Skeleton>
-            ))
+            <Skeleton key={index} className="min-h-[80px] min-w-[15rem]">
+              <div className="p-4 rounded-lg bg-white flex h-[80px] max-w-[326px] min-w-[15rem] w-full" />
+            </Skeleton>
+          ))
           : devices?.map((device: any) => (
-              <Button
-                variant="bordered"
-                key={device.device_id}
-                onClick={() => handleSelectDevice(device.device_id)}
-                className={cn(
-                  'p-4 rounded-lg bg-white flex h-[80px] min-h-[80px] max-w-[326px] min-w-[15rem] w-full justify-start',
-                  device.device_id === selectedDevice
-                    ? 'border-primary-color bg-[#F6F6F6]'
-                    : 'border-[#DDE1E6]',
-                )}
-              >
-                <div className="flex gap-4 items-center justify-start">
-                  <div className="w-12 h-12 bg-[#F6F6F6] flex justify-center items-center rounded-md">
-                    <Image
-                      src={device.is_active ? active.src : inactive.src}
-                      alt="active"
-                      as={NextImage}
-                      draggable={false}
-                      width={24}
-                      height={24}
-                      radius="none"
-                    />
-                  </div>
-                  <div className="flex flex-col items-start justify-between gap-2">
-                    <span className="text-[23px] font-medium text-text-primary leading-6">
-                      {device.is_active ? 'Actived' : 'Inactivated'}
-                    </span>
-                    <span className="text-sm text-[#697077] leading-4">
-                      {device.device_name}
-                    </span>
-                  </div>
+            <Button
+              variant="bordered"
+              key={device.device_id}
+              onClick={() => handleSelectDevice(device.device_id)}
+              className={cn(
+                'p-4 rounded-lg bg-white flex h-[80px] min-h-[80px] max-w-[326px] min-w-[15rem] w-full justify-start',
+                device.device_id === selectedDevice
+                  ? 'border-primary-color bg-[#F6F6F6]'
+                  : 'border-[#DDE1E6]',
+              )}
+            >
+              <div className="flex gap-4 items-center justify-start">
+                <div className="w-12 h-12 bg-[#F6F6F6] flex justify-center items-center rounded-md">
+                  <Image
+                    src={device.is_active ? active.src : inactive.src}
+                    alt="active"
+                    as={NextImage}
+                    draggable={false}
+                    width={24}
+                    height={24}
+                    radius="none"
+                  />
                 </div>
-              </Button>
-            ))}
+                <div className="flex flex-col items-start justify-between gap-2">
+                  <span className="text-[23px] font-medium text-text-primary leading-6">
+                    {device.is_active ? 'Actived' : 'Inactivated'}
+                  </span>
+                  <span className="text-sm text-[#697077] leading-4">
+                    {device.device_name}
+                  </span>
+                </div>
+              </div>
+            </Button>
+          ))}
         {paging && paging.total / paging.limit > paging.page ? (
           <DCarbonButton
             className="xl:min-h-[40px] min-h-[80px] min-w-[10rem]  rounded-lg"

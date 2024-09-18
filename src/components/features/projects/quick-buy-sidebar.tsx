@@ -57,6 +57,7 @@ function QuickBuySidebar() {
   const { publicKey, wallet } = useWallet();
   const [touched, setTouched] = useState<boolean>(false);
   const [creditsError, setCreditsError] = useState<string | null>(null);
+
   const { isOpen, onClose, onOpenChange } = useDisclosure({
     id: 'quick-buy-modal',
   });
@@ -73,6 +74,7 @@ function QuickBuySidebar() {
       iot_model = undefined;
       break;
   }
+
   const isAsset = Object.prototype.hasOwnProperty.call(asset, 'anchorKey');
   const { data, isLoading, mutate } = useSWR(
     [QUERY_KEYS.PROJECTS.GET_QUICK_BUY_LISTING_INFO, iot_model],
@@ -95,6 +97,11 @@ function QuickBuySidebar() {
       }),
     [data?.data],
   );
+  const assetSelected = useMemo(() => {
+    return assetSelectOptions?.find(
+      (item) => item.value === Array.from(asset)?.[0]?.toString(),
+    )?.label;
+  }, [asset, assetSelectOptions]);
 
   const openBuyModal = useCallback(() => {
     if (!publicKey || !wallet || !anchorWallet || !connection) {
@@ -422,6 +429,7 @@ function QuickBuySidebar() {
           handleBuy={handleBuyCarbon}
           publicKey={publicKey}
           isMinting={loading}
+          asset={assetSelected || 'USDT'}
         />
       )}
       <div>

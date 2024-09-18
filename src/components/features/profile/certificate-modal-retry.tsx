@@ -70,12 +70,9 @@ function CertificateRetryModal({
   const [isNameInvalid, setIsNameInvalid] = useState<boolean>(false);
 
   const [projectType, setProjectType] = useState<string>('');
-  const [isProjectTypeInvalid, setIsProjectTypeInvalid] =
-    useState<boolean>(false);
-
+  useState<boolean>(false);
   const [projectLocation, setProjectLocation] = useState<string>('');
-  const [isProjectLocationInvalid, setIsProjectLocationInvalid] =
-    useState<boolean>(false);
+  useState<boolean>(false);
 
   const [reason, setReason] = useState<string>('');
 
@@ -84,6 +81,7 @@ function CertificateRetryModal({
   const [country, setCountry] = useState<string>('');
   const [isCountryInvalid, setIsCountryInvalid] = useState<boolean>(false);
   const [selectedTab, setSelectedTab] = useState<TTab>('individual');
+
   return (
     <>
       <DCarbonModal
@@ -127,16 +125,6 @@ function CertificateRetryModal({
 
               if (!name) {
                 setIsNameInvalid(true);
-                return;
-              }
-
-              if (!projectType) {
-                setIsProjectTypeInvalid(true);
-                return;
-              }
-
-              if (!projectLocation) {
-                setIsProjectLocationInvalid(true);
                 return;
               }
 
@@ -371,14 +359,6 @@ function CertificateRetryModal({
                 setName={setName}
                 isNameInvalid={isNameInvalid}
                 setIsNameInvalid={setIsNameInvalid}
-                projectType={projectType}
-                setProjectType={setProjectType}
-                isProjectTypeInvalid={isProjectTypeInvalid}
-                setIsProjectTypeInvalid={setIsProjectTypeInvalid}
-                projectLocation={projectLocation}
-                setProjectLocation={setProjectLocation}
-                isProjectLocationInvalid={isProjectLocationInvalid}
-                setIsProjectLocationInvalid={setIsProjectLocationInvalid}
                 reason={reason}
                 setReason={setReason}
                 country={country}
@@ -395,14 +375,6 @@ function CertificateRetryModal({
                 setName={setName}
                 isNameInvalid={isNameInvalid}
                 setIsNameInvalid={setIsNameInvalid}
-                projectType={projectType}
-                setProjectType={setProjectType}
-                isProjectTypeInvalid={isProjectTypeInvalid}
-                setIsProjectTypeInvalid={setIsProjectTypeInvalid}
-                projectLocation={projectLocation}
-                setProjectLocation={setProjectLocation}
-                isProjectLocationInvalid={isProjectLocationInvalid}
-                setIsProjectLocationInvalid={setIsProjectLocationInvalid}
                 reason={reason}
                 setReason={setReason}
                 address={address}

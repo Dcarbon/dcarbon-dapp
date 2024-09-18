@@ -21,6 +21,7 @@ type QuickBuyModalProps = {
   handleBuy: () => void;
   publicKey: PublicKey;
   isMinting: boolean;
+  asset: string;
 };
 type MetaMintsData = Metadata &
   Pick<IListingInfo, 'available' | 'payment_info'> & { name: string };
@@ -31,6 +32,7 @@ const QuickBuyModal = ({
   handleBuy,
   publicKey,
   isMinting,
+  asset,
 }: QuickBuyModalProps) => {
   const [showMore, setShowMore] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -63,7 +65,6 @@ const QuickBuyModal = ({
     },
     [onClose, publicKey],
   );
-
   useEffect(() => {
     isOpen && getUnitPrice(data);
   }, [isOpen, getUnitPrice, data]);
@@ -134,7 +135,13 @@ const QuickBuyModal = ({
                             as={NextImage}
                           />
                           <div className="font-normal text-text-primary flex items-center gap-1">
-                            <span>{d.available}</span>
+                            <span>
+                              {d.available.toLocaleString('en-US', {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 3,
+                                roundingMode: 'trunc',
+                              })}
+                            </span>
                             <span>{d.name}</span>
                           </div>
                         </div>
@@ -149,7 +156,7 @@ const QuickBuyModal = ({
                                 d.payment_info?.exchange_rate || 1 || 0,
                               ).toFixed(4),
                             ).toLocaleString('en-US')}
-                            {' USDT'}
+                            {' ' + asset || 'USDT'}
                           </span>
                         </div>
                       </div>
@@ -196,7 +203,7 @@ const QuickBuyModal = ({
             </Skeleton>
           </div>
         ) : (
-          <p className="flex gap-1 items-baseline justify-end font-medium">
+          <p className="flex gap-1 items-baseline justify-end font-medium pr-4">
             <span className="text-[12px] font-light text-text-primary">
               Total:
             </span>
@@ -210,7 +217,7 @@ const QuickBuyModal = ({
                   ),
                 ).toFixed(4),
               ).toLocaleString('en-US')}
-              {' USDT'}
+              {' ' + asset || 'USDT'}
             </span>
           </p>
         )}

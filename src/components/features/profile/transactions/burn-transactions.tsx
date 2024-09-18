@@ -297,7 +297,9 @@ const BurnTransaction = () => {
                 className="min-w-[24px]"
               />
               <span className="text-base">
-                {(+user?.metadata_amount || 0)?.toLocaleString('en-US')}
+                {(+user?.metadata_amount || +user?.amount || 0)?.toLocaleString(
+                  'en-US',
+                )}
               </span>
             </div>
           );
@@ -354,7 +356,7 @@ const BurnTransaction = () => {
                   retryMintNft(
                     index,
                     user?.group_tx,
-                    user?.metadata_amount || 0,
+                    user?.metadata_amount || user?.amount || 0,
                     user?.mints,
                     user?.txs,
                     user?.metadata,
@@ -410,6 +412,7 @@ const BurnTransaction = () => {
     },
     [loading],
   );
+  console.info(listTx?.data);
   return (
     <>
       <Table

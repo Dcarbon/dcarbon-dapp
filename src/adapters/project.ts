@@ -120,6 +120,53 @@ interface IGetProjectDocumentResponse extends Response {
     created_at: string;
   }[];
 }
+interface IGetProjectListingInfoByMintResponse extends Response {
+  request_id: string;
+  statusCode: number;
+  data: {
+    id: string;
+    slug: string;
+    manager_id: string;
+    destination_wallet: string;
+    project_name: string;
+    description: string;
+    thumbnail: string;
+    images: string[];
+    country: string;
+    location: {
+      name: string;
+      iframe: string;
+      latitude: number;
+      longitude: number;
+    };
+    location_name: string;
+    power: number;
+    spec: {};
+    status: string;
+    country_name: string;
+    iot_models: {
+      id: string;
+      model_name: string;
+    }[];
+    type: {
+      id: number;
+      name: string;
+    };
+    manager: {
+      id: string;
+      ref_code: string;
+      user_name: string;
+      profile_name: string;
+      wallet: string;
+      role: string;
+      info: string;
+      status: string;
+    };
+    po_wallet: string;
+    implementation_date: string;
+    mints: string[];
+  }[];
+}
 const doGetProjetList = async ({
   keyword,
   page,
@@ -224,6 +271,19 @@ const doGetProjectDocuments = async (
     },
   ) as Promise<IGetProjectDocumentResponse>;
 };
+
+const doGetProjectInfoByMint = async (
+  mint: string,
+): Promise<IGetProjectListingInfoByMintResponse> => {
+  return request(
+    'GET',
+    API_ROUTES.PROJECT.PROJECT_INFO_BY_MINT,
+    { ids: mint },
+    {
+      cache: 'no-store',
+    },
+  ) as Promise<IGetProjectListingInfoByMintResponse>;
+};
 export {
   doGetProjetList,
   doGetProjectDetail,
@@ -232,6 +292,7 @@ export {
   doGetCarbonMinted,
   doGetWoodBurned,
   doGetProjectDocuments,
+  doGetProjectInfoByMint,
 };
 
 export type {

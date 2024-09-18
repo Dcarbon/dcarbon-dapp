@@ -11,6 +11,7 @@ const API_ROUTES = {
     CARBON_MINTED_DASHBOARD: '/v1/projects/[slug]/carbon-minted-dashboard',
     WOOD_BURNED_DASHBOARD: '/v1/projects/[slug]/wood-burned-dashboard',
     DOCUMENTS: '/v1/projects/[slug]/documents',
+    PROJECT_INFO_BY_MINT: '/v1/projects/project-info-by-mint',
   },
   COMMON: {
     SEND_FEEDBACK: '/v1/common/send-feedback',

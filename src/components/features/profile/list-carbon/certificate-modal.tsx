@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useCallback, useState } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import { doGetMintMetada } from '@/adapters/common';
+import { doGetProjectInfoByMint } from '@/adapters/project';
 import {
   doGenerateBurnMetadata,
   doGenerateNftMetadata,
@@ -41,7 +42,7 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import { env } from 'env.mjs';
 import certificateIcon from 'public/images/projects/cerfiticate-icon.png';
-import { KeyedMutator, useSWRConfig } from 'swr';
+import useSWR, { KeyedMutator, useSWRConfig } from 'swr';
 import { mintNft } from '@utils/contract/contract.util';
 
 import DCarbonButton from '../../../common/button';
@@ -53,7 +54,24 @@ import CertificateIndividual from './certificate-individual';
 dayjs.extend(utc);
 
 type TTab = 'individual' | 'corporate';
-
+type ProjectsType = {
+  projectsFt:
+    | {
+        id: string;
+        location_name: string;
+        amount: number;
+        type: {
+          name: string;
+        };
+      }[]
+    | any[];
+  projectFt?: {
+    amount: number;
+    type: {
+      name: string;
+    };
+  };
+};
 function CertificateModal({
   router,
   isOpen,
@@ -79,20 +97,10 @@ function CertificateModal({
   const { connection } = useConnection();
   const anchorWallet = useAnchorWallet();
   const [loading, setLoading] = useState<boolean>(false);
-
+  const [projects, setProjects] = useState({});
   const [name, setName] = useState<string>('');
   const [isNameInvalid, setIsNameInvalid] = useState<boolean>(false);
-
-  const [projectType, setProjectType] = useState<string>('');
-  const [isProjectTypeInvalid, setIsProjectTypeInvalid] =
-    useState<boolean>(false);
-
-  const [projectLocation, setProjectLocation] = useState<string>('');
-  const [isProjectLocationInvalid, setIsProjectLocationInvalid] =
-    useState<boolean>(false);
-
   const [reason, setReason] = useState<string>('');
-
   const [address, setAddress] = useState<string>('');
   const [isAddressInvalid, setIsAddressInvalid] = useState<boolean>(false);
   const [country, setCountry] = useState<string>('');
@@ -108,6 +116,20 @@ function CertificateModal({
     project_name: string;
     asset_type: 'sFT' | 'FT';
   }>();
+  const { data } = useSWR(
+    () =>
+      mints?.length
+        ? [QUERY_KEYS.PROJECTS.GET_PROJECT_INFO_BY_MINT, mints]
+        : null,
+    () => {
+      return mints?.length
+        ? doGetProjectInfoByMint(mints.map((m) => m.mint).join(','))
+        : null;
+    },
+    {
+      revalidateOnMount: true,
+    },
+  );
   const RetryLink = useCallback(() => {
     return (
       <>
@@ -121,10 +143,82 @@ function CertificateModal({
       </>
     );
   }, []);
+
+  const handleGetProjectType = useCallback(async () => {
+    if (!publicKey || !wallet || !anchorWallet || !connection) {
+      ShowAlert.error({ message: 'Please connect to wallet first!' });
+      return;
+    }
+    const provider = new AnchorProvider(connection, anchorWallet);
+    const program = new Program<ICarbonContract>(
+      CARBON_IDL as ICarbonContract,
+      provider,
+    );
+    const [configContract] = PublicKey.findProgramAddressSync(
+      [Buffer.from('contract_config')],
+      program.programId,
+    );
+    const configData =
+      await program.account.contractConfig.fetch(configContract);
+    const mintFt = configData.mint;
+    const sFt = mints?.filter((m) => m.mint !== mintFt.toString());
+    const sNotFt = mints?.find((m) => m.mint == mintFt.toString());
+    return { sFt, sNotFt };
+  }, [anchorWallet, connection, mints, publicKey, wallet]);
+  useEffect(() => {
+    if (data) {
+      Promise.resolve(handleGetProjectType()).then((res) => {
+        const projectData = {
+          projectsFt: [],
+        } as ProjectsType;
+        data.data.map((project) => {
+          if (res?.sNotFt?.mint) {
+            projectData.projectFt = {
+              type: {
+                name: 'Mix origin',
+              },
+              amount: res.sNotFt.amount,
+            };
+          }
+
+          projectData.projectsFt = [
+            ...projectData.projectsFt,
+            {
+              ...project,
+              amount: mints?.reduce((acc, cur) => {
+                if (
+                  project.mints?.includes(cur.mint) &&
+                  cur.mint !== res?.sNotFt?.mint
+                ) {
+                  acc += cur.amount;
+                }
+                return acc;
+              }, 0),
+            },
+          ];
+        });
+        projectData.projectsFt = projectData.projectsFt.filter(
+          (project) => project.amount > 0,
+        );
+        setProjects(projectData);
+      });
+    }
+  }, [
+    anchorWallet,
+    connection,
+    publicKey,
+    wallet,
+    data,
+    handleGetProjectType,
+    mints,
+  ]);
   return (
     <>
       <DCarbonModal
-        onClose={onClose}
+        onClose={() => {
+          reset();
+          onClose();
+        }}
         isOpen={isOpen}
         title="Certificate Info"
         icon={certificateIcon.src}
@@ -174,16 +268,6 @@ function CertificateModal({
 
               if (!name) {
                 setIsNameInvalid(true);
-                return;
-              }
-
-              if (!projectType) {
-                setIsProjectTypeInvalid(true);
-                return;
-              }
-
-              if (!projectLocation) {
-                setIsProjectLocationInvalid(true);
                 return;
               }
 
@@ -357,7 +441,6 @@ function CertificateModal({
                   const mintFt = configData.mint;
 
                   isNotFt = mints?.find((m) => m.mint !== mintFt.toString());
-
                   const pdfResponse = await doGenerateBurnMetadata(
                     publicKey.toBase58(),
                     {
@@ -408,14 +491,6 @@ function CertificateModal({
                         {
                           trait_type: 'amount',
                           value: amount.toString(),
-                        },
-                        {
-                          trait_type: 'project_type',
-                          value: projectType,
-                        },
-                        {
-                          trait_type: 'project_location',
-                          value: projectLocation,
                         },
                         { trait_type: 'file', value: pdfResponse.data.url },
                         {
@@ -660,8 +735,6 @@ function CertificateModal({
                 mutate();
                 globalMutate([QUERY_KEYS.USER.GET_PROFILE_INFO, publicKey]);
                 setName('');
-                setProjectType('');
-                setProjectLocation('');
                 setReason('');
                 setAddress('');
                 setCountry('');
@@ -708,14 +781,6 @@ function CertificateModal({
                 setName={setName}
                 isNameInvalid={isNameInvalid}
                 setIsNameInvalid={setIsNameInvalid}
-                projectType={projectType}
-                setProjectType={setProjectType}
-                isProjectTypeInvalid={isProjectTypeInvalid}
-                setIsProjectTypeInvalid={setIsProjectTypeInvalid}
-                projectLocation={projectLocation}
-                setProjectLocation={setProjectLocation}
-                isProjectLocationInvalid={isProjectLocationInvalid}
-                setIsProjectLocationInvalid={setIsProjectLocationInvalid}
                 reason={reason}
                 setReason={setReason}
                 country={country}
@@ -723,6 +788,7 @@ function CertificateModal({
                 isCountryInvalid={isCountryInvalid}
                 setIsCountryInvalid={setIsCountryInvalid}
                 loading={loading}
+                projects={projects as ProjectsType}
               />
             </Tab>
             <Tab key="corporate" title="Corporation">
@@ -732,14 +798,6 @@ function CertificateModal({
                 setName={setName}
                 isNameInvalid={isNameInvalid}
                 setIsNameInvalid={setIsNameInvalid}
-                projectType={projectType}
-                setProjectType={setProjectType}
-                isProjectTypeInvalid={isProjectTypeInvalid}
-                setIsProjectTypeInvalid={setIsProjectTypeInvalid}
-                projectLocation={projectLocation}
-                setProjectLocation={setProjectLocation}
-                isProjectLocationInvalid={isProjectLocationInvalid}
-                setIsProjectLocationInvalid={setIsProjectLocationInvalid}
                 reason={reason}
                 setReason={setReason}
                 address={address}
@@ -751,6 +809,7 @@ function CertificateModal({
                 isCountryInvalid={isCountryInvalid}
                 setIsCountryInvalid={setIsCountryInvalid}
                 loading={loading}
+                projects={projects as ProjectsType}
               />
             </Tab>
           </Tabs>
@@ -776,4 +835,4 @@ function CertificateModal({
   );
 }
 
-export default CertificateModal;
+export default memo(CertificateModal);

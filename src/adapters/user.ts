@@ -92,7 +92,7 @@ interface IGetListBurnTxResponse extends Response {
   };
   data?: {
     group_tx: string;
-    amount: number;
+    metadata_amount: number;
     txs: string[];
     metadata_uri?: string;
     metadata?: Metadata;

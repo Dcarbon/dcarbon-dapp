@@ -51,7 +51,7 @@ const txColumns = [
     label: 'Date',
   },
   {
-    key: 'amount',
+    key: 'metadata_amount',
     label: 'Token DCO2',
   },
   {
@@ -153,6 +153,7 @@ const BurnTransaction = () => {
     metadata?: Metadata,
     uri?: string,
   ) => {
+    console.info('mee', metadata?.attributes[1].value);
     if (!publicKey || !wallet || !anchorWallet || !connection) {
       ShowAlert.error({ message: 'Please connect to wallet first!' });
       return;
@@ -283,7 +284,7 @@ const BurnTransaction = () => {
       let cellValue = user[columnKey as keyof any];
 
       switch (columnKey) {
-        case 'amount': {
+        case 'metadata_amount': {
           return (
             <div className="relative flex gap-2 items-center text-base">
               <Image
@@ -296,7 +297,7 @@ const BurnTransaction = () => {
                 className="min-w-[24px]"
               />
               <span className="text-base">
-                {(+user?.amount || 0)?.toLocaleString('en-US')}
+                {(+user?.metadata_amount || 0)?.toLocaleString('en-US')}
               </span>
             </div>
           );
@@ -353,7 +354,7 @@ const BurnTransaction = () => {
                   retryMintNft(
                     index,
                     user?.group_tx,
-                    user?.amount || 0,
+                    user?.metadata_amount || 0,
                     user?.mints,
                     user?.txs,
                     user?.metadata,
